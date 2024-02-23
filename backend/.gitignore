@@ -25,6 +25,10 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+*.yml
+CustomOAuth2AuthorizedClientService.java
+CustomClientRegistrationRepo.java
+SocialClientRegistration.java
 
 ### NetBeans ###
 /nbproject/private/
