@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import Greeter from "./components/Greeter";
 import ShoppingList from "./components/ShoppingList";
+import Item from "./components/item";
+
 function App() {
-  const items = [
-    { id: 1, product: "Lemon", quantity: 3 },
-    { id: 2, product: "Apple", quantity: 2 },
-  ];
+  const [items, setItems] = useState<Item[]>([]);
 
   return (
     <div className="App">
-      {/* <ShoppingList items={items} /> */}
+      <ShoppingList items={items} />
       <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>
       <br />
       <a href="http://localhost:8080/login/oauth2/code/naver">Naver Login</a>
