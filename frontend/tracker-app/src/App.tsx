@@ -10,7 +10,10 @@ function App() {
 
   return (
     <div className="App">
-      <ShoppingList items={items} />
+      {/* <ShoppingList items={items} /> */}
+      <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>
+      <br />
+      <a href="http://localhost:8080/login/oauth2/code/naver">Naver Login</a>
     </div>
   );
 }
