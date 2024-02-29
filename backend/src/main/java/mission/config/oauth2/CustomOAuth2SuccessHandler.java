@@ -1,13 +1,12 @@
 package mission.config.oauth2;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import mission.dto.CustomOAuth2User;
 import mission.entity.RefreshTokenEntity;
-import mission.jwt.JWTUtil;
+import mission.config.jwt.JWTUtil;
 import mission.repository.RefreshTokenRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,19 +46,13 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 .email(email)
                 .build());
 
-        response.addCookie(createCookie("AccessToken", accessToken));
-        response.addCookie(createCookie("RefreshToken", refreshToken));
+        System.out.println(accessToken);
+
+        response.setHeader("AccessToken", accessToken);
+
+        response.addCookie(jwtUtil.createJwtCookie("RefreshToken", refreshToken));
         response.sendRedirect("http://localhost:8080/");
     }
 
-    private Cookie createCookie(String key, String value) {
 
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
-    }
 }

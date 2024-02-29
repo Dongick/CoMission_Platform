@@ -1,16 +1,17 @@
 package mission.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @ResponseBody
 public class AdminController {
 
-    @GetMapping("/admin")
-    public String adminP(){
+    @GetMapping("/test")
+    public ResponseEntity<String> adminP(){
 
-        return "admin Controller";
+        return ResponseEntity.ok("test good");
     }
 }
