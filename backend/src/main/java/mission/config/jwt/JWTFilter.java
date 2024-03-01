@@ -93,6 +93,7 @@ public class JWTFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // JWT 토큰을 이용해 사용자 정보를 추출 후 보안 컨텍스트에 등록
     private void setAuthentication(String token) {
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
@@ -112,6 +113,7 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 
+    // JWT 관련 에러메세지 작성
     private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String error, String message) throws IOException {
         ResponseEntity<String> errorResponse = ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -122,6 +124,7 @@ public class JWTFilter extends OncePerRequestFilter {
         response.getWriter().write(errorResponse.getBody());
     }
 
+    // cookie에 존재하는 RefreshToken 가져오기
     private String getRefreshToken(HttpServletRequest request) {
         String refreshToken = null;
 
@@ -141,6 +144,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
     }
 
+    // RefreshToken이 정상이고 만료되지 않았으면 새로운 AccessToken 발급 및 한번 사용된 RefreshToken 갱신
     private Boolean refreshTokenHandler(HttpServletResponse response, String refreshToken) {
         JwtTokenValidationResult refreshValidation = jwtUtil.refreshTokenValidation(refreshToken);
 

@@ -31,21 +31,25 @@ public class JWTUtil {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    // JWT 토큰에서 username 추출
     public String getUsername(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
 
+    // JWT 토큰에서 권한 추출
     public String getRole(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
+    // JWT 토큰에서 email 추출
     public String getEmail(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
     }
 
+    // JWT 토큰 인증 메서드
     public JwtTokenValidationResult tokenValidation(String token) {
 
         try{
@@ -60,6 +64,7 @@ public class JWTUtil {
         }
     }
 
+    // RefreshToken 추가 인증 메서드
     public JwtTokenValidationResult refreshTokenValidation(String token) {
 
         JwtTokenValidationResult validation = tokenValidation(token);
@@ -78,11 +83,13 @@ public class JWTUtil {
         }
     }
 
+    // DB에 존재하는 RefreshToken 삭제 메서드
     @Transactional
     public void deleteRefreshToken(String refreshToken) {
         refreshTokenRepository.deleteByRefreshToken(refreshToken);
     }
 
+    // DB에 존재하는 한번 사용된 RefreshToken 갱신 메서드
     @Transactional
     public void updateRefreshToken(String refreshToken, String email) {
         Optional<RefreshTokenEntity> existingToken = refreshTokenRepository.findByEmail(email);
@@ -94,6 +101,7 @@ public class JWTUtil {
         }
     }
 
+    // RefreshToken cookie 생성 메서드
     public Cookie createJwtCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
@@ -105,6 +113,7 @@ public class JWTUtil {
         return cookie;
     }
 
+    // JWT 토큰 생성 메서드
     public String createJwt(String username, String role, String email, String type) {
 
         long time = type.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
