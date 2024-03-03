@@ -19,7 +19,6 @@ const GlobalStyle = createGlobalStyle`
   height: 100%;
   }
   body{
-    line-height: 1;
     background-color: #F6F9F0;
     /* margin-bottom: 100px; */
   }

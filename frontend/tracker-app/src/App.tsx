@@ -10,7 +10,6 @@ import Item from "./components/item";
 import ShoppingListForm from "./components/ShoppingListForm";
 import { v4 as uuid4 } from "uuid";
 
-const SimpleButton = styled.button``;
 function App() {
   const [items, setItems] = useState<Item[]>([]);
   const AddItem = (product: string) => {
