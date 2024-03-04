@@ -2,6 +2,10 @@ package mission.service;
 
 import lombok.RequiredArgsConstructor;
 import mission.dto.*;
+import mission.dto.oauth2.CustomOAuth2User;
+import mission.dto.oauth2.GoogleResponse;
+import mission.dto.oauth2.NaverResponse;
+import mission.dto.oauth2.OAuth2Response;
 import mission.entity.UserEntity;
 import mission.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -9,6 +13,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -35,9 +41,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         String userEmail = oAuth2Response.getEmail();
-        UserEntity existData = userRepository.findByEmail(userEmail);
+        Optional<UserEntity> existDataOptional = userRepository.findByEmail(userEmail);
 
-        if(existData == null) {
+        if(existDataOptional.isEmpty()) {
 
             userRepository.save(UserEntity.builder()
                     .email(userEmail)
@@ -46,13 +52,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build());
         }
         else {
+            UserEntity existData = existDataOptional.get();
 
             existData.setEmail(oAuth2Response.getEmail());
             existData.setUsername(oAuth2Response.getName());
 
             userRepository.save(existData);
         }
-        return new CustomOAuth2User(UserDto.builder()
+        return new CustomOAuth2User(User.builder()
                 .email(oAuth2Response.getEmail())
                 .role("ROLE_USER")
                 .name(oAuth2Response.getName())

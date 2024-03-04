@@ -1,8 +1,8 @@
-package mission.dto;
+package mission.dto.user;
 
 import lombok.Getter;
 
 @Getter
-public class LogoutDto {
+public class UserLogoutRequest {
     private String email;
 }

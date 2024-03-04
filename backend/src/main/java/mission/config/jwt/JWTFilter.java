@@ -6,8 +6,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import mission.dto.CustomOAuth2User;
-import mission.dto.UserDto;
+import mission.dto.oauth2.CustomOAuth2User;
+import mission.dto.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
 
-        if (requestUri.matches("^\\/login(?:\\/.*)?$") || requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
 
             filterChain.doFilter(request, response);
             return;
@@ -100,7 +100,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String email = jwtUtil.getEmail(token);
 
         //UserDetails에 회원 정보 객체 담기
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(UserDto.builder()
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(User.builder()
                 .name(username)
                 .role(role)
                 .email(email)

@@ -4,7 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import mission.dto.CustomOAuth2User;
+import mission.dto.oauth2.CustomOAuth2User;
 import mission.entity.RefreshTokenEntity;
 import mission.config.jwt.JWTUtil;
 import mission.repository.RefreshTokenRepository;
@@ -51,7 +51,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         response.setHeader("AccessToken", accessToken);
 
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", refreshToken));
-        response.sendRedirect("http://localhost:8080/");
+        response.sendRedirect("http://localhost:3000/");
     }
 
 

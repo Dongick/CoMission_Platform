@@ -22,8 +22,8 @@ public class JWTUtil {
 
     private SecretKey secretKey;
     private final RefreshTokenRepository refreshTokenRepository;
-    private static final long ACCESS_TIME = 20 * 1000L;
-    private static final long REFRESH_TIME = 1 * 60 * 1000L;
+    private static final long ACCESS_TIME = 30 * 60 * 1000L;
+    private static final long REFRESH_TIME = 24 * 60 * 60 * 1000L;
 
     public JWTUtil(@Value("${spring.jwt.secret}")String secret, RefreshTokenRepository refreshTokenRepository) {
 
@@ -72,7 +72,6 @@ public class JWTUtil {
         if(validation == JwtTokenValidationResult.VALID) {
             Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenRepository.findByEmail(getEmail(token));
 
-            System.out.println(refreshTokenEntity.get().getEmail());
             if(refreshTokenEntity.isPresent() && token.equals(refreshTokenEntity.get().getRefreshToken())) {
                 return JwtTokenValidationResult.VALID;
             } else {
