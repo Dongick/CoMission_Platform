@@ -4,8 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import mission.dto.authentication.AuthenticationCreateRequest;
 import mission.dto.participant.ParticipantRequest;
-import mission.service.ParticipantService;
+import mission.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,23 +14,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/participant")
+@RequestMapping("/api/authentication")
 @RequiredArgsConstructor
-public class ParticipantController {
-    private final ParticipantService participantService;
+public class AuthenticationController {
+    private final AuthenticationService authenticationService;
 
-    @PostMapping("create")
+    @PostMapping("/create")
     @Operation(
-            summary = "미션 참가",
-            description = "기존 미션에 사용자 참가"
+            summary = "인증글 작성",
+            description = "해당 미션의 오늘의 인증글 작성"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "미션 참가 성공"),
-            @ApiResponse(responseCode = "400", description = "이미 종료된 미션이어서 미션 참가 실패"),
+            @ApiResponse(responseCode = "200", description = "인증글 작성 성공"),
+            @ApiResponse(responseCode = "400", description = "이미 오늘 인증글을 작성해서 인증글 작성 실패"),
             @ApiResponse(responseCode = "401", description = "토큰 만료")
     })
-    public ResponseEntity<String> participantMission(@RequestBody ParticipantRequest participantRequest) {
-        String result = participantService.participateMission(participantRequest);
+    public ResponseEntity<String> createAuthentication(@RequestBody AuthenticationCreateRequest authenticationCreateRequest) {
+        String result = authenticationService.createAuthentication(authenticationCreateRequest);
+
         if(result == "good") {
             return ResponseEntity.ok("good");
         } else {

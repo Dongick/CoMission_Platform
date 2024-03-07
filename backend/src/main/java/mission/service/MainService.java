@@ -1,8 +1,8 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
-import mission.dto.main.MainInitialResponse;
-import mission.dto.mission.MissionInitialInfo;
+import mission.dto.main.MainResponse;
+import mission.dto.mission.MissionInfo;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.dto.participant.ParticipantMissionId;
 import mission.repository.MissionRepository;
@@ -22,11 +22,11 @@ public class MainService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
 
-    public MainInitialResponse getInitialMissionList() {
+    public MainResponse getInitialMissionList() {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<MissionInitialInfo> participantMissionInfoList = null;
+        List<MissionInfo> participantMissionInfoList = null;
 
         if(principal instanceof CustomOAuth2User) {
             CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -45,10 +45,10 @@ public class MainService {
 
         Pageable pageable = PageRequest.of(0, 20);
 
-        List<MissionInitialInfo> missionInitialInfoList = missionRepository.findAllByOrderByCreatedAtAsc(pageable);
+        List<MissionInfo> missionInfoList = missionRepository.findAllByOrderByCreatedAtAsc(pageable);
 
-        MainInitialResponse mainInitialResponse = new MainInitialResponse(participantMissionInfoList, missionInitialInfoList);
+        MainResponse mainResponse = new MainResponse(participantMissionInfoList, missionInfoList);
 
-        return mainInitialResponse;
+        return mainResponse;
     }
 }

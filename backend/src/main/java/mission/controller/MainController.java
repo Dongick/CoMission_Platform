@@ -4,13 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import mission.dto.main.MainInitialResponse;
-import mission.dto.mission.MissionInitialInfo;
+import mission.dto.main.MainResponse;
 import mission.service.MainService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/main")
@@ -28,9 +25,9 @@ public class MainController {
             @ApiResponse(responseCode = "200", description = "미션 정보 제공 성공"),
             @ApiResponse(responseCode = "401", description = "토큰 만료")
     })
-    public ResponseEntity<MainInitialResponse> getInitialList() {
-        MainInitialResponse mainInitialResponse = mainService.getInitialMissionList();
+    public ResponseEntity<MainResponse> getInitialList() {
+        MainResponse mainResponse = mainService.getInitialMissionList();
 
-        return ResponseEntity.ok(mainInitialResponse);
+        return ResponseEntity.ok(mainResponse);
     }
 }

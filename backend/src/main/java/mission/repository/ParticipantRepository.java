@@ -13,4 +13,6 @@ public interface ParticipantRepository extends MongoRepository<ParticipantDocume
     List<ParticipantMissionId> findByEmail(String email);
 
     List<ParticipantDocument> findByMissionId(ObjectId missionId);
+
+    ParticipantDocument findByMissionIdAndUserEmail(ObjectId missionId, String userEmail);
 }

@@ -2,10 +2,8 @@ package mission.dto.mission;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-public class MissionInitialInfo {
+public class MissionInfo {
     private String title;
     private int minParticipants;
     private int participants;
