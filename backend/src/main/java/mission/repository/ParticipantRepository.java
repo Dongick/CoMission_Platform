@@ -11,4 +11,6 @@ import java.util.List;
 public interface ParticipantRepository extends MongoRepository<ParticipantDocument, ObjectId> {
     @Query(value = "{status: {$ne: 'COMPLETED'}}", fields="{missionId:1}")
     List<ParticipantMissionId> findByEmail(String email);
+
+    List<ParticipantDocument> findByMissionId(ObjectId missionId);
 }

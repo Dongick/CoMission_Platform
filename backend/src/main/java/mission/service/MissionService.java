@@ -8,6 +8,7 @@ import mission.dto.mission.MissionCreateRequest;
 import mission.enums.MissionStatus;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,63 +34,65 @@ public class MissionService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        MissionDocument missionDocument;
+        MissionDocument missionDocument = saveMission(missionCreateRequest, now);
 
         if (missionCreateRequest.getMinParticipants() == 1) {
-            LocalDate deadline = now.toLocalDate().plusDays(missionCreateRequest.getDuration());
 
-            missionDocument = missionRepository.save(MissionDocument.builder()
-                    .createdAt(now)
-                    .creatorEmail(missionCreateRequest.getCreatorEmail())
-                    .duration(missionCreateRequest.getDuration())
-                    .deadline(deadline)
-                    .description(missionCreateRequest.getDescription())
-                    .title(missionCreateRequest.getTitle())
-                    .frequency(missionCreateRequest.getFrequency())
-                    .status(MissionStatus.STARTED.name())
-                    .startDate(LocalDate.from(now))
-                    .minParticipants(missionCreateRequest.getMinParticipants())
-                    .build());
-
-            List<Authentication> authenticationList = new ArrayList<>();
-
-            Authentication authentication = Authentication.builder()
-                    .date(LocalDate.from(now))
-                    .completed(false)
-                    .photoData(null)
-                    .textData(null)
-                    .build();
-
-            authenticationList.add(authentication);
-
-            participantRepository.save(ParticipantDocument.builder()
-                    .missionId(missionDocument.getId())
-                    .joinedAt(now)
-                    .userEmail(missionCreateRequest.getCreatorEmail())
-                    .authentication(authenticationList)
-                    .build());
-
+            saveParticipantAndAuthentication(missionDocument.getId(), now, missionCreateRequest.getCreatorEmail());
         } else {
-            missionDocument = missionRepository.save(MissionDocument.builder()
-                    .createdAt(now)
-                    .creatorEmail(missionCreateRequest.getCreatorEmail())
-                    .duration(missionCreateRequest.getDuration())
-                    .deadline(null)
-                    .description(missionCreateRequest.getDescription())
-                    .title(missionCreateRequest.getTitle())
-                    .frequency(missionCreateRequest.getFrequency())
-                    .status(MissionStatus.CREATED.name())
-                    .startDate(null)
-                    .minParticipants(missionCreateRequest.getMinParticipants())
-                    .build());
 
-            participantRepository.save(ParticipantDocument.builder()
-                    .missionId(missionDocument.getId())
-                    .joinedAt(now)
-                    .userEmail(missionCreateRequest.getCreatorEmail())
-                    .authentication(new ArrayList<>())
-                    .build());
+            saveParticipant(missionDocument.getId(), now, missionCreateRequest.getCreatorEmail());
         }
+
+    }
+
+    private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now) {
+        MissionDocument missionDocument = MissionDocument.builder()
+                .createdAt(now)
+                .creatorEmail(request.getCreatorEmail())
+                .duration(request.getDuration())
+                .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
+                .description(request.getDescription())
+                .title(request.getTitle())
+                .frequency(request.getFrequency())
+                .status(request.getMinParticipants() == 1 ? MissionStatus.STARTED.name() : MissionStatus.CREATED.name())
+                .startDate(request.getMinParticipants() == 1 ? LocalDate.from(now) : null)
+                .minParticipants(request.getMinParticipants())
+                .participants(1)
+                .build();
+
+        return missionRepository.save(missionDocument);
+    }
+
+    private void saveParticipantAndAuthentication(ObjectId missionId, LocalDateTime now, String userEmail) {
+        List<Authentication> authenticationList = createAuthenticationList(now);
+
+        participantRepository.save(ParticipantDocument.builder()
+                .missionId(missionId)
+                .joinedAt(now)
+                .userEmail(userEmail)
+                .authentication(authenticationList)
+                .build());
+    }
+
+    private List<Authentication> createAuthenticationList(LocalDateTime now) {
+        Authentication authentication = Authentication.builder()
+                .date(LocalDate.from(now))
+                .completed(false)
+                .photoData(null)
+                .textData(null)
+                .build();
+
+        return List.of(authentication);
+    }
+
+    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail) {
+        participantRepository.save(ParticipantDocument.builder()
+                .missionId(missionId)
+                .joinedAt(now)
+                .userEmail(userEmail)
+                .authentication(new ArrayList<>())
+                .build());
     }
 
 }

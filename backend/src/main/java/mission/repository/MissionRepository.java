@@ -15,4 +15,6 @@ public interface MissionRepository extends MongoRepository<MissionDocument, Obje
 
     @Query(value= "{status: {$ne: 'COMPLETED'}}", fields="{title:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
     List<MissionInitialInfo> findByMissionIdInOrderByCreatedAtAsc(List<ObjectId> missionIdList);
+
+    MissionDocument findByTitle(String title);
 }
