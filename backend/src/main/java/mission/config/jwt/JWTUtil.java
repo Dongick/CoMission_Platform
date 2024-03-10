@@ -22,7 +22,7 @@ public class JWTUtil {
 
     private SecretKey secretKey;
     private final RefreshTokenRepository refreshTokenRepository;
-    private static final long ACCESS_TIME = 30 * 60 * 1000L;
+    private static final long ACCESS_TIME = 10 * 1000L;
     private static final long REFRESH_TIME = 24 * 60 * 60 * 1000L;
 
     public JWTUtil(@Value("${spring.jwt.secret}")String secret, RefreshTokenRepository refreshTokenRepository) {

@@ -1,15 +1,18 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
-import mission.document.Authentication;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.mission.MissionCreateRequest;
+import mission.dto.mission.MissionInfoResponse;
+import mission.dto.mission.MissionUpdateRequest;
+import mission.dto.oauth2.CustomOAuth2User;
 import mission.enums.MissionStatus;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import org.bson.types.ObjectId;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,63 @@ public class MissionService {
 
         saveParticipant(missionDocument.getId(), now, missionCreateRequest.getCreatorEmail());
 
+    }
+
+    @Transactional
+    public void updateMission(MissionUpdateRequest missionUpdateRequest) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(principal instanceof CustomOAuth2User) {
+            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+            String userEmail = customOAuth2User.getEmail();
+
+            MissionDocument missionDocument = missionRepository.findByTitle(missionUpdateRequest.getBeforeTitle());
+
+            if(missionDocument.getCreatorEmail() == userEmail) {
+                missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
+                missionDocument.setDescription(missionUpdateRequest.getDescription());
+                missionDocument.setDuration(missionUpdateRequest.getDuration());
+                missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
+                missionDocument.setFrequency(missionUpdateRequest.getFrequency());
+
+                missionRepository.save(missionDocument);
+            }
+
+        }
+    }
+
+    @Transactional
+    public MissionInfoResponse missionInfo(String title) {
+        Boolean participant = false;
+
+        MissionDocument missionDocument = missionRepository.findByTitle(title);
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(principal != null && principal instanceof CustomOAuth2User) {
+            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+            String userEmail = customOAuth2User.getEmail();
+
+            ParticipantDocument participantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+
+            if(participantDocument != null) {
+                participant = true;
+            }
+        }
+
+        MissionInfoResponse missionInfoResponse = MissionInfoResponse.builder()
+                .title(missionDocument.getTitle())
+                .description(missionDocument.getDescription())
+                .minParticipants(missionDocument.getMinParticipants())
+                .participants(missionDocument.getParticipants())
+                .frequency(missionDocument.getFrequency())
+                .duration(missionDocument.getDuration())
+                .status(missionDocument.getStatus())
+                .deadline(missionDocument.getDeadline())
+                .participant(participant)
+                .build();
+
+        return missionInfoResponse;
     }
 
     private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now) {

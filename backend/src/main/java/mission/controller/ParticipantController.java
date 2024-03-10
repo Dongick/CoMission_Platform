@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParticipantController {
     private final ParticipantService participantService;
 
-    @PostMapping("create")
+    @PostMapping("/create")
     @Operation(
             summary = "미션 참가",
             description = "기존 미션에 사용자 참가"
