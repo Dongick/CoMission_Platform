@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,25 +23,24 @@ public class MainService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
 
+    @Transactional
     public MainResponse getInitialMissionList() {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
+
         List<MissionInfo> participantMissionInfoList = null;
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        List<ParticipantMissionId> participantMissionIdList = participantRepository.findByUserEmailAndStatsNot(userEmail);
 
-            List<ParticipantMissionId> participantMissionIdList = participantRepository.findByEmail(userEmail);
+        List<ObjectId> missionIdList = participantMissionIdList.stream()
+                .map(ParticipantMissionId::getMissionId)
+                .collect(Collectors.toList());
 
-            List<ObjectId> missionIdList = participantMissionIdList.stream()
-                    .map(ParticipantMissionId::getMissionId)
-                    .collect(Collectors.toList());
-
-            if(!missionIdList.isEmpty()) {
-                participantMissionInfoList = missionRepository.findByMissionIdInOrderByCreatedAtAsc(missionIdList);
-            }
+        if(!missionIdList.isEmpty()) {
+            participantMissionInfoList = missionRepository.findByMissionIdInOrderByCreatedAtAsc(missionIdList);
         }
 
         Pageable pageable = PageRequest.of(0, 20);

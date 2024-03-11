@@ -7,12 +7,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParticipantRepository extends MongoRepository<ParticipantDocument, ObjectId> {
-    @Query(value = "{status: {$ne: 'COMPLETED'}}", fields="{missionId:1}")
-    List<ParticipantMissionId> findByEmail(String email);
+    @Query(value = "{userEmail: ?0, status: {$ne: 'COMPLETED'}}", fields="{missionId:1}")
+    List<ParticipantMissionId> findByUserEmailAndStatsNot(String email);
 
     List<ParticipantDocument> findByMissionId(ObjectId missionId);
 
-    ParticipantDocument findByMissionIdAndUserEmail(ObjectId missionId, String userEmail);
+    Optional<ParticipantDocument> findByMissionIdAndUserEmail(ObjectId missionId, String userEmail);
 }

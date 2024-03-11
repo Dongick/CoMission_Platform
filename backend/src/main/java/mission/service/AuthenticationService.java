@@ -6,6 +6,9 @@ import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.authentication.*;
 import mission.dto.oauth2.CustomOAuth2User;
+import mission.exception.BadRequestException;
+import mission.exception.ErrorCode;
+import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,128 +26,116 @@ public class AuthenticationService {
     private final MissionRepository missionRepository;
 
     @Transactional
-    public String createAuthentication(AuthenticationCreateRequest authenticationCreateRequest) {
+    public void createAuthentication(AuthenticationCreateRequest authenticationCreateRequest, String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(authenticationCreateRequest.getTitle());
+        MissionDocument missionDocument = getMissionDocument(title);
 
-            ParticipantDocument participantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
 
-            List<Authentication> authenticationList = participantDocument.getAuthentication();
+        List<Authentication> authenticationList = participantDocument.getAuthentication();
 
-            if(!authenticationList.isEmpty()) {
-                Authentication lastAuthentication = participantDocument.getAuthentication().get(authenticationList.size() - 1);
+        if(!authenticationList.isEmpty()) {
+            Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
-                if(lastAuthentication.getDate().isEqual(now)) {
-                    return "bad";
-                }
+            if(lastAuthentication.getDate().isEqual(now)) {
+                throw new BadRequestException(ErrorCode.DUPLICATE_AUTHENTICATION, ErrorCode.DUPLICATE_AUTHENTICATION.getMessage());
             }
-
-            authenticationList.add(saveAuthentication(now, authenticationCreateRequest.getPhotoData(), authenticationCreateRequest.getTextData()));
-            participantRepository.save(participantDocument);
-
         }
 
-        return "good";
+        authenticationList.add(saveAuthentication(now, authenticationCreateRequest.getPhotoData(), authenticationCreateRequest.getTextData()));
+        participantRepository.save(participantDocument);
     }
 
     @Transactional
-    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest) {
+    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest, String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(authenticationUpdateRequest.getTitle());
+        MissionDocument missionDocument = getMissionDocument(title);
 
-            ParticipantDocument participantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
 
-            List<Authentication> authenticationList = participantDocument.getAuthentication();
+        List<Authentication> authenticationList = participantDocument.getAuthentication();
 
-            if(!authenticationList.isEmpty()) {
-                Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
+        if(!authenticationList.isEmpty()) {
+            Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
-                if(lastAuthentication.getDate().isEqual(now)) {
-                    lastAuthentication.setPhotoData(authenticationUpdateRequest.getPhotoData());
-                    lastAuthentication.setTextData(authenticationUpdateRequest.getTextData());
+            if(lastAuthentication.getDate().isEqual(now)) {
+                lastAuthentication.setPhotoData(authenticationUpdateRequest.getPhotoData());
+                lastAuthentication.setTextData(authenticationUpdateRequest.getTextData());
 
-                    participantRepository.save(participantDocument);
-                }
+                participantRepository.save(participantDocument);
+            } else {
+                throw new NotFoundException(ErrorCode.AUTHENTICATION_NOT_FOUND, ErrorCode.AUTHENTICATION_NOT_FOUND.getMessage());
+
             }
-
+        } else {
+            throw new NotFoundException(ErrorCode.AUTHENTICATION_NOT_FOUND, ErrorCode.AUTHENTICATION_NOT_FOUND.getMessage());
         }
     }
 
     @Transactional
-    public void deleteAuthentication(AuthenticationDeleteRequest authenticationDeleteRequest) {
+    public void deleteAuthentication(String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(authenticationDeleteRequest.getTitle());
+        MissionDocument missionDocument = getMissionDocument(title);
 
-            ParticipantDocument participantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
 
-            List<Authentication> authenticationList = participantDocument.getAuthentication();
+        List<Authentication> authenticationList = participantDocument.getAuthentication();
 
-            if(!authenticationList.isEmpty()) {
-                Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
+        if(!authenticationList.isEmpty()) {
+            Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
-                if(lastAuthentication.getDate().isEqual(now)) {
-                    authenticationList.remove(authenticationList.size() - 1);
+            if(lastAuthentication.getDate().isEqual(now)) {
+                authenticationList.remove(authenticationList.size() - 1);
 
-                    participantRepository.save(participantDocument);
-                }
+                participantRepository.save(participantDocument);
+            } else {
+                throw new NotFoundException(ErrorCode.AUTHENTICATION_NOT_FOUND, ErrorCode.AUTHENTICATION_NOT_FOUND.getMessage());
+
             }
+        } else {
+            throw new NotFoundException(ErrorCode.AUTHENTICATION_NOT_FOUND, ErrorCode.AUTHENTICATION_NOT_FOUND.getMessage());
+
         }
     }
 
     public AuthenticationListResponse authenticationList(String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(title);
+        MissionDocument missionDocument = getMissionDocument(title);
 
-            List<ParticipantDocument> participantDocumentList = participantRepository.findByMissionId(missionDocument.getId());
+        getParticipantDocument(missionDocument, userEmail);
 
+        List<ParticipantDocument> participantDocumentList = participantRepository.findByMissionId(missionDocument.getId());
 
-            Map<LocalDate, List<Map<String, Object>>> result = groupAndSortAuthentications(participantDocumentList);
-            System.out.println(result);
+        Map<LocalDate, List<Map<String, Object>>> result = groupAndSortAuthentications(participantDocumentList);
 
-            return new AuthenticationListResponse(result);
-        } else {
-            return null;
-        }
+        return new AuthenticationListResponse(result);
     }
 
     public Map<LocalDate, List<Map<String, Object>>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
-//        return participantDocumentList.stream()
-//                .flatMap(participant -> participant.getAuthentication().stream()
-//                        .map(authentication -> new Object[]{participant.getUserEmail(), authentication})
-//                )
-//                .sorted(Comparator.comparing(o -> ((Authentication) o[1]).getDate()))
-//                .collect(Collectors.groupingBy(
-//                        o -> ((Authentication) o[1]).getDate(),
-//                        Collectors.groupingBy(o -> (String) o[0], Collectors.mapping(o -> (Authentication) o[1], Collectors.toList()))
-//                ));
 
         return participantDocumentList.stream()
                 .flatMap(participant -> participant.getAuthentication().stream()
@@ -168,13 +156,21 @@ public class AuthenticationService {
     }
 
     private Authentication saveAuthentication(LocalDate now, String photoData, String textData) {
-        Authentication authentication = Authentication.builder()
+        return Authentication.builder()
                 .date(now)
                 .completed(true)
                 .photoData(photoData)
                 .textData(textData)
                 .build();
+    }
 
-        return authentication;
+    private MissionDocument getMissionDocument(String title) {
+        return missionRepository.findByTitle(title)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
+    }
+
+    private ParticipantDocument getParticipantDocument(MissionDocument missionDocument, String userEmail) {
+        return participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PARTICIPANT_NOT_FOUND, ErrorCode.PARTICIPANT_NOT_FOUND.getMessage()));
     }
 }

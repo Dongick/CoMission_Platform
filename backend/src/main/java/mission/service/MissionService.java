@@ -8,6 +8,10 @@ import mission.dto.mission.MissionInfoResponse;
 import mission.dto.mission.MissionUpdateRequest;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.enums.MissionStatus;
+import mission.exception.ConflictException;
+import mission.exception.ErrorCode;
+import mission.exception.ForbiddenException;
+import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import org.bson.types.ObjectId;
@@ -20,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,39 +34,58 @@ public class MissionService {
 
     @Transactional
     public void createMission(MissionCreateRequest missionCreateRequest) {
-        if (missionCreateRequest == null || missionCreateRequest.getMinParticipants() <= 0) {
-            // 에러 처리: 요청이 유효하지 않은 경우
-            throw new IllegalArgumentException("Invalid mission create request");
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
+
+        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionCreateRequest.getTitle());
+
+        if(optionalMissionDocument.isPresent()) {
+            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
         }
 
         LocalDateTime now = LocalDateTime.now();
 
-        MissionDocument missionDocument = saveMission(missionCreateRequest, now);
+        MissionDocument missionDocument = saveMission(missionCreateRequest, now, userEmail);
 
-        saveParticipant(missionDocument.getId(), now, missionCreateRequest.getCreatorEmail());
-
+        saveParticipant(missionDocument.getId(), now, userEmail);
     }
 
     @Transactional
-    public void updateMission(MissionUpdateRequest missionUpdateRequest) {
+    public void updateMission(MissionUpdateRequest missionUpdateRequest, String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(missionUpdateRequest.getBeforeTitle());
+        MissionDocument missionDocument = getMissionDocument(title);
 
-            if(missionDocument.getCreatorEmail() == userEmail) {
-                missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
-                missionDocument.setDescription(missionUpdateRequest.getDescription());
-                missionDocument.setDuration(missionUpdateRequest.getDuration());
-                missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
-                missionDocument.setFrequency(missionUpdateRequest.getFrequency());
+        if(missionDocument.getStatus().equals(MissionStatus.STARTED.name())) {
+            throw new ConflictException(ErrorCode.MISSION_ALREADY_STARTED, ErrorCode.MISSION_ALREADY_STARTED.getMessage());
+        }
 
-                missionRepository.save(missionDocument);
-            }
+        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionUpdateRequest.getAfterTitle());
 
+        if(optionalMissionDocument.isPresent()) {
+            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
+        }
+
+        if(missionDocument.getCreatorEmail().equals(userEmail)) {
+            LocalDateTime now = LocalDateTime.now();
+
+            missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
+            missionDocument.setDescription(missionUpdateRequest.getDescription());
+            missionDocument.setDuration(missionUpdateRequest.getDuration());
+            missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
+            missionDocument.setFrequency(missionUpdateRequest.getFrequency());
+            missionDocument.setStatus(missionUpdateRequest.getMinParticipants() == 1 ? MissionStatus.STARTED.name() : MissionStatus.CREATED.name());
+            missionDocument.setStartDate(missionUpdateRequest.getMinParticipants() == 1 ? LocalDate.from(now) : null);
+            missionDocument.setDeadline(missionUpdateRequest.getMinParticipants() == 1 ? now.toLocalDate().plusDays(missionUpdateRequest.getDuration()) : null);
+
+            missionRepository.save(missionDocument);
+        } else {
+            throw new ForbiddenException(ErrorCode.MISSION_MODIFICATION_NOT_ALLOWED, ErrorCode.MISSION_MODIFICATION_NOT_ALLOWED.getMessage());
         }
     }
 
@@ -69,22 +93,20 @@ public class MissionService {
     public MissionInfoResponse missionInfo(String title) {
         Boolean participant = false;
 
-        MissionDocument missionDocument = missionRepository.findByTitle(title);
+        MissionDocument missionDocument = getMissionDocument(title);
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal != null && principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            ParticipantDocument participantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+        Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
 
-            if(participantDocument != null) {
-                participant = true;
-            }
+        if(optionalParticipantDocument.isPresent()) {
+            participant = true;
         }
 
-        MissionInfoResponse missionInfoResponse = MissionInfoResponse.builder()
+        return MissionInfoResponse.builder()
                 .title(missionDocument.getTitle())
                 .description(missionDocument.getDescription())
                 .minParticipants(missionDocument.getMinParticipants())
@@ -95,14 +117,12 @@ public class MissionService {
                 .deadline(missionDocument.getDeadline())
                 .participant(participant)
                 .build();
-
-        return missionInfoResponse;
     }
 
-    private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now) {
+    private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now, String userEmail) {
         MissionDocument missionDocument = MissionDocument.builder()
                 .createdAt(now)
-                .creatorEmail(request.getCreatorEmail())
+                .creatorEmail(userEmail)
                 .duration(request.getDuration())
                 .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
                 .description(request.getDescription())
@@ -130,6 +150,11 @@ public class MissionService {
         // 미션을 종료 상태로 변경
         mission.setStatus(MissionStatus.COMPLETED.name());
         missionRepository.save(mission);
+    }
+
+    private MissionDocument getMissionDocument(String title) {
+        return missionRepository.findByTitle(title)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행

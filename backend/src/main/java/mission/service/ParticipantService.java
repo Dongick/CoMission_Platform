@@ -7,6 +7,10 @@ import mission.document.ParticipantDocument;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.dto.participant.ParticipantRequest;
 import mission.enums.MissionStatus;
+import mission.exception.BadRequestException;
+import mission.exception.ConflictException;
+import mission.exception.ErrorCode;
+import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import org.bson.types.ObjectId;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,37 +30,45 @@ public class ParticipantService {
     private final MissionRepository missionRepository;
 
     @Transactional
-    public String participateMission(ParticipantRequest participantRequest) {
+    public void participateMission(ParticipantRequest participantRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-            String userEmail = customOAuth2User.getEmail();
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-            MissionDocument missionDocument = missionRepository.findByTitle(participantRequest.getTitle());
+        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(participantRequest.getTitle());
 
-            if(!(missionDocument.getStatus() == MissionStatus.COMPLETED.name())) {
-                int participants = missionDocument.getParticipants() + 1;
-                missionDocument.setParticipants(participants);
+        if(optionalMissionDocument.isEmpty()) {
+            throw new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage());
+        }
 
-                LocalDateTime now = LocalDateTime.now();
+        MissionDocument missionDocument = optionalMissionDocument.get();
 
-                if(participants == missionDocument.getMinParticipants()) {
+        if(!(missionDocument.getStatus().equals(MissionStatus.COMPLETED.name()))) {
 
-                    handleMissionStarted(missionDocument, now, userEmail);
-                } else {
+            Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
 
-                    saveParticipant(missionDocument.getId(), now, userEmail);
-                }
-
-                missionRepository.save(missionDocument);
-
-                return "good";
-            } else {
-                return "bad";
+            if(optionalParticipantDocument.isPresent()) {
+                throw new ConflictException(ErrorCode.ALREADY_PARTICIPATED, ErrorCode.ALREADY_PARTICIPATED.getMessage());
             }
+
+            int participants = missionDocument.getParticipants() + 1;
+            missionDocument.setParticipants(participants);
+
+            LocalDateTime now = LocalDateTime.now();
+
+            if(participants == missionDocument.getMinParticipants()) {
+
+                handleMissionStarted(missionDocument, now, userEmail);
+            } else {
+
+                saveParticipant(missionDocument.getId(), now, userEmail);
+            }
+
+            missionRepository.save(missionDocument);
+
         } else {
-            return "bad";
+            throw new BadRequestException(ErrorCode.MISSION_ALREADY_COMPLETED, ErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
         }
     }
 
