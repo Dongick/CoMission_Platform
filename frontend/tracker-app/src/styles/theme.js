@@ -6,12 +6,12 @@ export const size = {
 };
 
 export const theme = {
-  mainColor: "#6ABD8C",
-  mainColorLight: "#CCDFB0",
-  backgroundColor: "#F6F9F0",
-  darkGray: "#595959",
-  lightGray: "#939292",
-  superLightGray: "#F1F2F5",
+  mainBlue: "rgb(0, 30, 60)",
+  mainGray: "rgb(220,220,220)",
+  mainYellow: "rgb(255,236,102)",
+  subGreen: "rgb(72,247,155)",
+  subBlue: "rgb(115,242,255)",
+  subPink: "rgb(255,197,227)",
   typography: {
     fontFamily: ["Noto Sans KR", "GmarketSans", "sans-serif"].join(","),
   },
