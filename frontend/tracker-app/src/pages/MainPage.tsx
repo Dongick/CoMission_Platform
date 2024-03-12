@@ -5,9 +5,6 @@ const LoginPage = () => {
     <>
       <h1>This is MainPage</h1>
       <StyledButton bgColor={theme.mainBlue} color="white">
-        기모띠 Click me
-      </StyledButton>
-      <StyledButton bgColor={theme.mainGray} color="black">
         Click me
       </StyledButton>
       <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>

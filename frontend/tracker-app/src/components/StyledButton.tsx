@@ -3,6 +3,7 @@ import styled from "styled-components";
 interface ButtonProps {
   bgColor?: string;
   color?: string;
+  onClick?: () => void;
 }
 
 const StyledButton = styled.button<ButtonProps>`
