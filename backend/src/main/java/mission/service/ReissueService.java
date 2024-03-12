@@ -24,7 +24,7 @@ public class ReissueService {
 
     @Transactional
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
-        //get refresh token
+        // cookie에서 refresh token 찾음
         String refresh = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -35,6 +35,7 @@ public class ReissueService {
             }
         }
 
+        // 토큰이 존재하는지 확인
         if (refresh == null) {
 
             throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
@@ -42,7 +43,7 @@ public class ReissueService {
 
         System.out.println(refresh);
 
-        //expired check
+        // 토큰 만료 여부 확인
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {

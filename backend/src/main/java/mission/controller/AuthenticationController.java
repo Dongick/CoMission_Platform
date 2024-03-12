@@ -27,7 +27,8 @@ public class AuthenticationController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "인증글 작성 성공"),
-            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. VALIDATION_FAILED : 유효성 검사 실패 \t\n 2. DUPLICATE_AUTHENTICATION : 일일 인증글 중복",
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. VALIDATION_FAILED : 유효성 검사 실패 \t\n " +
+                    "3. DUPLICATE_AUTHENTICATION : 일일 인증글 중복 \t\n 4. MISSION_NOT_STARTED : 시작되지 않은 미션 \t\n 5. MISSION_ALREADY_COMPLETED : 이미 끝난 미션",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
@@ -50,7 +51,8 @@ public class AuthenticationController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증글 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. VALIDATION_FAILED : 유효성 검사 실패",
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. VALIDATION_FAILED : 유효성 검사 실패 \t\n " +
+                    "3. MISSION_NOT_STARTED : 시작되지 않은 미션 \t\n 4. MISSION_ALREADY_COMPLETED : 이미 끝난 미션",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
@@ -73,7 +75,7 @@ public class AuthenticationController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "206", description = "인증글 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류",
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. MISSION_NOT_STARTED : 시작되지 않은 미션 \t\n 3. MISSION_ALREADY_COMPLETED : 이미 끝난 미션",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
@@ -96,7 +98,7 @@ public class AuthenticationController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증글 보기 성공"),
-            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류",
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. MISSION_NOT_STARTED : 시작되지 않은 미션",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
