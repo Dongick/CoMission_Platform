@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/swagger-ui/**", "/oauth2/**", "/login/", "/join").permitAll()
+                        .requestMatchers("/api/main", "/api/mission/info/**", "/api/reissue", "/swagger-ui/**", "/v3/api-docs/**", "/login/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
@@ -78,6 +78,7 @@ public class SecurityConfig {
 
         //JWTFilter 추가
         http
+//                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
                 .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
 
 

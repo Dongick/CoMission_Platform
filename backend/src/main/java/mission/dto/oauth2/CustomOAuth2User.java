@@ -1,6 +1,7 @@
-package mission.dto;
+package mission.dto.oauth2;
 
 import lombok.AllArgsConstructor;
+import mission.dto.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class CustomOAuth2User implements OAuth2User {
 
-    private final UserDto userDto;
+    private final User user;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -26,7 +27,7 @@ public class CustomOAuth2User implements OAuth2User {
         collection.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return userDto.getRole();
+                return user.getRole();
             }
         });
 
@@ -36,10 +37,10 @@ public class CustomOAuth2User implements OAuth2User {
     @Override
     public String getName() {
 
-        return userDto.getName();
+        return user.getName();
     }
 
     public String getEmail() {
-        return userDto.getEmail();
+        return user.getEmail();
     }
 }

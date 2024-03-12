@@ -1,4 +1,4 @@
-package mission.dto;
+package mission.dto.oauth2;
 
 public interface OAuth2Response {
     // 제공자(Ex. naver, google, ...)

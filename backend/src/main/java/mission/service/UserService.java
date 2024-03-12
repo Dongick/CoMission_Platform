@@ -1,9 +1,7 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
-import mission.dto.CustomOAuth2User;
-import mission.dto.LogoutDto;
-import mission.config.jwt.JWTUtil;
+import mission.dto.oauth2.CustomOAuth2User;
 import mission.repository.RefreshTokenRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,16 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JWTUtil jwtUtil;
 
     @Transactional
-    public Boolean logout(LogoutDto logoutDto) {
+    public void logout() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        CustomOAuth2User id = (CustomOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(id.getEmail());
+        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+        String userEmail = customOAuth2User.getEmail();
 
-        refreshTokenRepository.deleteByEmail(id.getEmail());
-
-        return true;
+        refreshTokenRepository.deleteByEmail(userEmail);
     }
 }
