@@ -29,6 +29,7 @@ out/
 CustomOAuth2AuthorizedClientService.java
 CustomClientRegistrationRepo.java
 SocialClientRegistration.java
+*.jpg
 
 ### NetBeans ###
 /nbproject/private/

@@ -1,7 +1,6 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
-import mission.document.Authentication;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.oauth2.CustomOAuth2User;
@@ -29,6 +28,7 @@ public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final MissionRepository missionRepository;
 
+    // 미션 참가 매서드
     @Transactional
     public void participateMission(ParticipantRequest participantRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -38,16 +38,19 @@ public class ParticipantService {
 
         Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(participantRequest.getTitle());
 
+        // 미션이 존재하는지 확인
         if(optionalMissionDocument.isEmpty()) {
             throw new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage());
         }
 
         MissionDocument missionDocument = optionalMissionDocument.get();
 
+        // 해당 미션이 종료된 미션인지 확인
         if(!(missionDocument.getStatus().equals(MissionStatus.COMPLETED.name()))) {
 
             Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
 
+            // 해당 미션에 참여한 상태인지 확인
             if(optionalParticipantDocument.isPresent()) {
                 throw new ConflictException(ErrorCode.ALREADY_PARTICIPATED, ErrorCode.ALREADY_PARTICIPATED.getMessage());
             }
@@ -57,6 +60,7 @@ public class ParticipantService {
 
             LocalDateTime now = LocalDateTime.now();
 
+            // 해당 미션의 최소 참여자 수를 충족하면 미션을 시작 상태로 바꿈
             if(participants == missionDocument.getMinParticipants()) {
 
                 handleMissionStarted(missionDocument, now, userEmail);
@@ -72,6 +76,7 @@ public class ParticipantService {
         }
     }
 
+    // 미션 참여자 저장
     private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail) {
         participantRepository.save(ParticipantDocument.builder()
                 .missionId(missionId)
@@ -81,6 +86,7 @@ public class ParticipantService {
                 .build());
     }
 
+    // 최소 인원수를 만족한 미션을 시작으로 바꿈
     private void handleMissionStarted(MissionDocument missionDocument, LocalDateTime now, String userEmail) {
         LocalDate deadline = now.toLocalDate().plusDays(missionDocument.getDuration());
 
