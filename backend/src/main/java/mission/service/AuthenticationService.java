@@ -15,7 +15,9 @@ import mission.repository.ParticipantRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,10 +27,11 @@ import java.util.stream.Collectors;
 public class AuthenticationService {
     private final ParticipantRepository participantRepository;
     private final MissionRepository missionRepository;
+    private final FileService fileService;
 
     // 인증글 생성 매서드
     @Transactional
-    public void createAuthentication(AuthenticationCreateRequest authenticationCreateRequest, String title) {
+    public void createAuthentication(AuthenticationCreateRequest authenticationCreateRequest, MultipartFile file, String title) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -53,13 +56,15 @@ public class AuthenticationService {
             }
         }
 
-        authenticationList.add(saveAuthentication(now, authenticationCreateRequest.getPhotoData(), authenticationCreateRequest.getTextData()));
+        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
+
+        authenticationList.add(saveAuthentication(now, fileLocation, authenticationCreateRequest.getTextData()));
         participantRepository.save(participantDocument);
     }
 
     // 인증글 수정 매서드
     @Transactional
-    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest, String title) {
+    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest, MultipartFile file, String title) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -81,7 +86,15 @@ public class AuthenticationService {
 
             // 당일 인증글을 작성했는지 확인
             if(lastAuthentication.getDate().isEqual(now)) {
-                lastAuthentication.setPhotoData(authenticationUpdateRequest.getPhotoData());
+
+                // 기존 인증글에 사진 데이터가 존재하면 삭제
+                if (lastAuthentication.getPhotoData() != null) {
+                    fileService.deleteFile(lastAuthentication.getPhotoData());
+                }
+
+                String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
+
+                lastAuthentication.setPhotoData(fileLocation);
                 lastAuthentication.setTextData(authenticationUpdateRequest.getTextData());
 
                 participantRepository.save(participantDocument);
@@ -96,7 +109,7 @@ public class AuthenticationService {
 
     // 인증글 삭제 매서드
     @Transactional
-    public void deleteAuthentication(String title) {
+    public void deleteAuthentication(String title) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -118,6 +131,11 @@ public class AuthenticationService {
 
             // 당일 인증글을 작성했는지 확인
             if(lastAuthentication.getDate().isEqual(now)) {
+
+                if (lastAuthentication.getPhotoData() != null) {
+                    fileService.deleteFile(lastAuthentication.getPhotoData());
+                }
+
                 authenticationList.remove(authenticationList.size() - 1);
 
                 participantRepository.save(participantDocument);
@@ -153,7 +171,6 @@ public class AuthenticationService {
 
         return new AuthenticationListResponse(result);
     }
-
     // 인증글들을 형식에 맞춰 출력
     public Map<LocalDate, List<Map<String, Object>>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
 

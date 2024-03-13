@@ -11,8 +11,12 @@ import mission.dto.authentication.*;
 import mission.exception.ErrorResponse;
 import mission.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -38,8 +42,12 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> createAuthentication(final @Valid @RequestBody AuthenticationCreateRequest authenticationCreateRequest, @PathVariable String title) {
-        authenticationService.createAuthentication(authenticationCreateRequest, title);
+    public ResponseEntity<String> createAuthentication(
+            @Valid @RequestPart(value="textData") AuthenticationCreateRequest authenticationCreateRequest,
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData,
+            @PathVariable String title) throws IOException {
+
+        authenticationService.createAuthentication(authenticationCreateRequest, photoData, title);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
@@ -62,8 +70,11 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> updateAuthentication(final @Valid @RequestBody AuthenticationUpdateRequest authenticationUpdateRequest, @PathVariable String title) {
-        authenticationService.updateAuthentication(authenticationUpdateRequest, title);
+    public ResponseEntity<String> updateAuthentication(
+            @Valid @RequestPart(value="textData") AuthenticationUpdateRequest authenticationUpdateRequest,
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData,
+            @PathVariable String title) throws IOException {
+        authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, title);
 
         return ResponseEntity.ok("good");
     }
@@ -85,7 +96,7 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> deleteAuthentication(@PathVariable String title) {
+    public ResponseEntity<String> deleteAuthentication(@PathVariable String title) throws IOException {
         authenticationService.deleteAuthentication(title);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body("good");
