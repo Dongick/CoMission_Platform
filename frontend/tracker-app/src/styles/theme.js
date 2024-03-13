@@ -7,9 +7,9 @@ export const size = {
 
 export const theme = {
   mainBlue: "rgb(0, 30, 120)",
-  mainGray: "rgb(220,220,220)",
+  mainGray: "#F5F5F5",
   mainYellow: "rgb(255,236,102)",
-  subGreen: "rgb(72,247,155)",
+  subGreen: "#1DC078",
   subBlue: "rgb(115,242,255)",
   subPink: "rgb(255,197,227)",
   typography: {
