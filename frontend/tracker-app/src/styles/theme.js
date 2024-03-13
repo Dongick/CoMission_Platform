@@ -13,8 +13,8 @@ export const theme = {
   subBlue: "rgb(115,242,255)",
   subPink: "rgb(255,197,227)",
   typography: {
-    fontFamily: ["Noto Sans KR", "GmarketSans", "sans-serif"].join(","),
+    fontFamily: ["noto", "ubuntu"].join(","),
   },
-  boxShadow: "2px 2px 10px 2px rgba(0, 0, 0, 0.12)",
+  boxShadow: "1px 1px 5px 2px rgba(0, 0, 0, 0.10)",
   boxShadowHover: "3px 3px 10px 3px rgba(0, 0, 0, 0.25)",
 };

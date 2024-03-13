@@ -1,18 +1,21 @@
 import styled from "styled-components";
-
+import { theme } from "../styles/theme";
 interface ButtonProps {
-  bgColor?: string;
+  bgcolor?: string;
   color?: string;
-  onClick?: () => void;
 }
 
 const StyledButton = styled.button<ButtonProps>`
-  background-color: ${(props) => props.bgColor || "black"};
+  background-color: ${(props) => props.bgcolor || "black"};
   color: ${(props) => props.color || "white"};
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  &:hover {
+    box-shadow: ${theme.boxShadow};
+    filter: brightness(1.1);
+  }
 `;
 
 export default StyledButton;

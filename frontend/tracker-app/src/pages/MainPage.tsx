@@ -1,10 +1,13 @@
 import { theme } from "../styles/theme";
 import StyledButton from "../components/StyledButton";
 const LoginPage = () => {
+  const printMsg = () => {
+    console.log("clicked!!");
+  };
   return (
     <>
       <h1>This is MainPage</h1>
-      <StyledButton bgColor={theme.mainBlue} color="white">
+      <StyledButton bgcolor={theme.mainYellow} color="black" onClick={printMsg}>
         Click me
       </StyledButton>
       <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>

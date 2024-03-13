@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { theme } from "./theme";
 const GlobalStyle = createGlobalStyle`
   ${reset}
   *{
@@ -9,7 +10,7 @@ const GlobalStyle = createGlobalStyle`
     vertical-align: baseline;
     box-sizing: border-box;
     text-align: center;
-  }
+    font-family: ${theme.typography}
   a{
     text-decoration: none;
     color: inherit;
