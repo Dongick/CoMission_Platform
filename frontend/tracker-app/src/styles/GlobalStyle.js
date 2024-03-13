@@ -3,6 +3,9 @@ import reset from "styled-reset";
 import { theme } from "./theme";
 const GlobalStyle = createGlobalStyle`
   ${reset}
+  #root{
+    font-family: ${theme.typography.fontFamily}
+  }
   *{
     margin: 0;
     padding: 0;
@@ -10,7 +13,6 @@ const GlobalStyle = createGlobalStyle`
     vertical-align: baseline;
     box-sizing: border-box;
     text-align: center;
-    font-family: ${theme.typography}
   a{
     text-decoration: none;
     color: inherit;
@@ -19,10 +21,10 @@ const GlobalStyle = createGlobalStyle`
   font-size: 62.5%; // 1rem = 10px
   height: 100%;
   }
-  body{
+  /* body{
     background-color: #F6F9F0;
     /* margin-bottom: 100px; */
-  }
+  } */
   ol, ul, li{
     list-style: none;
   }

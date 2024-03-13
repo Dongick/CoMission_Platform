@@ -6,7 +6,7 @@ export const size = {
 };
 
 export const theme = {
-  mainBlue: "rgb(0, 30, 60)",
+  mainBlue: "rgb(0, 30, 120)",
   mainGray: "rgb(220,220,220)",
   mainYellow: "rgb(255,236,102)",
   subGreen: "rgb(72,247,155)",
