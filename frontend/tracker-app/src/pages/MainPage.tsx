@@ -3,7 +3,7 @@ import StyledButton from "../components/StyledButton";
 import Layout from "../layouts/Layout";
 import styled from "styled-components";
 import sectionSVG from "../assets/img/wave-haikei.svg";
-import StyledCard from "../components/StyledCard";
+import Card from "../components/Card";
 
 const SearchSection = styled.section`
   background-image: url(${sectionSVG});
@@ -18,17 +18,43 @@ const SearchSection = styled.section`
   flex-direction: column;
   justify-content: center;
 `;
+const Input = styled.input`
+  width: 25vw;
+  border-radius: 10px;
+  outline: none;
+  &:focus-visible {
+    outline: 1px solid ${theme.subGreen};
+    box-shadow: ${theme.boxShadowHover};
+  }
+`;
 const MainSection = styled.section`
-  background-color: ${theme.mainGray};
-  min-height: 50vh;
+  min-height: 100vh;
   padding: 5vh;
   width: 70%;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px; /* Adjust the gap between cards */
 `;
 const MainPage = () => {
-  const printMsg = () => {
-    console.log("clicked!!");
-  };
+  const cardsData = [
+    { title: "Title 1", author: "Author 1", people: 3 },
+    { title: "Title 2", author: "Author 2", people: 5 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    { title: "Title 3", author: "Author 3", people: 2 },
+    // Add more card data as needed
+  ];
   return (
     <Layout>
       <SearchSection>
@@ -41,11 +67,7 @@ const MainPage = () => {
             padding: "10px",
           }}
         >
-          <input
-            type="text"
-            placeholder="미션명 검색하기"
-            style={{ width: "25vw", borderRadius: "10px", outline: " none" }}
-          />
+          <Input type="text" placeholder="미션명 검색하기" />
           <StyledButton
             bgcolor={theme.subGreen}
             color="white"
@@ -56,15 +78,14 @@ const MainPage = () => {
         </div>
       </SearchSection>
       <MainSection>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
-        <StyledCard></StyledCard>
+        {cardsData.map((card, index) => (
+          <Card
+            key={index}
+            title={card.title}
+            author={card.author}
+            people={card.people}
+          />
+        ))}
       </MainSection>
       {/* <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>
       <br />
