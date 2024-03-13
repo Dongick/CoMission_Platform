@@ -7,12 +7,15 @@ const SearchSection = styled.section`
   background-image: url(${sectionSVG});
   background-size: cover; /* 원하는 크기로 이미지를 맞춥니다. */
   background-position: center; /* 이미지를 가운데 정렬합니다. */
-  height: 25vh;
+  height: 20vh;
   padding: 10px;
+  font-family: "gmarket2";
   font-size: 2rem;
-  font-weight: 400;
   color: #333;
   margin-bottom: 5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 const MainPage = () => {
   const printMsg = () => {
@@ -21,21 +24,25 @@ const MainPage = () => {
   return (
     <Layout>
       <SearchSection>
-        <h1>미션을 검색해보세요!</h1>
+        <div style={{ padding: "10px" }}>미션을 검색해보세요!</div>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
-            padding: "20px",
+            padding: "10px",
           }}
         >
           <input
             type="text"
             placeholder="미션명 검색하기"
-            style={{ width: "25%", borderRadius: "5px", outline: " none" }}
+            style={{ width: "25%", borderRadius: "10px", outline: " none" }}
           />
-          <StyledButton bgcolor={theme.subGreen} color="white">
+          <StyledButton
+            bgcolor={theme.subGreen}
+            color="white"
+            style={{ fontSize: "medium" }}
+          >
             검색
           </StyledButton>
         </div>

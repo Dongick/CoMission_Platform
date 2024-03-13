@@ -10,7 +10,8 @@ const StyledButton = styled.button<ButtonProps>`
   color: ${(props) => props.color || "white"};
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  font-family: "gmarket2";
+  border-radius: 10px;
   cursor: pointer;
   &:hover {
     box-shadow: ${theme.boxShadow};
