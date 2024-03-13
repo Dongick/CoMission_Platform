@@ -3,6 +3,8 @@ import StyledButton from "../components/StyledButton";
 import Layout from "../layouts/Layout";
 import styled from "styled-components";
 import sectionSVG from "../assets/img/wave-haikei.svg";
+import StyledCard from "../components/StyledCard";
+
 const SearchSection = styled.section`
   background-image: url(${sectionSVG});
   background-size: cover; /* 원하는 크기로 이미지를 맞춥니다. */
@@ -12,10 +14,16 @@ const SearchSection = styled.section`
   font-family: "gmarket2";
   font-size: 2rem;
   color: #333;
-  margin-bottom: 5vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+`;
+const MainSection = styled.section`
+  background-color: ${theme.mainGray};
+  min-height: 50vh;
+  padding: 5vh;
+  width: 70%;
+  margin: 0 auto;
 `;
 const MainPage = () => {
   const printMsg = () => {
@@ -36,7 +44,7 @@ const MainPage = () => {
           <input
             type="text"
             placeholder="미션명 검색하기"
-            style={{ width: "25%", borderRadius: "10px", outline: " none" }}
+            style={{ width: "25vw", borderRadius: "10px", outline: " none" }}
           />
           <StyledButton
             bgcolor={theme.subGreen}
@@ -47,10 +55,20 @@ const MainPage = () => {
           </StyledButton>
         </div>
       </SearchSection>
-
-      <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>
+      <MainSection>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+        <StyledCard></StyledCard>
+      </MainSection>
+      {/* <a href="http://localhost:8080/login/oauth2/code/google">Google Login</a>
       <br />
-      <a href="http://localhost:8080/login/oauth2/code/naver">Naver Login</a>
+      <a href="http://localhost:8080/login/oauth2/code/naver">Naver Login</a> */}
     </Layout>
   );
 };

@@ -8,6 +8,7 @@ const StyledHeader = styled.header`
   font-size: 6vh;
   padding: 5vh;
   margin: 0 auto;
+  font-style: italic;
 `;
 
 const Header = () => {
