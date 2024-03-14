@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
+import UserMenu from "../components/UserMenu";
 const StyledHeader = styled.header`
   background-color: white;
   color: ${theme.mainBlue};
@@ -13,9 +14,12 @@ const StyledHeader = styled.header`
 
 const Header = () => {
   return (
-    <>
-      <StyledHeader>Comission Platform</StyledHeader>
-    </>
+    <div style={{ position: "relative" }}>
+      <StyledHeader>
+        <h1>Comission Platform</h1>
+      </StyledHeader>
+      <UserMenu isLogin={true} />
+    </div>
   );
 };
 export default Header;
