@@ -33,7 +33,7 @@ const MainSection = styled.section`
   width: 70%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
   gap: 20px; /* Adjust the gap between cards */
 `;
 const MainPage = () => {
