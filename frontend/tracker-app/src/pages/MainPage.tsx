@@ -49,6 +49,7 @@ const MainPage = () => {
         {cardsData.map((card, index) => (
           <Card
             key={index}
+            id={index + 1}
             title={card.title}
             author={card.author}
             people={card.people}

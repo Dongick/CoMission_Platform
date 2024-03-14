@@ -4,9 +4,8 @@ import MissionDetail from "../pages/MissionDetail";
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<MainPage />}>
-        <Route path=":cardId" element={<MissionDetail />} />
-      </Route>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/mission/:cardId" element={<MissionDetail />} />
     </Routes>
   );
 };

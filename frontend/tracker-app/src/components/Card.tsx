@@ -7,7 +7,7 @@ interface CardProps {
   title: string;
   author: string;
   people: number;
-  key: number;
+  id: number;
 }
 const StyledCard = styled.section`
   height: 40vh;
@@ -31,72 +31,74 @@ const ContentDiv = styled.div`
   height: 40%;
   overflow: hidden;
 `;
-const Card = ({ title, author, people, key }: CardProps) => {
+const Card = ({ title, author, people, id }: CardProps) => {
   const navigate = useNavigate();
 
-  const onClickCardHandler = (index: number) => {
-    navigate(`/${index}`);
+  const handleClick = () => {
+    navigate(`/mission/${id}`);
   };
   return (
-    <StyledCard>
-      <ImgDiv />
-      <ContentDiv>
-        <div>
-          <h2
+    <div onClick={handleClick}>
+      <StyledCard>
+        <ImgDiv />
+        <ContentDiv>
+          <div>
+            <h2
+              style={{
+                fontFamily: "notoBold",
+                fontSize: "1.2rem",
+                paddingBottom: "5px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {title}
+            </h2>
+          </div>
+          <div
             style={{
-              fontFamily: "notoBold",
-              fontSize: "1.2rem",
-              paddingBottom: "5px",
-              whiteSpace: "nowrap",
+              padding: "5px",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-around",
+              maxWidth: "100%",
+            }}
+          >
+            <p
+              style={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {author}
+            </p>
+            <p
+              style={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              최소 인원: {people}명
+            </p>
+          </div>
+          <div
+            style={{
+              fontFamily: "gmarket1",
+              padding: "5px",
+              // height: "50%",
               overflow: "hidden",
+              whiteSpace: "wrap",
               textOverflow: "ellipsis",
             }}
           >
-            {title}
-          </h2>
-        </div>
-        <div
-          style={{
-            padding: "5px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-            maxWidth: "100%",
-          }}
-        >
-          <p
-            style={{
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {author}
-          </p>
-          <p
-            style={{
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            }}
-          >
-            최소 인원: {people}명
-          </p>
-        </div>
-        <div
-          style={{
-            fontFamily: "gmarket1",
-            padding: "5px",
-            height: "100%",
-            overflow: "hidden",
-            whiteSpace: "wrap",
-            textOverflow: "ellipsis",
-          }}
-        >
-          이것은 한줄 소개입니다.
-        </div>
-      </ContentDiv>
-    </StyledCard>
+            이것은 한줄 소개입니다.
+          </div>
+        </ContentDiv>
+      </StyledCard>
+    </div>
   );
 };
 export default Card;

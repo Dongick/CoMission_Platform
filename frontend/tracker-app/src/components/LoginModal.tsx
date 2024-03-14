@@ -30,6 +30,7 @@ const ModalContent = styled.div`
   position: relative;
   background-color: white;
   padding: 20px;
+  min-height: 30%;
   border-radius: 8px;
 `;
 const LoginDiv = styled.div<LoginDivProps>`
@@ -37,7 +38,7 @@ const LoginDiv = styled.div<LoginDivProps>`
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  height: 50px;
+  height: 40px;
   width: 300px;
 `;
 const LoginModal = ({ onClose }: LoginModalProps) => {
@@ -57,12 +58,13 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
             right: "10px",
             backgroundColor: "white",
             fontSize: "1.1rem",
+            cursor: "pointer",
           }}
         >
           X
         </button>
         <ModalTitle>로그인 하여 참여하세요!</ModalTitle>
-        <div style={{ marginTop: "30px" }}>
+        <div style={{ marginTop: "15%" }}>
           <a href="http://localhost:8080/login/oauth2/code/google">
             <LoginDiv />
           </a>
