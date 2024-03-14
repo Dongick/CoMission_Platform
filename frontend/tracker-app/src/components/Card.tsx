@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
+import { useNavigate } from "react-router-dom";
 
 interface CardProps {
   title: string;
   author: string;
   people: number;
+  key: number;
 }
 const StyledCard = styled.section`
   height: 40vh;
@@ -29,7 +31,12 @@ const ContentDiv = styled.div`
   height: 40%;
   overflow: hidden;
 `;
-const Card = ({ title, author, people }: CardProps) => {
+const Card = ({ title, author, people, key }: CardProps) => {
+  const navigate = useNavigate();
+
+  const onClickCardHandler = (index: number) => {
+    navigate(`/${index}`);
+  };
   return (
     <StyledCard>
       <ImgDiv />

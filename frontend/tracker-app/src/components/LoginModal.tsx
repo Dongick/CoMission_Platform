@@ -3,7 +3,7 @@ import { theme } from "../styles/theme";
 import googleLogin from "../assets/img/google-login.svg";
 import naverLogin from "../assets/img/naver-login.png";
 interface LoginDivProps {
-  naver?: boolean;
+  naver?: string;
 }
 interface LoginModalProps {
   onClose: () => void;
@@ -31,8 +31,6 @@ const ModalContent = styled.div`
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  /* height: 30vh; */
-  /* width: 25vw; */
 `;
 const LoginDiv = styled.div<LoginDivProps>`
   background-image: url(${(props) => (props.naver ? naverLogin : googleLogin)});
@@ -70,7 +68,7 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
           </a>
           <br />
           <a href="http://localhost:8080/login/oauth2/code/naver">
-            <LoginDiv naver={true} />
+            <LoginDiv naver="true" />
           </a>
         </div>
       </ModalContent>
