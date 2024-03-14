@@ -45,6 +45,7 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
     }
 
+    // JWT 토큰에서 해당 토큰이 access인지 refresh인지 추출
     public String getCategory(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
@@ -55,24 +56,6 @@ public class JWTUtil {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
-
-    // RefreshToken 추가 인증 메서드
-//    public JwtTokenValidationResult refreshTokenValidation(String token) {
-//
-//        JwtTokenValidationResult validation = tokenValidation(token);
-//
-//        if(validation == JwtTokenValidationResult.VALID) {
-//            Optional<RefreshTokenEntity> refreshTokenEntity = refreshTokenRepository.findByEmail(getEmail(token));
-//
-//            if(refreshTokenEntity.isPresent() && token.equals(refreshTokenEntity.get().getRefreshToken())) {
-//                return JwtTokenValidationResult.VALID;
-//            } else {
-//                return JwtTokenValidationResult.REFRESH_TOKEN_DB_MISMATCH;
-//            }
-//        } else {
-//            return validation;
-//        }
-//    }
 
     // DB에 존재하는 한번 사용된 RefreshToken 갱신 메서드
     @Transactional

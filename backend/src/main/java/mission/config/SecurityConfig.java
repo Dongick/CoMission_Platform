@@ -2,8 +2,6 @@ package mission.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import mission.config.oauth2.CustomClientRegistrationRepo;
-import mission.config.oauth2.CustomOAuth2AuthorizedClientService;
 import mission.config.oauth2.CustomOAuth2SuccessHandler;
 import mission.config.jwt.JWTFilter;
 import mission.config.jwt.JWTUtil;
@@ -27,8 +25,6 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomClientRegistrationRepo customClientRegistrationRepo;
-    private final CustomOAuth2AuthorizedClientService customOAuth2AuthorizedClientService;
     private final JdbcTemplate jdbcTemplate;
     private final JWTUtil jwtUtil;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
@@ -69,8 +65,6 @@ public class SecurityConfig {
 
         http
                 .oauth2Login((oauth2) -> oauth2
-//                        .clientRegistrationRepository(customClientRegistrationRepo.clientRegistrationRepository())
-//                        .authorizedClientService(customOAuth2AuthorizedClientService.oAuth2AuthorizedClientService(jdbcTemplate, customClientRegistrationRepo.clientRegistrationRepository()))
                         .userInfoEndpoint((userInfoEndpointConfig) ->
                                 userInfoEndpointConfig.userService(customOAuth2UserService))
                         .successHandler(customOAuth2SuccessHandler)

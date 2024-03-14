@@ -23,6 +23,7 @@ public class MainService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
 
+    // 미션 목록을 보여주는 매서드
     @Transactional
     public MainResponse getInitialMissionList() {
 
@@ -39,12 +40,14 @@ public class MainService {
                 .map(ParticipantMissionId::getMissionId)
                 .collect(Collectors.toList());
 
+        // 로그인을 진행한 사용자이면 현재 참가한 미션 목록
         if(!missionIdList.isEmpty()) {
             participantMissionInfoList = missionRepository.findByMissionIdInOrderByCreatedAtAsc(missionIdList);
         }
 
         Pageable pageable = PageRequest.of(0, 20);
 
+        // 현재 참여 가능한 미션 목록
         List<MissionInfo> missionInfoList = missionRepository.findAllByOrderByCreatedAtAsc(pageable);
 
         MainResponse mainResponse = new MainResponse(participantMissionInfoList, missionInfoList);

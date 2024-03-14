@@ -22,6 +22,7 @@ public enum ErrorCode {
     PARTICIPANT_NOT_FOUND("해당 미션에 참여한 사용자가 아닙니다."),
     DUPLICATE_AUTHENTICATION("이미 인증글을 작성했습니다."),
     AUTHENTICATION_NOT_FOUND("해당 인증글이 존재하지 않습니다."),
+    MISSION_NOT_STARTED("해당 미션이 아직 시작하지 않았습니다."),
 
 
     //USER

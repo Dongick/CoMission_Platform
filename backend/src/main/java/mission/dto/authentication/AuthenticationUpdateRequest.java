@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class AuthenticationUpdateRequest {
-    private String photoData;
     @NotBlank
     private String textData;
 }
