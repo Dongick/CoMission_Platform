@@ -2,6 +2,7 @@ package mission.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,13 +62,24 @@ public class JWTFilter extends OncePerRequestFilter {
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.ACCESS_TOKEN_EXPIRED, ErrorCode.ACCESS_TOKEN_EXPIRED.getMessage());
 
             return;
+        } catch (SignatureException e) {
+            sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+            return;
         }
 
         // 토큰이 access인지 확인 (발급시 페이로드에 명시)
-        String category = jwtUtil.getCategory(accessToken);
+        try {
+            String category = jwtUtil.getCategory(accessToken);
 
-        if (!category.equals("access")) {
+            if (!category.equals("access")) {
 
+                sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+                return;
+            }
+
+        } catch (SignatureException e) {
             sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
 
             return;
@@ -104,6 +116,7 @@ public class JWTFilter extends OncePerRequestFilter {
         ErrorResponse errorResponse = new ErrorResponse(errorCode, errorMessage);
 
         ResponseEntity<ErrorResponse> responseEntity = ResponseEntity.status(status).body(errorResponse);
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseEntity.getBody()));
