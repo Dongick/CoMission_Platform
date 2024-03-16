@@ -97,20 +97,22 @@ public class MissionService {
     // 미션 상세정보 매서드
     @Transactional
     public MissionInfoResponse missionInfo(String title) {
-        Boolean participant = true;
+        Boolean participant = false;
 
         MissionDocument missionDocument = getMissionDocument(title);
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
-        String userEmail = customOAuth2User.getEmail();
+        if (principal instanceof CustomOAuth2User) {
+            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+            String userEmail = customOAuth2User.getEmail();
 
-        Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+            Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
 
-        // 해당 미션이 끝나지 않은 상태에서 해당 미션에 참여한 사용자인지 확인
-        if(optionalParticipantDocument.isEmpty() && !missionDocument.getStatus().equals(MissionStatus.COMPLETED.name())) {
-            participant = false;
+            // 해당 미션이 끝나지 않은 상태에서 해당 미션에 참여한 사용자인지 확인
+            if(optionalParticipantDocument.isPresent() && !missionDocument.getStatus().equals(MissionStatus.COMPLETED.name())) {
+                participant = true;
+            }
         }
 
         return MissionInfoResponse.builder()

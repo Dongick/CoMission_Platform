@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class MainController {
     private final MainService mainService;
 
-    @GetMapping()
+    @GetMapping("/{num}")
     @Operation(
             summary = "초기 main 화면",
             description = "처음 main 화면에 들어갔을 때 로그인이 되어있으면 해당 사용자가 참가한 모든 미션과 20개의 미션 정보 제공" +
@@ -32,8 +32,8 @@ public class MainController {
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<MainResponse> getInitialList() {
-        MainResponse mainResponse = mainService.getInitialMissionList();
+    public ResponseEntity<MainResponse> getInitialList(@PathVariable int num) {
+        MainResponse mainResponse = mainService.getInitialMissionList(num);
 
         return ResponseEntity.ok(mainResponse);
     }
