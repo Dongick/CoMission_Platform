@@ -2,12 +2,13 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
-
+import { MissionType } from "../types";
 interface CardProps {
   title: string;
   author: string;
   people: number;
   id: number;
+  missionInfo: MissionType;
 }
 const StyledCard = styled.section`
   height: 40vh;
@@ -31,7 +32,7 @@ const ContentDiv = styled.div`
   height: 40%;
   overflow: hidden;
 `;
-const Card = ({ title, author, people, id }: CardProps) => {
+const Card = ({ title, author, people, id, missionInfo }: CardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -81,7 +82,7 @@ const Card = ({ title, author, people, id }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              최소 인원: {people}명
+              필요 인원: {people}명
             </p>
           </div>
           <div
@@ -94,7 +95,8 @@ const Card = ({ title, author, people, id }: CardProps) => {
               textOverflow: "ellipsis",
             }}
           >
-            이것은 한줄 소개입니다.
+            ??명이 더 모이면
+            <br /> 미션이 시작됩니다
           </div>
         </ContentDiv>
       </StyledCard>
