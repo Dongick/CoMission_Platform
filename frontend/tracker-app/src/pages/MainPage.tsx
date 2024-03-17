@@ -100,7 +100,7 @@ const MainPage = () => {
             title={card.title}
             author={card.author}
             people={card.participants}
-            missionInfo={card}
+            missionData={card}
           />
         ))}
       </MainSection>

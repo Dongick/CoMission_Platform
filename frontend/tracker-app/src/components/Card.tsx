@@ -8,7 +8,7 @@ interface CardProps {
   author: string;
   people: number;
   id: number;
-  missionInfo: MissionType;
+  missionData: MissionType;
 }
 const StyledCard = styled.section`
   height: 40vh;
@@ -32,11 +32,11 @@ const ContentDiv = styled.div`
   height: 40%;
   overflow: hidden;
 `;
-const Card = ({ title, author, people, id, missionInfo }: CardProps) => {
+const Card = ({ title, author, people, id, missionData }: CardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/mission/${id}`);
+    navigate(`/mission/${id}`, { state: { mission: missionData } });
   };
   return (
     <div onClick={handleClick}>
