@@ -6,11 +6,11 @@ export const size = {
 };
 
 export const theme = {
-  mainBlue: "rgb(0, 30, 120)",
+  mainBlue: "#001E78",
   mainGray: "#F5F5F5",
   mainYellow: "rgb(255,236,102)",
-  subGreen: "#1DC078",
-  subBlue: "rgb(115,242,255)",
+  subGreen: "#00C471",
+  subBlue: "#558EF8",
   subPink: "rgb(255,197,227)",
   typography: {
     fontFamily: ["noto", "ubuntu"].join(","),

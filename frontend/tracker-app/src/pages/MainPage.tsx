@@ -110,7 +110,7 @@ const MainPage = () => {
 
 export default MainPage;
 
-const SearchSection = styled.section`
+export const SearchSection = styled.section`
   background-image: url(${sectionSVG});
   background-size: cover; /* 원하는 크기로 이미지를 맞춥니다. */
   background-position: center; /* 이미지를 가운데 정렬합니다. */
