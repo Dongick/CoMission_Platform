@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
         MissionDocument missionDocument = getMissionDocument(title);
 
@@ -51,7 +52,7 @@ public class AuthenticationService {
             Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
             // 당일 인증글을 이미 작성했는지 확인
-            if(lastAuthentication.getDate().isEqual(now)) {
+            if(LocalDate.from(lastAuthentication.getDate()).isEqual(LocalDate.from(now))) {
                 throw new BadRequestException(ErrorCode.DUPLICATE_AUTHENTICATION, ErrorCode.DUPLICATE_AUTHENTICATION.getMessage());
             }
         }
@@ -85,7 +86,7 @@ public class AuthenticationService {
             Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
             // 당일 인증글을 작성했는지 확인
-            if(lastAuthentication.getDate().isEqual(now)) {
+            if(LocalDate.from(lastAuthentication.getDate()).isEqual(LocalDate.from(now))) {
 
                 // 기존 인증글에 사진 데이터가 존재하면 삭제
                 if (lastAuthentication.getPhotoData() != null) {
@@ -130,7 +131,7 @@ public class AuthenticationService {
             Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
             // 당일 인증글을 작성했는지 확인
-            if(lastAuthentication.getDate().isEqual(now)) {
+            if(LocalDate.from(lastAuthentication.getDate()).isEqual(LocalDate.from(now))) {
 
                 if (lastAuthentication.getPhotoData() != null) {
                     fileService.deleteFile(lastAuthentication.getPhotoData());
@@ -149,8 +150,9 @@ public class AuthenticationService {
         }
     }
 
-    // 해당 미션의 모든 인증글 보기 매서드
-    public AuthenticationListResponse authenticationList(String title) {
+    // 해당 미션의 인증글 보기 매서드
+    @Transactional
+    public AuthenticationListResponse authenticationList(String title, int num) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -167,12 +169,31 @@ public class AuthenticationService {
 
         List<ParticipantDocument> participantDocumentList = participantRepository.findByMissionId(missionDocument.getId());
 
-        Map<LocalDate, List<Map<String, Object>>> result = groupAndSortAuthentications(participantDocumentList);
+        List<Map<String, Object>> allAuthenticationList = groupAndSortAuthentications(participantDocumentList);
 
-        return new AuthenticationListResponse(result);
+        List<Map<String, Object>> authenticationList = null;
+
+        // 인증글들을 lazy loading 으로 처리
+        if(allAuthenticationList.size() > 20 * num) {
+            if(allAuthenticationList.size() >= 20 * (num + 1)) {
+                authenticationList = allAuthenticationList.subList(20*num, 20*(num+1));
+            } else {
+                int endIndex = allAuthenticationList.size();
+
+                authenticationList = allAuthenticationList.subList(20*num, endIndex);
+            }
+
+            for(Map<String, Object> authentication : authenticationList) {
+
+                authentication.put("date", LocalDate.from((LocalDateTime) authentication.get("date")));
+            }
+        }
+
+        return new AuthenticationListResponse(authenticationList);
     }
+
     // 인증글들을 형식에 맞춰 출력
-    public Map<LocalDate, List<Map<String, Object>>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
+    public List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
 
         return participantDocumentList.stream()
                 .flatMap(participant -> participant.getAuthentication().stream()
@@ -182,18 +203,16 @@ public class AuthenticationService {
                             authenticationMap.put("photoData", authentication.getPhotoData());
                             authenticationMap.put("textData", authentication.getTextData());
                             authenticationMap.put("userEmail", participant.getUserEmail());
-                            return new Object[]{authentication.getDate(), authenticationMap};
+                            return authenticationMap;
                         })
                 )
-                .sorted(Comparator.comparing(o -> ((LocalDate) o[0])))
-                .collect(Collectors.groupingBy(
-                        o -> ((LocalDate) o[0]),
-                        Collectors.mapping(o -> (Map<String, Object>) o[1], Collectors.toList())
-                ));
+                .sorted(Comparator.comparing(map -> (LocalDateTime) map.get("date"), Comparator.reverseOrder()))
+                .collect(Collectors.toList()
+                );
     }
 
     // 인증글 저장
-    private Authentication saveAuthentication(LocalDate now, String photoData, String textData) {
+    private Authentication saveAuthentication(LocalDateTime now, String photoData, String textData) {
         return Authentication.builder()
                 .date(now)
                 .completed(true)

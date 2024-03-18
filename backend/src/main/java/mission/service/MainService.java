@@ -1,6 +1,7 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
+import mission.dto.main.MainLazyLoadingResponse;
 import mission.dto.main.MainResponse;
 import mission.dto.mission.MissionInfo;
 import mission.dto.oauth2.CustomOAuth2User;
@@ -25,7 +26,7 @@ public class MainService {
 
     // 미션 목록을 보여주는 매서드
     @Transactional
-    public MainResponse getInitialMissionList(int num) {
+    public MainResponse getInitialMissionList() {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -47,13 +48,27 @@ public class MainService {
             }
         }
 
-        Pageable pageable = PageRequest.of(20*(num-1), 20*num);
-
-        // 현재 참여 가능한 미션 목록
-        List<MissionInfo> missionInfoList = missionRepository.findAllByOrderByCreatedAtAsc(pageable);
+        List<MissionInfo> missionInfoList = getMissionList(0);
 
         MainResponse mainResponse = new MainResponse(participantMissionInfoList, missionInfoList);
 
         return mainResponse;
+    }
+
+    // 메인화면 lazy loading 시 이후 미션 목록을 보여주는 메서드
+    public MainLazyLoadingResponse getLazyLoadingMissionList(int num) {
+
+        List<MissionInfo> missionInfoList = getMissionList(num);
+
+        MainLazyLoadingResponse mainLazyLoadingResponse = new MainLazyLoadingResponse(missionInfoList);
+
+        return mainLazyLoadingResponse;
+    }
+
+    // 현재 참여 가능한 미션 목록
+    private List<MissionInfo> getMissionList(int num) {
+        Pageable pageable = PageRequest.of(20*num, 20*(num+1));
+
+        return missionRepository.findAllByOrderByCreatedAtAsc(pageable);
     }
 }
