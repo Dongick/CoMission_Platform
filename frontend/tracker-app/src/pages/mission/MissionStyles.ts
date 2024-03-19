@@ -29,22 +29,47 @@ export const TitleDiv = styled.div`
 `;
 export const Navbar = styled.nav`
   border-bottom: 2px solid #e9ecef;
-  height: 5vh;
+  height: 5%;
 `;
-export const NavButton = styled.button<{ clicked: boolean }>`
+export const NavButton = styled.button<{ clicked: string }>`
   height: 100%;
   background-color: white;
-  font-family: ${(props) => (props.clicked ? "notoBold" : "noto")};
+  font-family: ${(props) => (props.clicked === "true" ? "notoBold" : "noto")};
   border-bottom: ${(props) =>
-    props.clicked === true ? "2px solid #1a1b1e" : "none"};
+    props.clicked === "true" ? "2px solid #1a1b1e" : "none"};
   font-size: large;
   padding: 10px;
   margin-right: 10px;
 `;
 export const MainSection = styled.section`
-  min-height: 100vh;
-  padding: 3vh;
-  width: 50%;
+  min-height: 80vh;
+  padding: 3vh 5vw;
+  width: 40%;
   margin: 0 auto;
   background-color: ${theme.mainGray};
+`;
+
+export const MissionContent = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+export const MissionSubTitle = styled.h2`
+  padding: 15px 0px;
+  text-align: left;
+  font-family: "gmarket1";
+  font-size: 1.3rem;
+`;
+
+export const MissionSubContent = styled.div`
+  text-align: left;
+  padding: 1rem;
+  min-height: 20vh;
+`;
+
+export const HrDivider = styled.hr`
+  margin: 1.5rem 0;
+  border-top: 1.5px solid #393939;
 `;
