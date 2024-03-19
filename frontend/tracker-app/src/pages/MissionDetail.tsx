@@ -23,6 +23,7 @@ const TitleDiv = styled.div`
   align-items: flex-start;
   height: 70%;
   font-size: 1.6rem;
+
   & > div:nth-child(n + 2) {
     font-size: 1rem;
     color: #dee2e6;
@@ -65,9 +66,9 @@ const MissionDetail = () => {
         <TitleDiv>
           <div>김영한의 스프링 부트와 JPA 실무 완전 정복 로드맵</div>
           <div>
-            <p>{missionData.start?.toLocaleString()}</p>
-            <p>{missionData.created?.toLocaleString()}</p>
-            <p>{missionData.deadline?.toLocaleString()}</p>
+            <p>{missionData.start.toLocaleString()}</p>
+            <p>{missionData.created.toLocaleString()}</p>
+            <p>{missionData.deadline.toLocaleString()}</p>
           </div>
           <div>
             <p>{missionData.duration}</p>

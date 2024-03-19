@@ -14,9 +14,9 @@
 export type MissionType = {
   title: string;
   description: string;
-  created: string | Date;
-  start: string | Date;
-  deadline: string | Date;
+  created: Date;
+  start: Date;
+  deadline: Date;
   minParticipants: number;
   participants: number;
   duration: number | string;
@@ -31,7 +31,7 @@ export type MissionType = {
 // String photoData;
 // String textData;
 export type MissionSuccessCheck = {
-  date: string | Date;
+  date: Date;
   completed: boolean;
   photo: string;
   text: string;
