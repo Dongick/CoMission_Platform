@@ -1,17 +1,21 @@
 package mission.config.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import mission.entity.RefreshTokenEntity;
+import mission.exception.BadRequestException;
+import mission.exception.ErrorCode;
+import mission.exception.MissionAuthenticationException;
 import mission.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JWTUtil {
@@ -58,11 +62,23 @@ public class JWTUtil {
     }
 
     // DB에 존재하는 한번 사용된 RefreshToken 갱신 메서드
-    @Transactional
     public void updateRefreshToken(RefreshTokenEntity refreshTokenEntity, String refreshToken) {
         refreshTokenEntity.setRefreshToken(refreshToken);
+        refreshTokenEntity.setExpiration((new Date(System.currentTimeMillis() + REFRESH_TIME)).toString());
 
         refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    // RefreshToken db 저장 메서드
+    public void saveRefreshToken(String refreshToken, String email) {
+
+        Date date = new Date(System.currentTimeMillis() + REFRESH_TIME);
+
+        refreshTokenRepository.save(RefreshTokenEntity.builder()
+                .refreshToken(refreshToken)
+                .email(email)
+                .expiration(date.toString())
+                .build());
     }
 
     // RefreshToken cookie 생성 메서드
@@ -91,5 +107,39 @@ public class JWTUtil {
                 .expiration(new Date(System.currentTimeMillis() + time))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public RefreshTokenEntity validateRefreshToken(String refreshToken) {
+
+        // 토큰이 존재하는지 확인
+        if (refreshToken == null) {
+
+            throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
+        }
+
+        // 토큰 만료 여부 확인
+        try {
+            isExpired(refreshToken);
+        } catch (ExpiredJwtException e) {
+
+            throw new MissionAuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED, ErrorCode.REFRESH_TOKEN_EXPIRED.getMessage());
+        }
+
+        // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
+        String category = getCategory(refreshToken);
+
+        if (!category.equals("refresh")) {
+
+            throw new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage());
+        }
+
+        //DB에 저장되어 있는지 확인
+        Optional<RefreshTokenEntity> optionalRefreshTokenEntity = refreshTokenRepository.findByRefreshToken(refreshToken);
+        if (optionalRefreshTokenEntity.isEmpty()) {
+
+            throw new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage());
+        }
+
+        return optionalRefreshTokenEntity.get();
     }
 }

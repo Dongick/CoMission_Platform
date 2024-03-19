@@ -18,11 +18,8 @@ public class RefreshTokenEntity {
     @Column(unique = true)
     private String email;
 
-    public RefreshTokenEntity() {
-    }
+    private String expiration;
 
-    public RefreshTokenEntity updateToken(String token) {
-        this.refreshToken = token;
-        return this;
+    public RefreshTokenEntity() {
     }
 }

@@ -32,7 +32,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
 
-        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$") || requestUri.matches("^\\/swagger-ui(?:\\/.*)?$") || requestUri.matches("^\\/v3\\/api-docs(?:\\/.*)?$")) {
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$") || requestUri.matches("^\\/swagger-ui(?:\\/.*)?$") ||
+                requestUri.matches("^\\/v3\\/api-docs(?:\\/.*)?$") || requestUri.matches("^\\/api\\/reissue")) {
 
             filterChain.doFilter(request, response);
             return;
