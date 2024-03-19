@@ -1,11 +1,16 @@
 import { Routes, Route } from "react-router-dom";
 import MainPage from "../pages/MainPage";
 import MissionDetail from "../pages/MissionDetail";
+import MissionConfirmPost from "../pages/MissionConfirmPost";
 const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<MainPage />} />
-      <Route path="/mission/:cardId" element={<MissionDetail />} />
+      <Route path="/mission/:cardId/detail" element={<MissionDetail />} />
+      <Route
+        path="/mission/:cardId/confirm-post"
+        element={<MissionConfirmPost />}
+      />
     </Routes>
   );
 };

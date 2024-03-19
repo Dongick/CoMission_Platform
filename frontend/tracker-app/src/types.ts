@@ -30,7 +30,7 @@ export type MissionType = {
 // boolean completed;
 // String photoData;
 // String textData;
-export type MissionSuccessCheck = {
+export type MissionConfirmPost = {
   date: Date;
   completed: boolean;
   photo: string;

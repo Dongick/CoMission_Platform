@@ -36,7 +36,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/mission/${id}`, { state: { mission: missionData } });
+    navigate(`/mission/${id}/detail`, { state: { mission: missionData } });
   };
   return (
     <div onClick={handleClick}>

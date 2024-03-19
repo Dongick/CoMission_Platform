@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Layout from "../layouts/Layout";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { MissionType } from "../types";
 import { SearchSection } from "./MainPage";
 import { theme } from "../styles/theme";
@@ -22,21 +22,23 @@ const TitleDiv = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   height: 70%;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
 
   & > div:nth-child(n + 2) {
     font-size: 1rem;
     color: #dee2e6;
     display: flex;
     justify-content: flex-start;
-    & > p {
-      /* padding: 5px; */
-    }
+    font-family: "noto";
   }
 `;
 const Navbar = styled.nav`
-  border-bottom: 3px solid ${theme.mainGray};
+  border-bottom: 2px solid #e9ecef;
   height: 5vh;
+`;
+const NavButton = styled.button`
+  height: 100%;
+  background-color: red;
 `;
 const MainSection = styled.section`
   min-height: 100vh;
@@ -48,8 +50,9 @@ const MainSection = styled.section`
 const MissionDetail = () => {
   const { cardId } = useParams();
   const location = useLocation();
+  const detailURL = `localhost:3000/mission/${cardId}/detail`;
+  const confirmURL = `localhost:3000/mission/${cardId}/confirm-post`;
   const missionData = location.state.mission as MissionType;
-  console.log(missionData.start);
   return (
     <Layout>
       <BannerSection>
@@ -64,22 +67,35 @@ const MissionDetail = () => {
           }}
         />
         <TitleDiv>
-          <div>김영한의 스프링 부트와 JPA 실무 완전 정복 로드맵</div>
-          <div>
-            <p>{missionData.start.toLocaleString()}</p>
-            <p>{missionData.created.toLocaleString()}</p>
-            <p>{missionData.deadline.toLocaleString()}</p>
+          <div style={{ marginBottom: "30px" }}>
+            김영한의 스프링 부트와 JPA 실무 완전 정복 로드맵
           </div>
           <div>
-            <p>{missionData.duration}</p>
-            <p>{missionData.frequency}</p>
-            <p>{missionData.minParticipants}</p>
-            <p>{missionData.participants}</p>
+            <p style={{ marginRight: "10px" }}>
+              미션 생성일 : {missionData.created.toLocaleDateString()} &nbsp;/
+            </p>
+            <p>
+              미션 진행일 : {missionData.start.toLocaleDateString()} -&nbsp;
+              {missionData.deadline.toLocaleDateString()} (
+              {missionData.duration}
+              일간)
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "80%",
+            }}
+          >
+            <p>인증주기: {missionData.frequency}</p>
+            <p>👨‍👧‍👧최소 필요인원: {missionData.minParticipants}</p>
+            <p>👨‍👧‍👧현재 참가인원: {missionData.participants}</p>
           </div>
           <StyledButton
             bgcolor={theme.subGreen}
             style={{
-              margin: "0px",
+              margin: "20px 0px 0px 0px",
               fontSize: "large",
               borderRadius: "10px",
               padding: "15px 20px",
@@ -90,7 +106,15 @@ const MissionDetail = () => {
           </StyledButton>
         </TitleDiv>
       </BannerSection>
-      <Navbar>가나다라</Navbar>
+      <Navbar>
+        <Link to={detailURL}>
+          <NavButton>미션 소개</NavButton>
+        </Link>
+        <Link to={confirmURL}>
+          <NavButton>미션 인증글</NavButton>
+          {confirmURL}
+        </Link>
+      </Navbar>
       <MainSection></MainSection>
     </Layout>
   );

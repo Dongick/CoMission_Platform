@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
 import UserMenu from "../components/UserMenu";
+import { Link } from "react-router-dom";
 const StyledHeader = styled.header`
   background-color: white;
   color: ${theme.mainBlue};
@@ -16,7 +17,7 @@ const Header = () => {
   return (
     <div style={{ position: "relative" }}>
       <StyledHeader>
-        <h1>Comission Platform</h1>
+        <Link to="/">Comission Platform</Link>
       </StyledHeader>
       <UserMenu isLogin={true} />
     </div>
