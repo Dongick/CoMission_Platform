@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import MainPage from "../pages/MainPage";
-import MissionDetail from "../pages/MissionDetail";
-import MissionConfirmPost from "../pages/MissionConfirmPost";
+import MissionDetail from "../pages/mission/MissionDetail";
+import MissionConfirmPost from "../pages/mission/MissionConfirmPost";
 const Router = () => {
   return (
     <Routes>

@@ -35,6 +35,7 @@ const ContentDiv = styled.div`
 const Card = ({ title, author, people, id, missionData }: CardProps) => {
   const navigate = useNavigate();
 
+  // todo: react-query에 저장되어 있는 값으로 받기
   const handleClick = () => {
     navigate(`/mission/${id}/detail`, { state: { mission: missionData } });
   };

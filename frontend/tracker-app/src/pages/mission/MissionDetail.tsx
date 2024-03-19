@@ -1,57 +1,22 @@
 import styled from "styled-components";
-import Layout from "../layouts/Layout";
+import Layout from "../../layouts/Layout";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { MissionType } from "../types";
-import { SearchSection } from "./MainPage";
-import { theme } from "../styles/theme";
-import example from "../assets/img/roadmap-77.png";
-import StyledButton from "../components/StyledButton";
-
-const BannerSection = styled(SearchSection)`
-  background-color: #25262b;
-  background-image: none;
-  color: white;
-  height: 30vh;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 0;
-`;
-const TitleDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  height: 70%;
-  font-size: 1.7rem;
-
-  & > div:nth-child(n + 2) {
-    font-size: 1rem;
-    color: #dee2e6;
-    display: flex;
-    justify-content: flex-start;
-    font-family: "noto";
-  }
-`;
-const Navbar = styled.nav`
-  border-bottom: 2px solid #e9ecef;
-  height: 5vh;
-`;
-const NavButton = styled.button`
-  height: 100%;
-  background-color: red;
-`;
-const MainSection = styled.section`
-  min-height: 100vh;
-  padding: 3vh;
-  width: 50%;
-  margin: 0 auto;
-  background-color: ${theme.mainGray};
-`;
+import { MissionType } from "../../types";
+import { theme } from "../../styles/theme";
+import example from "../../assets/img/roadmap-77.png";
+import StyledButton from "../../components/StyledButton";
+import {
+  BannerSection,
+  Navbar,
+  NavButton,
+  MainSection,
+  TitleDiv,
+} from "./MissionStyles";
 const MissionDetail = () => {
   const { cardId } = useParams();
   const location = useLocation();
-  const detailURL = `localhost:3000/mission/${cardId}/detail`;
-  const confirmURL = `localhost:3000/mission/${cardId}/confirm-post`;
+  const detailURL = `/mission/${cardId}/detail`;
+  const confirmURL = `/mission/${cardId}/confirm-post`;
   const missionData = location.state.mission as MissionType;
   return (
     <Layout>
@@ -108,11 +73,10 @@ const MissionDetail = () => {
       </BannerSection>
       <Navbar>
         <Link to={detailURL}>
-          <NavButton>미션 소개</NavButton>
+          <NavButton clicked={true}>미션 소개</NavButton>
         </Link>
         <Link to={confirmURL}>
-          <NavButton>미션 인증글</NavButton>
-          {confirmURL}
+          <NavButton clicked={false}>미션 인증글</NavButton>
         </Link>
       </Navbar>
       <MainSection></MainSection>
