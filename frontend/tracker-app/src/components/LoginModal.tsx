@@ -64,7 +64,19 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
           X
         </button>
         <ModalTitle>로그인 하여 참여하세요!</ModalTitle>
-        <div style={{ marginTop: "15%" }}>
+        <div
+          style={{
+            marginTop: "10%",
+          }}
+        >
+          <Hr
+            style={{
+              backgroundColor: `#f1f3f5`,
+              height: "2px",
+              width: "100%",
+            }}
+          />
+          <Span>소셜 로그인</Span>
           <a href="http://localhost:8080/login/oauth2/code/google">
             <LoginDiv />
           </a>
@@ -78,3 +90,23 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
   );
 };
 export default LoginModal;
+
+const Span = styled.span`
+  background-color: white;
+  color: #abb0b5;
+  z-index: 1;
+  margin-bottom: 30px;
+  display: inline-block;
+  padding: 0 8px;
+  position: relative;
+  font-family: "notoBold";
+  font-size: 0.8rem;
+`;
+const Hr = styled.hr`
+  background-color: rgb(241, 243, 245);
+  height: 2px;
+  width: 100%;
+  position: relative;
+  top: 10px;
+  display: block;
+`;
