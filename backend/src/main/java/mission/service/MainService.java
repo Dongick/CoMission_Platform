@@ -44,7 +44,7 @@ public class MainService {
 
             // 로그인을 진행한 사용자이면 현재 참가한 미션 목록
             if(!missionIdList.isEmpty()) {
-                participantMissionInfoList = missionRepository.findByMissionIdInOrderByCreatedAtAsc(missionIdList);
+                participantMissionInfoList = missionRepository.findByMissionIdInAndStatusNotOrderByCreatedAtDesc(missionIdList);
             }
         }
 
@@ -69,6 +69,6 @@ public class MainService {
     private List<MissionInfo> getMissionList(int num) {
         Pageable pageable = PageRequest.of(20*num, 20*(num+1));
 
-        return missionRepository.findAllByOrderByCreatedAtAsc(pageable);
+        return missionRepository.findAllAndStatusNotByOrderByCreatedAtDesc(pageable);
     }
 }

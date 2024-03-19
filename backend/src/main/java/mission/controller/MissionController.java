@@ -7,9 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mission.dto.mission.MissionCreateRequest;
-import mission.dto.mission.MissionInfoResponse;
-import mission.dto.mission.MissionUpdateRequest;
+import mission.dto.mission.*;
 import mission.exception.ErrorResponse;
 import mission.service.MissionService;
 import org.springframework.http.HttpStatus;
@@ -93,5 +91,21 @@ public class MissionController {
     public ResponseEntity<MissionInfoResponse> missionInfo(@PathVariable String title) {
         MissionInfoResponse missionInfoResponse = missionService.missionInfo(title);
         return ResponseEntity.ok(missionInfoResponse);
+    }
+
+    @PostMapping("/search")
+    @Operation(
+            summary = "미션 검색",
+            description = "검색 화면에서 미션 제목의 일부를 입력하면 해당 제목의 일부와 일치하는 미션 목록 나열"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "미션 검색 성공"),
+            @ApiResponse(responseCode = "400", description = "1. VALIDATION_FAILED : 유효성 검사 실패",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+
+    })
+    public ResponseEntity<MissionSearchResponse> missionSearch(@Valid @RequestBody MissionSearchRequest missionSearchRequest) {
+        MissionSearchResponse missionSearchResponse = missionService.missionSearch(missionSearchRequest);
+        return ResponseEntity.ok(missionSearchResponse);
     }
 }
