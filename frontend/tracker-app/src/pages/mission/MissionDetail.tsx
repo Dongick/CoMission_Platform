@@ -16,12 +16,16 @@ import {
   MissionSubContent,
   HrDivider,
 } from "./MissionStyles";
+import { userInfo } from "../../recoil";
+import { useRecoilState } from "recoil";
 const MissionDetail = () => {
   const { cardId } = useParams();
   const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const missionData = location.state.mission as MissionType;
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+
   //todo 여기서 mission의 ID를 알고, api요청을 해서 상세 정보를 가져와야 한다
   return (
     <Layout>
@@ -70,6 +74,9 @@ const MissionDetail = () => {
               borderRadius: "10px",
               padding: "15px 20px",
               width: "100%",
+            }}
+            onClick={() => {
+              if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
             }}
           >
             미션 참가하기

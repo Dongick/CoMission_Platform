@@ -2,11 +2,15 @@ import styled from "styled-components";
 import Layout from "../../layouts/Layout";
 import { BannerSection, Navbar, NavButton, MainSection } from "./MissionStyles";
 import { Link, useParams, useLocation } from "react-router-dom";
+import { userInfo } from "../../recoil";
+import { useRecoilState } from "recoil";
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
   const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+
   return (
     <Layout>
       <BannerSection>zz</BannerSection>
@@ -19,11 +23,13 @@ const MissionConfirmPost = () => {
         </Link>
       </Navbar>
       <MainSection>
-        <NoLoginContent>
-          <span>❌</span>
-          <h1>미션에 가입해야 조회가 가능합니다.</h1>
-          <p>미션에 참가해보세요!</p>
-        </NoLoginContent>
+        {userInfoState.isLoggedIn || (
+          <NoLoginContent>
+            <span>❌</span>
+            <h1>미션에 가입해야 조회가 가능합니다.</h1>
+            <p>미션에 참가해보세요!</p>
+          </NoLoginContent>
+        )}
       </MainSection>
     </Layout>
   );
