@@ -44,7 +44,7 @@ export const NavButton = styled.button<{ clicked: string }>`
 export const MainSection = styled.section`
   min-height: 80vh;
   padding: 3vh 5vw;
-  width: 40%;
+  width: 650px;
   margin: 0 auto;
   background-color: ${theme.mainGray};
 `;

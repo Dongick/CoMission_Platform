@@ -3,6 +3,7 @@ import { theme } from "../styles/theme";
 interface ButtonProps {
   bgcolor?: string;
   color?: string;
+  onClick?: () => void;
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -15,7 +16,6 @@ const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;
   &:hover {
     box-shadow: ${theme.boxShadow};
-    /* filter: brightness(1.1); */
   }
   @media screen and (max-width: 1024px) {
     padding: 8px 16px;

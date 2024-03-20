@@ -4,6 +4,8 @@ import googleLogin from "../assets/img/google-login.svg";
 import naverLogin from "../assets/img/naver-login.png";
 import { useLocation } from "react-router";
 import { useEffect } from "react";
+import { userInfo } from "../recoil";
+import { useRecoilState } from "recoil";
 interface LoginDivProps {
   naver?: string;
 }
@@ -44,6 +46,7 @@ const LoginDiv = styled.div<LoginDivProps>`
   width: 300px;
 `;
 const LoginModal = ({ onClose }: LoginModalProps) => {
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -55,9 +58,14 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
     const accessToken = urlSearchParams.get("AccessToken");
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
+      setUserInfoState({
+        isLoggedIn: true,
+        user_id: "user123",
+        user_email: "example@example.com",
+      });
       onClose();
     }
-  }, [location.search, onClose]);
+  }, [location.search, onClose, setUserInfoState]);
   return (
     <ModalOverlay onClick={handleOverlayClick}>
       <ModalContent>

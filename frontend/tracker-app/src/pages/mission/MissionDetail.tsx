@@ -22,6 +22,7 @@ const MissionDetail = () => {
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const missionData = location.state.mission as MissionType;
+  //todo 여기서 mission의 ID를 알고, api요청을 해서 상세 정보를 가져와야 한다
   return (
     <Layout>
       <BannerSection>
@@ -88,7 +89,7 @@ const MissionDetail = () => {
           <h1
             style={{
               fontFamily: "gmarket2",
-              fontSize: "1.5rem",
+              fontSize: "1.3rem",
               paddingTop: "20px",
             }}
           >
