@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import googleLogin from "../assets/img/google-login.svg";
 import naverLogin from "../assets/img/naver-login.png";
+import { useLocation } from "react-router";
+import { useEffect } from "react";
 interface LoginDivProps {
   naver?: string;
 }
@@ -47,6 +49,15 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
       onClose();
     }
   };
+  const location = useLocation();
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const accessToken = urlSearchParams.get("AccessToken");
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      onClose();
+    }
+  }, [location.search, onClose]);
   return (
     <ModalOverlay onClick={handleOverlayClick}>
       <ModalContent>
