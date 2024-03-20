@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends MongoRepository<ParticipantDocument, ObjectId> {
     @Query(value = "{userEmail: ?0, status: {$ne: 'COMPLETED'}}", fields="{missionId:1}")
-    List<ParticipantMissionId> findByUserEmailAndStatsNot(String email);
+    List<ParticipantMissionId> findByUserEmailAndStatusNot(String email);
 
     List<ParticipantDocument> findByMissionId(ObjectId missionId);
 

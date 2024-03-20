@@ -37,6 +37,9 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403",
+                    description = "1. EXCEEDED_AUTHENTICATION_LIMIT : 인증글 작성 횟수 초과",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404",
                     description = "1. MISSION_NOT_FOUND : 해당 미션을 찾을 수 없음 \t\n 2. PARTICIPANT_NOT_FOUND : 해당 미션의 참여자가 아님",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

@@ -9,6 +9,7 @@ import mission.dto.oauth2.CustomOAuth2User;
 import mission.enums.MissionStatus;
 import mission.exception.BadRequestException;
 import mission.exception.ErrorCode;
+import mission.exception.ForbiddenException;
 import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
@@ -39,16 +40,34 @@ public class AuthenticationService {
         String userEmail = customOAuth2User.getEmail();
 
         LocalDateTime now = LocalDateTime.now();
+        int dayOfWeek = now.getDayOfWeek().getValue();
+
+        LocalDate startDate = LocalDate.from(now.minusDays(dayOfWeek - 1));
 
         MissionDocument missionDocument = getMissionDocument(title);
 
         judgeMissionStatus(missionDocument.getStatus());
 
+        int authCount = getAuthenticationCount(missionDocument.getFrequency());
+
         ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
 
         List<Authentication> authenticationList = participantDocument.getAuthentication();
 
+        // 기존에 작성한 인증글이 존재하는지 확인
         if(!authenticationList.isEmpty()) {
+
+            // 이번주에 사용자가 해당 미션에 작성한 인증글 확인
+            List<Authentication> dayOfWeekAuthenticationList =
+                    authenticationList.stream()
+                            .filter(auth -> !auth.getDate().toLocalDate().isBefore(startDate) && !auth.getDate().toLocalDate().isAfter(LocalDate.from(now)))
+                            .collect(Collectors.toList());
+
+            // 이번주에 작성한 인증글의 횟수가 이번주에 허용된 작성 횟수를 초과했는지 확인
+            if(dayOfWeekAuthenticationList.size() == authCount) {
+                throw new ForbiddenException(ErrorCode.EXCEEDED_AUTHENTICATION_LIMIT, ErrorCode.EXCEEDED_AUTHENTICATION_LIMIT.getMessage());
+            }
+
             Authentication lastAuthentication = authenticationList.get(authenticationList.size() - 1);
 
             // 당일 인증글을 이미 작성했는지 확인
@@ -71,7 +90,7 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
         MissionDocument missionDocument = getMissionDocument(title);
 
@@ -116,7 +135,7 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
         MissionDocument missionDocument = getMissionDocument(title);
 
@@ -241,5 +260,29 @@ public class AuthenticationService {
         } else if(status.equals(MissionStatus.COMPLETED.name())){
             throw new BadRequestException(ErrorCode.MISSION_ALREADY_COMPLETED, ErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
         }
+    }
+
+    // 해당 미션의 인증글 작성이 주 몇회인지 확인
+    private int getAuthenticationCount(String frequency) {
+        int authCount = 0;
+
+        switch (frequency) {
+            case "매일" : authCount = 7;
+                break;
+            case "주1회" : authCount = 1;
+                break;
+            case "주2회" : authCount = 2;
+                break;
+            case "주3회" : authCount = 3;
+                break;
+            case "주4회" : authCount = 4;
+                break;
+            case "주5회" : authCount = 5;
+                break;
+            case "주6회" : authCount = 6;
+                break;
+        }
+
+        return authCount;
     }
 }
