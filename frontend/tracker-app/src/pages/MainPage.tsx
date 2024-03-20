@@ -4,6 +4,8 @@ import Layout from "../layouts/Layout";
 import styled from "styled-components";
 import sectionSVG from "../assets/img/wave-haikei.svg";
 import Card from "../components/Card";
+import { userInfo } from "../recoil";
+import { useRecoilState } from "recoil";
 const MainPage = () => {
   const cardsData = [
     {
@@ -64,6 +66,7 @@ const MainPage = () => {
     },
     // Add more card data as needed
   ];
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   return (
     <Layout>
       <SearchSection>
@@ -89,6 +92,9 @@ const MainPage = () => {
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "10px", fontSize: "large", borderRadius: "20px" }}
+        onClick={() => {
+          if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+        }}
       >
         새로운 미션 등록
       </StyledButton>

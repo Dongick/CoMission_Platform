@@ -10,6 +10,7 @@ const { persistAtom } = recoilPersist({
 export const userInfo = atom<UserInfoType>({
   key: "userInfo",
   default: {
+    isLoggedIn: false,
     user_id: "",
     user_email: "",
   },
