@@ -2,8 +2,24 @@ import styled from "styled-components";
 import Layout from "../../layouts/Layout";
 import { BannerSection, Navbar, NavButton, MainSection } from "./MissionStyles";
 import { Link, useParams, useLocation } from "react-router-dom";
+import ConfirmPostList from "../../components/ConfirmPostList";
 import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
+import { MissionConfirmPostType } from "../../types";
+const examplePosts: MissionConfirmPostType[] = [
+  {
+    date: new Date("2024-03-15T12:30:00"),
+    completed: true,
+    photo: "http://example.com/photo1.jpg",
+    text: "Mission completed successfully.",
+  },
+  {
+    date: new Date("2024-03-16"),
+    completed: false,
+    photo: "http://example.com/photo2.jpg",
+    text: "Encountered some difficulties during the mission.",
+  },
+];
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
   const location = useLocation();
@@ -23,7 +39,9 @@ const MissionConfirmPost = () => {
         </Link>
       </Navbar>
       <MainSection>
-        {userInfoState.isLoggedIn || (
+        {!userInfoState.isLoggedIn ? (
+          <ConfirmPostList postList={examplePosts} />
+        ) : (
           <NoLoginContent>
             <span>❌</span>
             <h1>미션에 가입해야 조회가 가능합니다.</h1>

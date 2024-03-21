@@ -30,11 +30,20 @@ export type MissionType = {
 // boolean completed;
 // String photoData;
 // String textData;
-export type MissionConfirmPost = {
+export type MissionConfirmPostType = {
+  //todo 글쓴이가 추가되어야 함.
   date: Date;
   completed: boolean;
   photo: string;
   text: string;
+};
+export type ConfirmPostListType = {
+  postList: MissionConfirmPostType[];
+};
+
+export type ConfirmPostType = {
+  post: MissionConfirmPostType;
+  index: number;
 };
 
 export type UserInfoType = {
