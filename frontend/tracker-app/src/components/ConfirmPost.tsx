@@ -1,10 +1,20 @@
 import styled from "styled-components";
+import { useState } from "react";
 import { ConfirmPostType } from "../types";
 import exampleImg from "../assets/img/roadmap-77.png";
 import { theme } from "../styles/theme";
+import PostModal from "./PostModal";
 const ConfirmPost = ({ post, index }: ConfirmPostType) => {
+  const [clickPost, setClickPost] = useState<boolean>(false);
+  const postClickHandler = () => {
+    setClickPost(true);
+  };
+  const postCloseHandler = () => {
+    setClickPost(false);
+  };
   return (
     <PostLayout>
+      {clickPost && <PostModal onClose={postCloseHandler} />}
       <PostHeader>
         <p
           style={{
@@ -24,7 +34,7 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
           {post.date.toLocaleString()}
         </p>
       </PostHeader>
-      <PostContent>
+      <PostContent onClick={postClickHandler}>
         <p>
           {post.text} 스프링(Spring Fram ework)을 완전히 마스터할 수 있는 학습
           로드맵 입니다. 막 자바 학습을 끝낸 분들, 서버 개발자로 취업을 준비하는
@@ -59,6 +69,7 @@ const PostHeader = styled.div`
 `;
 
 const PostContent = styled.div`
+  cursor: pointer;
   min-height: 120px;
   padding: 10px;
   & > img {

@@ -6,6 +6,7 @@ import { useLocation } from "react-router";
 import { useEffect } from "react";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
+import { ModalContent, ModalOverlay } from "./StyledModal";
 interface LoginDivProps {
   naver?: string;
 }
@@ -18,26 +19,8 @@ const ModalTitle = styled.h1`
   color: ${theme.mainBlue};
   padding: 10px;
 `;
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
-const ModalContent = styled.div`
-  position: relative;
-  background-color: white;
-  padding: 20px;
-  min-height: 30%;
-  border-radius: 8px;
-`;
-const LoginDiv = styled.div<LoginDivProps>`
+const SocialLoginDiv = styled.div<LoginDivProps>`
   background-image: url(${(props) => (props.naver ? naverLogin : googleLogin)});
   background-position: center;
   background-size: cover;
@@ -97,11 +80,11 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
           />
           <Span>소셜 로그인</Span>
           <a href="http://localhost:8080/login/oauth2/code/google">
-            <LoginDiv />
+            <SocialLoginDiv />
           </a>
           <br />
           <a href="http://localhost:8080/login/oauth2/code/naver">
-            <LoginDiv naver="true" />
+            <SocialLoginDiv naver="true" />
           </a>
         </div>
       </ModalContent>
