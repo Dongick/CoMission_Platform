@@ -13,9 +13,13 @@ const GlobalStyle = createGlobalStyle`
     vertical-align: baseline;
     box-sizing: border-box;
     text-align: center;
+    white-space: pre-wrap;
   a{
     text-decoration: none;
     color: inherit;
+  }
+  p{
+    line-height: 1.3rem;
   }
   html {
   font-size: 62.5%; // 1rem = 10px
