@@ -39,12 +39,12 @@ const MissionConfirmPost = () => {
         </Link>
       </Navbar>
       <MainSection>
-        {!userInfoState.isLoggedIn ? (
+        {userInfoState.isLoggedIn ? (
           <ConfirmPostList postList={examplePosts} />
         ) : (
           <NoLoginContent>
             <span>❌</span>
-            <h1>미션에 가입해야 조회가 가능합니다.</h1>
+            <h1>미션 멤버만 조회가 가능합니다.</h1>
             <p>미션에 참가해보세요!</p>
           </NoLoginContent>
         )}

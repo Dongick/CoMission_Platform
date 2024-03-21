@@ -6,7 +6,9 @@ import sectionSVG from "../assets/img/wave-haikei.svg";
 import Card from "../components/Card";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
+import { useNavigate } from "react-router";
 const MainPage = () => {
+  const navigate = useNavigate();
   const cardsData = [
     {
       title: "Title 1",
@@ -93,7 +95,10 @@ const MainPage = () => {
         bgcolor={theme.subGreen}
         style={{ margin: "10px", fontSize: "large", borderRadius: "20px" }}
         onClick={() => {
-          if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+          if (userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+          else {
+            navigate("/mission-create");
+          }
         }}
       >
         새로운 미션 등록

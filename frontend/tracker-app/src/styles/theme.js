@@ -12,6 +12,7 @@ export const theme = {
   subGreen: "#00C471",
   subBlue: "#558EF8",
   subGray: "#999999",
+  subGray2: "#393939",
   subPink: "rgb(255,197,227)",
   typography: {
     fontFamily: ["noto", "ubuntu"].join(","),
