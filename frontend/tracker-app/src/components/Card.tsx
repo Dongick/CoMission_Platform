@@ -23,13 +23,13 @@ const ImgDiv = styled.div`
   background-image: url(${Img});
   background-size: cover;
   background-position: center;
-  height: 60%;
+  min-height: 60%;
   width: 100%;
 `;
 const ContentDiv = styled.div`
   padding: 15px;
   font-family: "noto";
-  height: 40%;
+  /* height: 40%; */
   overflow: hidden;
 `;
 const Card = ({ title, author, people, id, missionData }: CardProps) => {
@@ -90,14 +90,12 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
             style={{
               fontFamily: "gmarket1",
               padding: "5px",
-              // height: "50%",
               overflow: "hidden",
-              whiteSpace: "wrap",
+              whiteSpace: "nowrap",
               textOverflow: "ellipsis",
             }}
           >
-            ??명이 더 모이면
-            <br /> 미션이 시작됩니다
+            여기에 뭘 넣을까요
           </div>
         </ContentDiv>
       </StyledCard>

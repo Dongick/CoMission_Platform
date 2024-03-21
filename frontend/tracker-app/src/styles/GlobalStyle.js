@@ -13,7 +13,6 @@ const GlobalStyle = createGlobalStyle`
     vertical-align: baseline;
     box-sizing: border-box;
     text-align: center;
-    white-space: pre-wrap;
   a{
     text-decoration: none;
     color: inherit;
@@ -25,12 +24,12 @@ const GlobalStyle = createGlobalStyle`
   font-size: 62.5%; // 1rem = 10px
   height: 100%;
   }
-  /* body{
-    background-color: #F6F9F0;
-    /* margin-bottom: 100px; */
-  } */
+  }
   ol, ul, li{
     list-style: none;
+  }
+  body{
+    line-height: 1.2rem;
   }
   article,
   aside,
