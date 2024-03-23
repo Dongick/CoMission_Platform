@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router";
+import Input from "../components/StyledInput";
 const MainPage = () => {
   const navigate = useNavigate();
   const cardsData = [
@@ -81,7 +82,7 @@ const MainPage = () => {
             padding: "10px",
           }}
         >
-          <Input type="text" placeholder="미션명 검색하기" />
+          <Input type="text" placeholder="미션명 검색하기" size={25} />
           <StyledButton
             bgcolor={theme.subGreen}
             color="white"
@@ -123,8 +124,8 @@ export default MainPage;
 
 export const SearchSection = styled.section`
   background-image: url(${sectionSVG});
-  background-size: cover; /* 원하는 크기로 이미지를 맞춥니다. */
-  background-position: center; /* 이미지를 가운데 정렬합니다. */
+  background-size: cover;
+  background-position: center;
   height: 20vh;
   padding: 10px;
   margin-bottom: 3vh;
@@ -135,15 +136,7 @@ export const SearchSection = styled.section`
   flex-direction: column;
   justify-content: center;
 `;
-const Input = styled.input`
-  width: 25vw;
-  border-radius: 10px;
-  outline: none;
-  &:focus-visible {
-    outline: 1px solid ${theme.subGreen};
-    box-shadow: ${theme.boxShadowHover};
-  }
-`;
+
 const MainSection = styled.section`
   min-height: 100vh;
   padding: 3vh;
