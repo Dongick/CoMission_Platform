@@ -3,7 +3,7 @@ import { theme } from "../styles/theme";
 interface ButtonProps {
   bgcolor?: string;
   color?: string;
-  onClick?: () => void;
+  onClick?: (e: React.FormEvent | React.MouseEvent) => void;
 }
 
 const StyledButton = styled.button<ButtonProps>`

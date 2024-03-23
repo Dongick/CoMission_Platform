@@ -3,10 +3,41 @@ import styled from "styled-components";
 import { SearchSection } from "../MainPage";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
+import Form from "../../components/StyledForm";
+import { useState } from "react";
+import Input from "../../components/StyledInput";
+import StyledButton from "../../components/StyledButton";
+
 const MissionCreatePage = () => {
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [minParticipants, setMinParticipants] = useState(2);
+  const today = new Date().toISOString().split("T")[0];
+  const [deadline, setDeadline] = useState<string>(today);
+  const formSubmitHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description) {
+      window.alert("모든 값을 입력해주세요!");
+    }
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    if (photo) {
+      formData.append("photo", photo);
+    }
+    formData.append("minParticipants", minParticipants.toString());
+    formData.append("deadline", deadline);
+    console.log(...formData);
+
+    // Send formData to the server using Axios
+    // header에 'Content-Type': 'multipart/form-data'
+  };
   return (
     <Layout footer={false}>
-      <div style={{ backgroundColor: `${theme.mainGray}` }}>
+      <div
+        style={{ backgroundColor: `${theme.mainGray}`, paddingBottom: "50px" }}
+      >
         <MissionCreateBanner>
           <div>
             <h2>미션 공유 플랫폼이란?</h2>
@@ -19,8 +50,135 @@ const MissionCreatePage = () => {
           <img src={missionImg} alt="zz" width={100} height={100} />
         </MissionCreateBanner>
         <MissionFormWrapper>
-          <MissionFormView></MissionFormView>
+          <p>미션 상세 설정</p>
+          <MissionFormView>
+            <Form>
+              <InputDiv>
+                <label htmlFor="title">미션 제목 (필수)</label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  placeholder="미션명(예: 매일 책 읽기)"
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  style={{
+                    border: "1px solid #ebebeb",
+                    marginTop: "15px",
+                    width: "100%",
+                    height: "30px",
+                    textAlign: "left",
+                    padding: "5px",
+                  }}
+                />
+              </InputDiv>
+              <InputDiv>
+                <label htmlFor="description">미션 상세 설명 (필수)</label>
+                <Input
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                  placeholder="미션에 대한 설명과 인증 방법에 대해 설명해주세요"
+                  type="textarea"
+                  style={{ border: "1px solid #ebebeb", marginTop: "15px" }}
+                />
+              </InputDiv>
+              <InputDiv>
+                <label htmlFor="photo">미션 대표 이미지 </label>
+                <input
+                  type="file"
+                  id="photo"
+                  onChange={(e) =>
+                    setPhoto(e.target.files ? e.target.files[0] : null)
+                  }
+                  accept="image/*"
+                  style={{ marginTop: "15px" }}
+                />
+              </InputDiv>
+              <InputDiv>
+                <label htmlFor="participants">미션 최소 인원 설정</label>
+                <input
+                  type="number"
+                  id="participants"
+                  value={minParticipants}
+                  onChange={(e) => setMinParticipants(parseInt(e.target.value))}
+                  min={2}
+                  required
+                  style={{
+                    border: "1px solid #ebebeb",
+                    marginTop: "15px",
+                    width: "20%",
+                    height: "30px",
+                    padding: "5px",
+                  }}
+                />
+              </InputDiv>
+            </Form>
+          </MissionFormView>
+          <p>미션 기간과 인증 빈도 설정</p>
+          <MissionFormView>
+            <Form>
+              <InputDiv>
+                <label htmlFor="deadline">미션 마감일</label>
+                <input
+                  type="date"
+                  id="deadline"
+                  value={deadline}
+                  min={today}
+                  onChange={(e) => {
+                    setDeadline(e.target.value);
+                  }}
+                  style={{
+                    border: "1px solid #ebebeb",
+                    marginTop: "15px",
+                    width: "30%",
+                    height: "30px",
+                    textAlign: "center",
+                    padding: "5px",
+                  }}
+                />
+              </InputDiv>
+              <InputDiv>
+                <label htmlFor="frequency">미션 인증 주기</label>
+                <select
+                  id="frequency"
+                  style={{
+                    border: "1px solid #ebebeb",
+                    marginTop: "15px",
+                    width: "30%",
+                    height: "30px",
+                    textAlign: "center",
+                    padding: "5px",
+                  }}
+                >
+                  <option value="100" disabled>
+                    100일
+                  </option>
+                  <option value="365">365일</option>
+                </select>
+              </InputDiv>
+            </Form>
+          </MissionFormView>
         </MissionFormWrapper>
+        <StyledButton
+          type="button"
+          style={{ marginRight: "10px" }}
+          bgcolor={theme.subGray}
+          color={theme.mainGray}
+          onClick={() => {
+            window.history.back();
+          }}
+        >
+          취소
+        </StyledButton>
+        <StyledButton
+          type="button"
+          bgcolor={theme.subGreen}
+          onClick={formSubmitHandler}
+        >
+          완료
+        </StyledButton>
       </div>
     </Layout>
   );
@@ -56,10 +214,31 @@ const MissionFormWrapper = styled.section`
   padding: 3vh;
   width: 50%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  & > p {
+    font-family: "notoBold";
+    font-size: 1.1rem;
+    margin: 10px;
+  }
 `;
 
 const MissionFormView = styled.div`
   width: 100%;
-  min-height: 600px;
+  min-height: 250px;
   background-color: white;
+  margin-bottom: 50px;
+  border-radius: 10px;
+  font-family: "gmarket2  ";
+`;
+
+const InputDiv = styled.div`
+  padding: 20px;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid ${theme.subGray};
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
 `;
