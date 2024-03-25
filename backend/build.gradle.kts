@@ -36,6 +36,8 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation ("com.h2database:h2")
+	testImplementation ("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.3")
 }
 
 tasks.withType<Test> {

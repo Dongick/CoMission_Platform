@@ -9,6 +9,7 @@ import mission.dto.participant.ParticipantMissionId;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +49,9 @@ public class MainService {
             }
         }
 
-        List<MissionInfo> missionInfoList = getMissionList(0);
+        Page<MissionInfo> missionInfoPage = getMissionList(0);
+
+        List<MissionInfo> missionInfoList = missionInfoPage.getContent();
 
         MainResponse mainResponse = new MainResponse(participantMissionInfoList, missionInfoList);
 
@@ -58,7 +61,9 @@ public class MainService {
     // 메인화면 lazy loading 시 이후 미션 목록을 보여주는 메서드
     public MainLazyLoadingResponse getLazyLoadingMissionList(int num) {
 
-        List<MissionInfo> missionInfoList = getMissionList(num);
+        Page<MissionInfo> missionInfoPage = getMissionList(num);
+
+        List<MissionInfo> missionInfoList = missionInfoPage.getContent();
 
         MainLazyLoadingResponse mainLazyLoadingResponse = new MainLazyLoadingResponse(missionInfoList);
 
@@ -66,7 +71,7 @@ public class MainService {
     }
 
     // 현재 참여 가능한 미션 목록
-    private List<MissionInfo> getMissionList(int num) {
+    private Page<MissionInfo> getMissionList(int num) {
         Pageable pageable = PageRequest.of(20*num, 20*(num+1));
 
         return missionRepository.findAllAndStatusNotByOrderByCreatedAtDesc(pageable);
