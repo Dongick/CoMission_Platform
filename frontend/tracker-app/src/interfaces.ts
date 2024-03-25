@@ -6,11 +6,11 @@
  *  status : 응답 HTTP 상태 코드
  *  statusText : 응답 HTTP 상태 메시지
  */
-export interface APIResponse<T> {
+export interface APIResponse<Data> {
   statusCode: number; // 상태코드 (보인 서버상태코드)
   errorCode: number; // 에러코드 (본인 서버에러코드)
   message: string; // 메시지
-  data: T; // 데이터 내용
+  data: Data; // 데이터 내용
   header?: {};
-  timestamp?: Date; // 시간
+  timestamp?: any; // 시간
 }

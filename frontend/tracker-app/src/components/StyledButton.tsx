@@ -3,6 +3,7 @@ import { theme } from "../styles/theme";
 interface ButtonProps {
   bgcolor?: string;
   color?: string;
+  onClick?: (e: React.FormEvent | React.MouseEvent) => void;
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -11,11 +12,18 @@ const StyledButton = styled.button<ButtonProps>`
   padding: 10px 20px;
   border: none;
   font-family: "gmarket2";
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   &:hover {
     box-shadow: ${theme.boxShadow};
-    filter: brightness(1.1);
+  }
+  @media screen and (max-width: 1024px) {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  @media screen and (max-width: 768px) {
+    padding: 5px 10px;
+    font-size: 10px;
   }
 `;
 

@@ -1,5 +1,5 @@
 import axios, {
-  Axios,
+  AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
@@ -7,8 +7,9 @@ import axios, {
 import { APIResponse } from "./interfaces";
 
 // Axios instance 생성
-const instance: Axios = axios.create({
+const apiRequester: AxiosInstance = axios.create({
   baseURL: "http://localhost:3000", // BASE URL
+  timeout: 5000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,31 +17,40 @@ const instance: Axios = axios.create({
 });
 
 // 요청 interceptor
-instance.interceptors.request.use(
+apiRequester.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    if (config.data instanceof FormData) {
+      config.headers["Content-Type"] = "multipart/form-data";
+    }
     return config;
   },
   (error) => {
-    console.log(error);
+    console.log(`request interceptor 에러: ${error}`);
     return Promise.reject(error);
   }
 );
 
 // 응답 interceptor
-instance.interceptors.response.use(
+apiRequester.interceptors.response.use(
   (response: AxiosResponse) => {
     //todo 응답 시 콜백함수 추가 가능
     return response;
   },
   (error) => {
     // 토큰 만료 확인
-    if (error.response && error.response.status === 401) {
-      // 여기서 토큰 갱신 등의 작업 수행 가능
+    console.log(`request failed: ${error.message}`);
+    if (error.response?.status === 401) {
       // 예: refreshToken을 사용하여 새로운 accessToken을 요청
+      try {
+        // error.config.headers.Authorization = `Bearer ${refreshedAccessToken}`;
+      } catch (refreshError) {
+        console.error("Failed to refresh access token:", refreshError);
+        //todo 로그아웃 시키고 메인 페이지 이동
+      }
     }
     return Promise.reject(error);
   }
@@ -52,23 +62,27 @@ export const getData = async <T>(
   config?: AxiosRequestConfig
 ): Promise<T> => {
   try {
-    const response = await instance.get<T>(url, config);
+    const response = await apiRequester.get<T>(url, config);
     return response.data;
   } catch (error) {
-    throw error;
+    if (error instanceof Error)
+      throw new Error(`Failed to get data from ${url}: ${error.message}`);
+    throw new Error(`Failed to get data from ${url}: Unknown error occurred`);
   }
 };
 
 // POST Method
-export const postData = async <T>(
+export const postData = async <T, R>(
   url: string,
   data: T,
   config?: AxiosRequestConfig
-): Promise<T> => {
+): Promise<R> => {
   try {
-    const response = await instance.post<T>(url, data, config);
+    const response = await apiRequester.post<R>(url, data, config);
     return response.data;
   } catch (error) {
-    throw error;
+    if (error instanceof Error)
+      throw new Error(`Failed to post data from ${url}: ${error.message}`);
+    throw new Error(`Failed to post data from ${url}: Unknown error occurred`);
   }
 };

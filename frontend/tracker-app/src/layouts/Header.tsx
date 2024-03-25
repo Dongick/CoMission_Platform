@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
+import UserMenu from "../components/UserMenu";
+import { Link } from "react-router-dom";
 const StyledHeader = styled.header`
   background-color: white;
   color: ${theme.mainBlue};
@@ -13,9 +15,12 @@ const StyledHeader = styled.header`
 
 const Header = () => {
   return (
-    <>
-      <StyledHeader>Comission Platform</StyledHeader>
-    </>
+    <div style={{ position: "relative" }}>
+      <StyledHeader>
+        <Link to="/">Comission Platform</Link>
+      </StyledHeader>
+      <UserMenu isLogin={false} />
+    </div>
   );
 };
 export default Header;

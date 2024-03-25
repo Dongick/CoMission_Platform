@@ -6,6 +6,7 @@ import styled from "styled-components";
 
 interface Props {
   children: ReactNode;
+  footer?: boolean;
 }
 const StyledLayout = styled.div`
   display: flex;
@@ -13,12 +14,12 @@ const StyledLayout = styled.div`
   height: 100%;
 `;
 
-const Layout = ({ children }: Props) => {
+const Layout = ({ children, footer = true }: Props) => {
   return (
     <StyledLayout>
       <Header />
       <Main>{children}</Main>
-      <Footer />
+      {footer && <Footer />}
     </StyledLayout>
   );
 };
