@@ -4,7 +4,7 @@ import { SearchSection } from "../MainPage";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
 import Form from "../../components/StyledForm";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
 
@@ -15,6 +15,42 @@ const MissionCreatePage = () => {
   const [minParticipants, setMinParticipants] = useState(2);
   const today = new Date().toISOString().split("T")[0];
   const [deadline, setDeadline] = useState<string>(today);
+  const titleChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.target.value);
+    },
+    []
+  );
+  const descriptionChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDescription(e.target.value);
+    },
+    []
+  );
+
+  const photoChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        setPhoto(e.target.files[0]);
+      }
+    },
+    []
+  );
+
+  const minParticipantsChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setMinParticipants(parseInt(e.target.value));
+    },
+    []
+  );
+
+  const deadlineChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDeadline(e.target.value);
+    },
+    []
+  );
+
   const formSubmitHandler = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description) {
@@ -60,7 +96,7 @@ const MissionCreatePage = () => {
                   id="title"
                   value={title}
                   placeholder="미션명(예: 매일 책 읽기)"
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={titleChangeHandler}
                   required
                   style={{
                     border: "1px solid #ebebeb",
@@ -74,10 +110,10 @@ const MissionCreatePage = () => {
               </InputDiv>
               <InputDiv>
                 <label htmlFor="description">미션 상세 설명 (필수)</label>
-                <Input
+                <input
                   id="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={descriptionChangeHandler}
                   required
                   placeholder="미션에 대한 설명과 인증 방법에 대해 설명해주세요"
                   type="textarea"
@@ -89,9 +125,7 @@ const MissionCreatePage = () => {
                 <input
                   type="file"
                   id="photo"
-                  onChange={(e) =>
-                    setPhoto(e.target.files ? e.target.files[0] : null)
-                  }
+                  onChange={photoChangeHandler}
                   accept="image/*"
                   style={{ marginTop: "15px" }}
                 />
@@ -102,7 +136,7 @@ const MissionCreatePage = () => {
                   type="number"
                   id="participants"
                   value={minParticipants}
-                  onChange={(e) => setMinParticipants(parseInt(e.target.value))}
+                  onChange={minParticipantsChangeHandler}
                   min={2}
                   required
                   style={{
@@ -125,10 +159,8 @@ const MissionCreatePage = () => {
                   type="date"
                   id="deadline"
                   value={deadline}
-                  min={today}
-                  onChange={(e) => {
-                    setDeadline(e.target.value);
-                  }}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={deadlineChangeHandler}
                   style={{
                     border: "1px solid #ebebeb",
                     marginTop: "15px",

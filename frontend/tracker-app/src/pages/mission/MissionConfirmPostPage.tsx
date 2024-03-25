@@ -39,7 +39,7 @@ const MissionConfirmPost = () => {
         </Link>
       </Navbar>
       <MainSection>
-        {userInfoState.isLoggedIn ? (
+        {!userInfoState.isLoggedIn ? (
           <ConfirmPostList postList={examplePosts} />
         ) : (
           <NoLoginContent>

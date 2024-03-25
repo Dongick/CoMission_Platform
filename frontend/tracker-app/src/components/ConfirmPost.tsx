@@ -43,7 +43,7 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
           백엔드 개발자로 성 장할 수 있도록 스프링을 제대로 이해하고 사용하는
           방법을 알려드립니다.
         </p>
-        <img src={exampleImg} alt={`Post ${index}`} />
+        <img src={exampleImg} alt={`Post ${index}`} width="100%" />
         <p>{post.completed ? "Completed" : "Not Completed"}</p>
       </PostContent>
     </PostLayout>
