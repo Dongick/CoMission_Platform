@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { MissionType } from "../types";
 interface CardProps {
   title: string;
-  author: string;
+  author?: string;
   people: number;
   id: number;
   missionData: MissionType;
@@ -19,8 +19,8 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
     navigate(`/mission/${id}/detail`, { state: { mission: missionData } });
   };
   return (
-    <div onClick={handleClick}>
-      <StyledCard>
+    <div>
+      <StyledCard onClick={handleClick}>
         <ImgDiv />
         <ContentDiv>
           <div>
@@ -83,7 +83,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
 };
 export default Card;
 
-const StyledCard = styled.section`
+export const StyledCard = styled.section`
   height: 40vh;
   width: 15vw;
   border-radius: 10px;
@@ -91,6 +91,7 @@ const StyledCard = styled.section`
   box-shadow: ${theme.boxShadow};
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 `;
 const ImgDiv = styled.div`
   background-image: url(${Img});
