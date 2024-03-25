@@ -28,7 +28,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
-	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation ("io.jsonwebtoken:jjwt-api:0.12.3")
 	implementation ("io.jsonwebtoken:jjwt-impl:0.12.3")
 	implementation ("io.jsonwebtoken:jjwt-jackson:0.12.3")
@@ -37,6 +36,8 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation ("com.h2database:h2")
+	testImplementation ("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.3")
 }
 
 tasks.withType<Test> {

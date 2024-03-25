@@ -3,9 +3,7 @@ package mission.service;
 import lombok.RequiredArgsConstructor;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
-import mission.dto.mission.MissionCreateRequest;
-import mission.dto.mission.MissionInfoResponse;
-import mission.dto.mission.MissionUpdateRequest;
+import mission.dto.mission.*;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.enums.MissionStatus;
 import mission.exception.*;
@@ -109,8 +107,8 @@ public class MissionService {
 
             Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
 
-            // 해당 미션이 끝나지 않은 상태에서 해당 미션에 참여한 사용자인지 확인
-            if(optionalParticipantDocument.isPresent() && !missionDocument.getStatus().equals(MissionStatus.COMPLETED.name())) {
+            // 해당 미션에 참여한 사용자인지 확인
+            if(optionalParticipantDocument.isPresent()) {
                 participant = true;
             }
         }
@@ -126,6 +124,15 @@ public class MissionService {
                 .deadline(missionDocument.getDeadline())
                 .participant(participant)
                 .build();
+    }
+
+    public MissionSearchResponse missionSearch(MissionSearchRequest missionSearchRequest) {
+        List<MissionInfo> missionInfoList = missionRepository.findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(missionSearchRequest.getTitle());
+
+        MissionSearchResponse missionSearchResponse = new MissionSearchResponse(missionInfoList);
+
+        return missionSearchResponse;
+
     }
 
     // 미션 저장
