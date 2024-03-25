@@ -16,6 +16,7 @@ public class MissionDocument {
     private ObjectId id;
     private String title;
     private String description;
+    private String photoUrl;
     private LocalDateTime createdAt;
     private LocalDate startDate;
     private LocalDate deadline;
