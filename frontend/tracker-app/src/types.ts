@@ -9,7 +9,7 @@
 // int participants;  미션 참가 인원수
 // int duration;   ex 365일
 // String status;   ex 미션 상태  CREATED, STARTED, COMPLETED
-// String frequency; 인증 주기 ex daily
+// String frequency; 인증 주기 ex 매일, 주1~6회
 // String creatorEmail;  ex 미션 생성한 사용자
 export type MissionType = {
   title: string;

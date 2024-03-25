@@ -19,7 +19,7 @@ const Header = () => {
       <StyledHeader>
         <Link to="/">Comission Platform</Link>
       </StyledHeader>
-      <UserMenu isLogin={true} />
+      <UserMenu isLogin={false} />
     </div>
   );
 };

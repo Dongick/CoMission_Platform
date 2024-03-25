@@ -10,28 +10,7 @@ interface CardProps {
   id: number;
   missionData: MissionType;
 }
-const StyledCard = styled.section`
-  height: 40vh;
-  width: 15vw;
-  border-radius: 10px;
-  margin-bottom: 5vh;
-  box-shadow: ${theme.boxShadow};
-  display: flex;
-  flex-direction: column;
-`;
-const ImgDiv = styled.div`
-  background-image: url(${Img});
-  background-size: cover;
-  background-position: center;
-  min-height: 60%;
-  width: 100%;
-`;
-const ContentDiv = styled.div`
-  padding: 15px;
-  font-family: "noto";
-  /* height: 40%; */
-  overflow: hidden;
-`;
+
 const Card = ({ title, author, people, id, missionData }: CardProps) => {
   const navigate = useNavigate();
 
@@ -103,3 +82,25 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
   );
 };
 export default Card;
+
+const StyledCard = styled.section`
+  height: 40vh;
+  width: 15vw;
+  border-radius: 10px;
+  margin-bottom: 5vh;
+  box-shadow: ${theme.boxShadow};
+  display: flex;
+  flex-direction: column;
+`;
+const ImgDiv = styled.div`
+  background-image: url(${Img});
+  background-size: cover;
+  background-position: center;
+  min-height: 60%;
+  width: 100%;
+`;
+const ContentDiv = styled.div`
+  padding: 15px;
+  font-family: "noto";
+  overflow: hidden;
+`;
