@@ -31,7 +31,7 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
             color: `${theme.subGray}`,
           }}
         >
-          {post.date.toLocaleDateString()}
+          {post.date}
         </p>
       </PostHeader>
       <PostContent onClick={postClickHandler}>

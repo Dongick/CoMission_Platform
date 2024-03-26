@@ -13,24 +13,24 @@ export type MainServerResponseType = {
 };
 
 // 미션 상세 정보
-export type MissionType = Partial<{
+export type MissionType = {
   title: string;
-  creatorEmail: string;
+  creatorEmail?: string;
   description: string;
-  created: Date;
-  start: Date;
-  deadline: Date;
+  created?: string;
+  start?: string;
+  deadline?: string;
   minParticipants: number;
   participants: number;
   duration: number;
-  status: string;
+  status?: string;
   frequency: string;
   participant: boolean;
-}>;
+};
 
 export type MissionConfirmPostType = {
   //todo 글쓴이가 추가되어야 함.
-  date: Date;
+  date: string;
   completed: boolean;
   photo: string;
   text: string;

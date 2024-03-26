@@ -8,13 +8,13 @@ import { useRecoilState } from "recoil";
 import { MissionConfirmPostType } from "../../types";
 const examplePosts: MissionConfirmPostType[] = [
   {
-    date: new Date("2024-03-15T12:30:00"),
+    date: "2024-03-15T12:30:00",
     completed: true,
     photo: "http://example.com/photo1.jpg",
     text: "Mission completed successfully.",
   },
   {
-    date: new Date("2024-03-16"),
+    date: "2024-03-16",
     completed: false,
     photo: "http://example.com/photo2.jpg",
     text: "Encountered some difficulties during the mission.",

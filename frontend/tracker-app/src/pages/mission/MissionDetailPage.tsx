@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import Layout from "../../layouts/Layout";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { MissionType } from "../../types";
 import { theme } from "../../styles/theme";
 import example from "../../assets/img/roadmap-77.png";
 import StyledButton from "../../components/StyledButton";
@@ -18,15 +17,29 @@ import {
 } from "./MissionStyles";
 import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
+import { useQuery } from "@tanstack/react-query";
+import { MissionType } from "../../types";
+import { getData } from "../../axios";
+
 const MissionDetail = () => {
   const { cardId } = useParams();
   const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
-  const missionData = location.state.mission as MissionType;
+  const title = location.state.title;
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const fetchData = () => getData<MissionType>(`/api/mission/info/${title}`);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["missionDetailInfo"],
+    queryFn: fetchData,
+  });
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  //todo 여기서 mission의 ID를 알고, api요청을 해서 상세 정보를 가져와야 한다
+  if (isError) {
+    return <div>Error fetching detail mission data</div>;
+  }
   return (
     <Layout>
       <BannerSection>
@@ -46,12 +59,10 @@ const MissionDetail = () => {
           </div>
           <div>
             <p style={{ marginRight: "10px" }}>
-              미션 생성일 : {missionData.created.toLocaleDateString()} &nbsp;/
+              미션 생성일 : {data?.created} &nbsp;/
             </p>
             <p>
-              ⏱ 미션 진행일 : {missionData.start.toLocaleDateString()} -&nbsp;
-              {missionData.deadline.toLocaleDateString()} (
-              {missionData.duration}
+              ⏱ 미션 진행일 : {data?.start} -{data?.deadline}({data?.duration}
               일간)
             </p>
           </div>
@@ -62,9 +73,9 @@ const MissionDetail = () => {
               width: "80%",
             }}
           >
-            <p>인증주기: {missionData.frequency}</p>
-            <p>👨‍👧‍👧최소 필요인원: {missionData.minParticipants}</p>
-            <p>👨‍👧‍👧현재 참가인원: {missionData.participants}</p>
+            <p>인증주기: {data?.frequency}</p>
+            <p>👨‍👧‍👧최소 필요인원: {data?.minParticipants}</p>
+            <p>👨‍👧‍👧현재 참가인원: {data?.participants}</p>
           </div>
           <StyledButton
             bgcolor={theme.subGreen}
@@ -100,13 +111,13 @@ const MissionDetail = () => {
               paddingTop: "20px",
             }}
           >
-            {missionData.creatorEmail} 님이 만든 미션
+            {data?.creatorEmail} 님이 만든 미션
           </h1>
           <h2 style={{ paddingTop: "15px", fontSize: "1.2rem" }}>
             <span
               style={{ fontFamily: "notoBold", color: `${theme.subGreen}` }}
             >
-              {missionData.minParticipants - missionData.participants}명
+              {(data?.minParticipants ?? 0) - (data?.participants ?? 0)}명
             </span>
             이 더 참가시 미션 시작 🚩
           </h2>

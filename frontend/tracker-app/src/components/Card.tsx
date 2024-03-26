@@ -14,7 +14,7 @@ interface CardProps {
 const Card = ({ id, title, author, minPar, par, duration }: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate(`/mission/${id}/detail`);
+    navigate(`/mission/${id}/detail`, { state: { title } });
   };
 
   return (
