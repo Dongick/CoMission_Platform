@@ -22,6 +22,7 @@ import { MissionType } from "../../types";
 import { getData } from "../../axios";
 
 const MissionDetail = () => {
+  //todo: cardId -> _id로 변경, title 얻어오는 방식 변경
   const { cardId } = useParams();
   const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;

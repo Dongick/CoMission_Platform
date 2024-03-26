@@ -5,24 +5,9 @@ import { Link, useParams, useLocation } from "react-router-dom";
 import ConfirmPostList from "../../components/ConfirmPostList";
 import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
-import { MissionConfirmPostType } from "../../types";
-const examplePosts: MissionConfirmPostType[] = [
-  {
-    date: "2024-03-15T12:30:00",
-    completed: true,
-    photo: "http://example.com/photo1.jpg",
-    text: "Mission completed successfully.",
-  },
-  {
-    date: "2024-03-16",
-    completed: false,
-    photo: "http://example.com/photo2.jpg",
-    text: "Encountered some difficulties during the mission.",
-  },
-];
+
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
-  const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
@@ -40,7 +25,7 @@ const MissionConfirmPost = () => {
       </Navbar>
       <MainSection>
         {!userInfoState.isLoggedIn ? (
-          <ConfirmPostList postList={examplePosts} />
+          <ConfirmPostList />
         ) : (
           <NoLoginContent>
             <span>❌</span>

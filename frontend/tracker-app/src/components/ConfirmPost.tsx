@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { ConfirmPostType } from "../types";
+import { ConfirmPostIndexType } from "../types";
 import exampleImg from "../assets/img/roadmap-77.png";
 import { theme } from "../styles/theme";
 import PostModal from "./PostModal";
-const ConfirmPost = ({ post, index }: ConfirmPostType) => {
+const ConfirmPost = ({ post, index }: ConfirmPostIndexType) => {
   const [clickPost, setClickPost] = useState<boolean>(false);
   const postClickHandler = () => {
     setClickPost(true);
@@ -36,14 +36,14 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
       </PostHeader>
       <PostContent onClick={postClickHandler}>
         <p>
-          {post.text} 스프링(Spring Fram ework)을 완전히 마스터할 수 있는 학습
-          로드맵 입니다. 막 자바 학습을 끝낸 분들, 서버 개발자로 취업을 준비하는
-          분들은 물론 이미 현업 에서 스프링을 사용하며 수준을 한 단계 끌어올리고
-          싶은 분들까지 모두 에게 도움이 됩니다. 원리부터 응용까지, 내공있는
-          백엔드 개발자로 성 장할 수 있도록 스프링을 제대로 이해하고 사용하는
-          방법을 알려드립니다.
+          {post.textData} 스프링(Spring Fram ework)을 완전히 마스터할 수 있는
+          학습 로드맵 입니다. 막 자바 학습을 끝낸 분들, 서버 개발자로 취업을
+          준비하는 분들은 물론 이미 현업 에서 스프링을 사용하며 수준을 한 단계
+          끌어올리고 싶은 분들까지 모두 에게 도움이 됩니다. 원리부터 응용까지,
+          내공있는 백엔드 개발자로 성 장할 수 있도록 스프링을 제대로 이해하고
+          사용하는 방법을 알려드립니다.
         </p>
-        <img src={exampleImg} alt={`Post ${index}`} width="100%" />
+        <img src={post.photoData} alt={`Post ${index}`} width="100%" />
       </PostContent>
     </PostLayout>
   );

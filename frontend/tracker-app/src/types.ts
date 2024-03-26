@@ -28,19 +28,16 @@ export type MissionType = {
   participant: boolean;
 };
 
-export type MissionConfirmPostType = {
-  //todo 글쓴이가 추가되어야 함.
+export type ConfirmPostDataType = {
+  author?: string;
+  userEmail: string;
   date: string;
-  completed: boolean;
-  photo: string;
-  text: string;
-};
-export type ConfirmPostListType = {
-  postList: MissionConfirmPostType[];
+  photoData: string;
+  textData: string;
 };
 
-export type ConfirmPostType = {
-  post: MissionConfirmPostType;
+export type ConfirmPostIndexType = {
+  post: ConfirmPostDataType;
   index: number;
 };
 

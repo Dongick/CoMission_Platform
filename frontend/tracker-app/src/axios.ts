@@ -1,4 +1,5 @@
 import axios, {
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
@@ -24,7 +25,7 @@ apiRequester.interceptors.request.use(
     // }
     return config;
   },
-  (error) => {
+  (error: AxiosError) => {
     console.log(`request interceptor 에러: ${error}`);
     return Promise.reject(error);
   }
@@ -36,9 +37,9 @@ apiRequester.interceptors.response.use(
     //todo 응답 시 콜백함수 추가 가능
     return response;
   },
-  (error) => {
+  (error: AxiosError) => {
     // 토큰 만료 확인
-    console.log(`request failed: ${error.message}`);
+    console.log(`request failed: ${error}`);
     if (error.response?.status === 401) {
       // 예: refreshToken을 사용하여 새로운 accessToken을 요청
       try {

@@ -1,14 +1,29 @@
 import styled from "styled-components";
-import { MissionConfirmPostType, ConfirmPostListType } from "../types";
+import { ConfirmPostDataType } from "../types";
+import { useQuery } from "@tanstack/react-query";
+import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
 const PostListLayout = styled.div``;
 
-const ConfirmPostList = ({ postList }: ConfirmPostListType) => {
+const ConfirmPostList = () => {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["ConfrimPostList"],
+    queryFn: () => getData<ConfirmPostDataType[]>("/api/authentication/test/1"),
+  });
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error fetching posts</div>;
+  }
+  console.log(data);
+  console.log(error);
   return (
     <PostListLayout>
-      {postList.map((post, index) => (
-        <ConfirmPost post={post} index={index} key={index} />
+      {data?.map((post, index) => (
+        <ConfirmPost index={index + 1} post={post} />
       ))}
     </PostListLayout>
   );
