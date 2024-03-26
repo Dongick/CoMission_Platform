@@ -132,7 +132,7 @@ const MainPage = () => {
       >
         새로운 미션 등록
       </StyledButton>
-      {!userInfoState.isLoggedIn && (
+      {userInfoState.isLoggedIn && (
         <div
           style={{
             backgroundColor: "#F5F5F5",

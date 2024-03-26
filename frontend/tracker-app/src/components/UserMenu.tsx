@@ -35,7 +35,7 @@ const UserMenu = ({ isLogin = false }: UserMenuProps) => {
   );
   return (
     <Wrapper>
-      {!isLogin ? (
+      {isLogin ? (
         <div>
           {myInfo}
           <StyledButton

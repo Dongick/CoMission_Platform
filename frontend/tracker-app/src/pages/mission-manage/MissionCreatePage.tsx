@@ -13,8 +13,8 @@ const MissionCreatePage = () => {
   const [description, setDescription] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [minParticipants, setMinParticipants] = useState(2);
-  const today = new Date().toISOString().split("T")[0];
-  const [deadline, setDeadline] = useState<string>(today);
+  const [frequency, setFrequency] = useState<string>("매일");
+  const [duration, setDuration] = useState<number>(365);
   const titleChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTitle(e.target.value);
@@ -44,9 +44,15 @@ const MissionCreatePage = () => {
     []
   );
 
-  const deadlineChangeHandler = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setDeadline(e.target.value);
+  const frequencyChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setFrequency(e.target.value);
+    },
+    []
+  );
+  const durationChangeHandler = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setDuration(parseInt(e.target.value));
     },
     []
   );
@@ -63,7 +69,8 @@ const MissionCreatePage = () => {
       formData.append("photo", photo);
     }
     formData.append("minParticipants", minParticipants.toString());
-    formData.append("deadline", deadline);
+    formData.append("frequency", frequency);
+    formData.append("duration", duration.toString());
     console.log(...formData);
 
     // Send formData to the server using Axios
@@ -110,7 +117,7 @@ const MissionCreatePage = () => {
               </InputDiv>
               <InputDiv>
                 <label htmlFor="description">미션 상세 설명 (필수)</label>
-                <input
+                <Input
                   id="description"
                   value={description}
                   onChange={descriptionChangeHandler}
@@ -154,27 +161,11 @@ const MissionCreatePage = () => {
           <MissionFormView>
             <Form>
               <InputDiv>
-                <label htmlFor="deadline">미션 마감일</label>
-                <input
-                  type="date"
-                  id="deadline"
-                  value={deadline}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={deadlineChangeHandler}
-                  style={{
-                    border: "1px solid #ebebeb",
-                    marginTop: "15px",
-                    width: "30%",
-                    height: "30px",
-                    textAlign: "center",
-                    padding: "5px",
-                  }}
-                />
-              </InputDiv>
-              <InputDiv>
                 <label htmlFor="frequency">미션 인증 주기</label>
                 <select
                   id="frequency"
+                  value={frequency}
+                  onChange={frequencyChangeHandler}
                   style={{
                     border: "1px solid #ebebeb",
                     marginTop: "15px",
@@ -184,10 +175,34 @@ const MissionCreatePage = () => {
                     padding: "5px",
                   }}
                 >
-                  <option value="100" disabled>
+                  <option value="매일">Every day</option>
+                  <option value="주 1회">Once a week</option>
+                  <option value="주 2회">Twice a week</option>
+                  <option value="주 3회">Three times a week</option>
+                  <option value="주 4회">Four times a week</option>
+                  <option value="주 5회">Five times a week</option>
+                  <option value="주 6회">Six times a week</option>
+                </select>
+              </InputDiv>
+              <InputDiv>
+                <label htmlFor="duration">미션 참여 기간</label>
+                <select
+                  id="duration"
+                  value={duration}
+                  style={{
+                    border: "1px solid #ebebeb",
+                    marginTop: "15px",
+                    width: "30%",
+                    height: "30px",
+                    textAlign: "center",
+                    padding: "5px",
+                  }}
+                  onChange={durationChangeHandler}
+                >
+                  <option value={100} disabled>
                     100일
                   </option>
-                  <option value="365">365일</option>
+                  <option value={365}>365일</option>
                 </select>
               </InputDiv>
             </Form>
@@ -269,7 +284,7 @@ const InputDiv = styled.div`
   padding: 20px;
   width: 100%;
   text-align: left;
-  border-bottom: 1px solid ${theme.subGray};
+  border-bottom: 2px solid ${theme.mainGray};
   flex-direction: column;
   align-items: flex-start;
   display: flex;
