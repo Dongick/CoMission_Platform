@@ -5,8 +5,8 @@ import exampleImg from "../assets/img/wave-haikei.svg";
 import { useNavigate } from "react-router-dom";
 interface CardProps {
   title: string;
-  start: Date;
-  deadline: Date;
+  duration: number;
+  frequency: string;
   people: number;
   id: number;
 }
@@ -21,10 +21,8 @@ const MyCard = (props: CardProps) => {
       <MyImgDiv />
       <MyContentDiv>
         <p>{props.title}</p>
-        <p>
-          {props.start.toLocaleDateString()} ~{" "}
-          {props.deadline.toLocaleDateString()}
-        </p>
+        <p>{props.duration}</p>
+        <p>{props.frequency}</p>
         <p>멤버 {props.people}</p>
       </MyContentDiv>
     </MyStyledCard>

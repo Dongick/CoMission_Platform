@@ -9,104 +9,17 @@ import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router";
 import Input from "../components/StyledInput";
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { MissionType } from "../types";
-import axios from "axios";
+import { MainServerResponseType } from "../types";
 import { getData } from "../axios";
-const cardsData = [
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-];
+
 const MainPage = () => {
   const navigate = useNavigate();
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
 
-  const fetchData = () => getData<MissionType>("/api/main/1");
+  const fetchData = () => getData<MainServerResponseType>("/api/main");
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["missionData"],
+    queryKey: ["myMissionData", "totalMissionData"],
     queryFn: fetchData,
   });
   if (isLoading) {
@@ -116,7 +29,8 @@ const MainPage = () => {
   if (isError) {
     return <div>Error fetching data</div>;
   }
-  console.log(data);
+  const totalMissionData = data?.missionInfoList;
+  const myMissionData = data?.participantMissionInfoList;
   return (
     <Layout>
       <SearchSection>
@@ -161,39 +75,42 @@ const MainPage = () => {
             style={{
               fontSize: "1.3rem",
               fontFamily: "gmarket2",
-              paddingTop: "20px",
+              padding: "20px 0px",
               width: "40%",
               margin: "0 auto",
             }}
           >
             내가 참가한 미션
             <span style={{ color: `${theme.subGreen}`, paddingLeft: "10px" }}>
-              {cardsData.length}
+              {myMissionData?.length || 0}
             </span>
           </h2>
-          <MyMissionSection>
-            {cardsData.map((card, index) => (
-              <MyCard
-                key={index}
-                id={index + 1}
-                title={card.title}
-                start={card.start}
-                deadline={card.deadline}
-                people={card.participants}
-              />
-            ))}
-          </MyMissionSection>
+          {myMissionData?.length && (
+            <MyMissionSection>
+              {myMissionData?.map((mission, index) => (
+                <MyCard
+                  key={index}
+                  id={index + 1}
+                  title={mission.title}
+                  duration={mission.duration}
+                  frequency={mission.frequency}
+                  people={mission.participants}
+                />
+              ))}
+            </MyMissionSection>
+          )}
         </div>
       )}
       <MainSection>
-        {cardsData.map((card, index) => (
+        {totalMissionData?.map((mission, index) => (
           <Card
             key={index}
             id={index + 1}
-            title={card.title}
-            author={card.author}
-            people={card.participants}
-            missionData={card}
+            title={mission.title}
+            author="author name"
+            minPar={mission.minParticipants}
+            par={mission.participants}
+            duration={mission.duration}
           />
         ))}
       </MainSection>
