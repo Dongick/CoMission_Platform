@@ -93,14 +93,14 @@ export const StyledCard = styled.section`
   flex-direction: column;
   cursor: pointer;
 `;
-const ImgDiv = styled.div`
+export const ImgDiv = styled.div`
   background-image: url(${Img});
   background-size: cover;
   background-position: center;
   min-height: 60%;
   width: 100%;
 `;
-const ContentDiv = styled.div`
+export const ContentDiv = styled.div`
   padding: 15px;
   font-family: "noto";
   overflow: hidden;

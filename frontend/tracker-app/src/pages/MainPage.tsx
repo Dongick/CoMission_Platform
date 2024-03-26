@@ -158,7 +158,8 @@ const MainPage = () => {
                 key={index}
                 id={index + 1}
                 title={card.title}
-                author={card.author}
+                start={card.start}
+                deadline={card.deadline}
                 people={card.participants}
               />
             ))}
@@ -211,7 +212,7 @@ const MyMissionSection = styled.section`
   padding: 10px;
   margin: 0 auto;
   margin-bottom: 5vh;
-  height: 25vh;
+  height: 30vh;
   width: 50%;
   display: flex;
   overflow-x: auto;

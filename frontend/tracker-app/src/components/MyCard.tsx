@@ -1,21 +1,32 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
-import { StyledCard } from "./Card";
-import { title } from "process";
-
+import { StyledCard, ImgDiv, ContentDiv } from "./Card";
+import exampleImg from "../assets/img/wave-haikei.svg";
+import { useNavigate } from "react-router-dom";
 interface CardProps {
   title: string;
-  author: string;
+  start: Date;
+  deadline: Date;
   people: number;
   id: number;
 }
 
 const MyCard = (props: CardProps) => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate(`/mission/${props.id}/detail`);
+  };
   return (
-    <MyStyledCard>
-      {props.author}
-      {props.title}
-      {props.people}
+    <MyStyledCard onClick={handleClick}>
+      <MyImgDiv />
+      <MyContentDiv>
+        <p>{props.title}</p>
+        <p>
+          {props.start.toLocaleDateString()} ~{" "}
+          {props.deadline.toLocaleDateString()}
+        </p>
+        <p>멤버 {props.people}</p>
+      </MyContentDiv>
     </MyStyledCard>
   );
 };
@@ -24,10 +35,31 @@ export default MyCard;
 
 const MyStyledCard = styled(StyledCard)`
   background-color: white;
-  height: 90%;
+  height: 100%;
   width: 12vw;
   margin: 0;
   margin-right: 2vw;
-  padding: 10px;
   flex: 0 0 auto;
+`;
+
+const MyImgDiv = styled(ImgDiv)`
+  background-image: url(${exampleImg});
+  /* height: 60%; */
+`;
+
+const MyContentDiv = styled(ContentDiv)`
+  padding: 5px;
+  overflow: hidden;
+  p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* text-align: left; */
+    font-family: "noto";
+    font-size: 0.8rem;
+  }
+  & > p:first-child {
+    font-family: "notoBold";
+    font-size: 1rem;
+  }
 `;
