@@ -8,12 +8,8 @@ import { APIResponse } from "./interfaces";
 
 // Axios instance 생성
 const apiRequester: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000", // BASE URL
+  baseURL: "http://localhost:8080", // BASE URL
   timeout: 5000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  //  image나 영상 같은 거를 formData로 보낼 때에 는 multipart/form-data를 메서드 정의할 때 header에 작성
 });
 
 // 요청 interceptor
@@ -23,9 +19,9 @@ apiRequester.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    if (config.data instanceof FormData) {
-      config.headers["Content-Type"] = "multipart/form-data";
-    }
+    // if (config.data instanceof FormData) {
+    //   config.headers["Content-Type"] = "multipart/form-data";
+    // }
     return config;
   },
   (error) => {

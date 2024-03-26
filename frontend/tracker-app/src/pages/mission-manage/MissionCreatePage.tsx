@@ -176,12 +176,12 @@ const MissionCreatePage = () => {
                   }}
                 >
                   <option value="매일">Every day</option>
-                  <option value="주 1회">Once a week</option>
-                  <option value="주 2회">Twice a week</option>
-                  <option value="주 3회">Three times a week</option>
-                  <option value="주 4회">Four times a week</option>
-                  <option value="주 5회">Five times a week</option>
-                  <option value="주 6회">Six times a week</option>
+                  <option value="주1회">주 1회</option>
+                  <option value="주2회">주 2회</option>
+                  <option value="주3회">주 3회</option>
+                  <option value="주4회">주 4회</option>
+                  <option value="주5회">주 5회</option>
+                  <option value="주6회">주 6회</option>
                 </select>
               </InputDiv>
               <InputDiv>

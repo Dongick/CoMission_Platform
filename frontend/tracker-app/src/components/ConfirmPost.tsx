@@ -31,7 +31,7 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
             color: `${theme.subGray}`,
           }}
         >
-          {post.date.toLocaleString()}
+          {post.date.toLocaleDateString()}
         </p>
       </PostHeader>
       <PostContent onClick={postClickHandler}>
@@ -44,7 +44,6 @@ const ConfirmPost = ({ post, index }: ConfirmPostType) => {
           방법을 알려드립니다.
         </p>
         <img src={exampleImg} alt={`Post ${index}`} width="100%" />
-        <p>{post.completed ? "Completed" : "Not Completed"}</p>
       </PostContent>
     </PostLayout>
   );

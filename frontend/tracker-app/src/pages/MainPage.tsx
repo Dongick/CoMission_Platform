@@ -9,95 +9,114 @@ import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router";
 import Input from "../components/StyledInput";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { MissionType } from "../types";
+import axios from "axios";
+import { getData } from "../axios";
+const cardsData = [
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+  {
+    title: "Title 1",
+    author: "Author 1",
+    participants: 3,
+    description: "이것은 설명입니다",
+    minParticipants: 10,
+    duration: 365,
+    status: "CREATED",
+    frequency: "daily",
+    creatorEmail: "qkrcksdyd99@gmail.com",
+    created: new Date(),
+    start: new Date(),
+    deadline: new Date(),
+  },
+];
 const MainPage = () => {
   const navigate = useNavigate();
-  const cardsData = [
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-    {
-      title: "Title 1",
-      author: "Author 1",
-      participants: 3,
-      description: "이것은 설명입니다",
-      minParticipants: 10,
-      duration: 365,
-      status: "CREATED",
-      frequency: "daily",
-      creatorEmail: "qkrcksdyd99@gmail.com",
-      created: new Date(),
-      start: new Date(),
-      deadline: new Date(),
-    },
-  ];
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+
+  const fetchData = () => getData<MissionType>("/api/main/1");
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["missionData"],
+    queryFn: fetchData,
+  });
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error fetching data</div>;
+  }
+  console.log(data);
   return (
     <Layout>
       <SearchSection>
