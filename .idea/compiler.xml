@@ -11,7 +11,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="java.backend" target="17" />
       <module name="java.backend.main~2" target="17" />
+      <module name="java.backend.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

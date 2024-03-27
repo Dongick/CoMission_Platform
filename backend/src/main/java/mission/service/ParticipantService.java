@@ -36,7 +36,7 @@ public class ParticipantService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(participantRequest.getTitle());
+        Optional<MissionDocument> optionalMissionDocument = missionRepository.findById(participantRequest.getId());
 
         // 미션이 존재하는지 확인
         if(optionalMissionDocument.isEmpty()) {
