@@ -7,16 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mission.dto.authentication.AuthenticationCreateRequest;
 import mission.dto.mission.*;
 import mission.exception.ErrorResponse;
 import mission.service.MissionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/mission")
@@ -41,10 +37,8 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> createMission(
-            @Valid @RequestPart(value="missionInfo") MissionCreateRequest missionCreateRequest,
-            @RequestPart(value = "photoData", required = true) MultipartFile photoData) throws IOException {
-        missionService.createMission(missionCreateRequest, photoData);
+    public ResponseEntity<String> createMission(final @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
+        missionService.createMission(missionCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
 
@@ -71,11 +65,8 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> updateMission(
-            @Valid @RequestPart(value="missionInfo") MissionUpdateRequest missionUpdateRequest,
-            @RequestPart(value = "photoData", required = true) MultipartFile photoData,
-            @PathVariable String title) throws IOException{
-        missionService.updateMission(missionUpdateRequest, photoData, title);
+    public ResponseEntity<String> updateMission(final @Valid @RequestBody MissionUpdateRequest missionUpdateRequest, @PathVariable String title) {
+        missionService.updateMission(missionUpdateRequest, title);
 
         return ResponseEntity.ok("good");
     }

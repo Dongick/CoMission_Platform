@@ -14,9 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,11 +26,10 @@ import java.util.Optional;
 public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
-    private final FileService fileService;
 
     // 미션 생성 매서드
     @Transactional
-    public void createMission(MissionCreateRequest missionCreateRequest, MultipartFile photoData) throws IOException {
+    public void createMission(MissionCreateRequest missionCreateRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -47,17 +44,14 @@ public class MissionService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 미션 생성 사진을 서버에 저장
-        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
-
-        MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail);
+        MissionDocument missionDocument = saveMission(missionCreateRequest, now, userEmail);
 
         saveParticipant(missionDocument.getId(), now, userEmail);
     }
 
     // 미션 수정 매서드
     @Transactional
-    public void updateMission(MissionUpdateRequest missionUpdateRequest, MultipartFile photoData, String title) throws IOException {
+    public void updateMission(MissionUpdateRequest missionUpdateRequest, String title) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -81,18 +75,10 @@ public class MissionService {
 
         // 미션을 수정하는 사용자가 해당 미션의 작성자와 동일한지 확인
         if(missionDocument.getCreatorEmail().equals(userEmail)) {
-
-            // 기존 미션에 존재하는 사진 서버에서 삭제
-            fileService.deleteFile(missionDocument.getPhotoUrl());
-
-            // 미션 사진 서버에 저장
-            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
-
             LocalDateTime now = LocalDateTime.now();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
             missionDocument.setDescription(missionUpdateRequest.getDescription());
-            missionDocument.setPhotoUrl(fileLocation);
             missionDocument.setDuration(missionUpdateRequest.getDuration());
             missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
             missionDocument.setFrequency(missionUpdateRequest.getFrequency());
@@ -150,12 +136,11 @@ public class MissionService {
     }
 
     // 미션 저장
-    private MissionDocument saveMission(MissionCreateRequest request, String fileLocation, LocalDateTime now, String userEmail) {
+    private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now, String userEmail) {
         MissionDocument missionDocument = MissionDocument.builder()
                 .createdAt(now)
                 .creatorEmail(userEmail)
                 .duration(request.getDuration())
-                .photoUrl(fileLocation)
                 .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
                 .description(request.getDescription())
                 .title(request.getTitle())

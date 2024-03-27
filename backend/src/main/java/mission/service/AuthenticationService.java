@@ -58,9 +58,10 @@ public class AuthenticationService {
         if(!authenticationList.isEmpty()) {
 
             // 이번주에 사용자가 해당 미션에 작성한 인증글 확인
-            List<Authentication> dayOfWeekAuthenticationList = authenticationList.stream()
-                    .filter(auth -> !auth.getDate().toLocalDate().isBefore(startDate) && !auth.getDate().toLocalDate().isAfter(LocalDate.from(now)))
-                    .collect(Collectors.toList());
+            List<Authentication> dayOfWeekAuthenticationList =
+                    authenticationList.stream()
+                            .filter(auth -> !auth.getDate().toLocalDate().isBefore(startDate) && !auth.getDate().toLocalDate().isAfter(LocalDate.from(now)))
+                            .collect(Collectors.toList());
 
             // 이번주에 작성한 인증글의 횟수가 이번주에 허용된 작성 횟수를 초과했는지 확인
             if(dayOfWeekAuthenticationList.size() == authCount) {
@@ -75,8 +76,7 @@ public class AuthenticationService {
             }
         }
 
-        // 인증 사진을 서버에 저장
-        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadAuthenticationFile(file);
+        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
 
         authenticationList.add(saveAuthentication(now, fileLocation, authenticationCreateRequest.getTextData()));
         participantRepository.save(participantDocument);
@@ -112,8 +112,7 @@ public class AuthenticationService {
                     fileService.deleteFile(lastAuthentication.getPhotoData());
                 }
 
-                // 인증글에 사진이 존재하면 서버에 저장
-                String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadAuthenticationFile(file);
+                String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
 
                 lastAuthentication.setPhotoData(fileLocation);
                 lastAuthentication.setTextData(authenticationUpdateRequest.getTextData());
