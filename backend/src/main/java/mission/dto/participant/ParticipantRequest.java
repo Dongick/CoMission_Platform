@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class ParticipantRequest {
     @NotBlank
-    private String title;
+    private String id;
 }

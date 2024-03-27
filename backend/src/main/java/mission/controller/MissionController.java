@@ -13,6 +13,9 @@ import mission.service.MissionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/mission")
@@ -37,12 +40,14 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> createMission(final @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
-        missionService.createMission(missionCreateRequest);
+    public ResponseEntity<String> createMission(
+            @Valid @RequestPart(value="missionInfo") MissionCreateRequest missionCreateRequest,
+            @RequestPart(value = "photoData", required = true) MultipartFile photoData) throws IOException {
+        missionService.createMission(missionCreateRequest, photoData);
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
 
-    @PutMapping("/{title}")
+    @PutMapping("/{id}")
     @Operation(
             summary = "미션 수정",
             description = "미션을 수정"
@@ -65,13 +70,16 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> updateMission(final @Valid @RequestBody MissionUpdateRequest missionUpdateRequest, @PathVariable String title) {
-        missionService.updateMission(missionUpdateRequest, title);
+    public ResponseEntity<String> updateMission(
+            @Valid @RequestPart(value="missionInfo") MissionUpdateRequest missionUpdateRequest,
+            @RequestPart(value = "photoData", required = true) MultipartFile photoData,
+            @PathVariable String id) throws IOException{
+        missionService.updateMission(missionUpdateRequest, photoData, id);
 
         return ResponseEntity.ok("good");
     }
 
-    @GetMapping("/info/{title}")
+    @GetMapping("/info/{id}")
     @Operation(
             summary = "미션 정보",
             description = "해당 미션 정보 보기"
@@ -88,8 +96,8 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<MissionInfoResponse> missionInfo(@PathVariable String title) {
-        MissionInfoResponse missionInfoResponse = missionService.missionInfo(title);
+    public ResponseEntity<MissionInfoResponse> missionInfo(@PathVariable String id) {
+        MissionInfoResponse missionInfoResponse = missionService.missionInfo(id);
         return ResponseEntity.ok(missionInfoResponse);
     }
 

@@ -24,7 +24,7 @@ import java.io.IOException;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/{title}")
+    @PostMapping("/{id}")
     @Operation(
             summary = "인증글 작성",
             description = "해당 미션의 오늘의 인증글 작성"
@@ -48,14 +48,14 @@ public class AuthenticationController {
     public ResponseEntity<String> createAuthentication(
             @Valid @RequestPart(value="textData") AuthenticationCreateRequest authenticationCreateRequest,
             @RequestPart(value = "photoData", required = false) MultipartFile photoData,
-            @PathVariable String title) throws IOException {
+            @PathVariable String id) throws IOException {
 
-        authenticationService.createAuthentication(authenticationCreateRequest, photoData, title);
+        authenticationService.createAuthentication(authenticationCreateRequest, photoData, id);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
 
-    @PutMapping("/{title}")
+    @PutMapping("/{id}")
     @Operation(
             summary = "인증글 수정",
             description = "해당 미션의 오늘의 인증글 수정"
@@ -76,13 +76,13 @@ public class AuthenticationController {
     public ResponseEntity<String> updateAuthentication(
             @Valid @RequestPart(value="textData") AuthenticationUpdateRequest authenticationUpdateRequest,
             @RequestPart(value = "photoData", required = false) MultipartFile photoData,
-            @PathVariable String title) throws IOException {
-        authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, title);
+            @PathVariable String id) throws IOException {
+        authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, id);
 
         return ResponseEntity.ok("good");
     }
 
-    @DeleteMapping("/{title}")
+    @DeleteMapping("/{id}")
     @Operation(
             summary = "인증글 삭제",
             description = "해당 미션의 오늘의 인증글 삭제"
@@ -99,13 +99,13 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> deleteAuthentication(@PathVariable String title) throws IOException {
-        authenticationService.deleteAuthentication(title);
+    public ResponseEntity<String> deleteAuthentication(@PathVariable String id) throws IOException {
+        authenticationService.deleteAuthentication(id);
 
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body("good");
     }
 
-    @GetMapping("/{title}/{num}")
+    @GetMapping("/{id}/{num}")
     @Operation(
             summary = "인증글 보기",
             description = "해당 미션의 오늘의 인증글 보기"
@@ -128,8 +128,8 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<AuthenticationListResponse> authenticationList(@PathVariable String title, @PathVariable int num) {
-        AuthenticationListResponse result = authenticationService.authenticationList(title, num);
+    public ResponseEntity<AuthenticationListResponse> authenticationList(@PathVariable String id, @PathVariable int num) {
+        AuthenticationListResponse result = authenticationService.authenticationList(id, num);
         return ResponseEntity.ok(result);
     }
 }
