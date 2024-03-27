@@ -39,12 +39,14 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
+    const email = urlSearchParams.get("email");
+    const name = urlSearchParams.get("username");
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
       setUserInfoState({
         isLoggedIn: true,
-        user_id: "user123",
-        user_email: "example@example.com",
+        user_id: `${name}`,
+        user_email: `${email}`,
       });
       onClose();
     }

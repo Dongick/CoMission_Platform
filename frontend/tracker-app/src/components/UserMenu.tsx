@@ -3,12 +3,17 @@ import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
 import { useState } from "react";
+import { useRecoilState } from "recoil";
+import { userInfo } from "../recoil";
+import { postData } from "../axios";
+import { useNavigate } from "react-router";
 interface UserMenuProps {
   isLogin: boolean;
 }
 const UserMenu = ({ isLogin = false }: UserMenuProps) => {
+  const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
@@ -16,8 +21,23 @@ const UserMenu = ({ isLogin = false }: UserMenuProps) => {
     setShowLoginModal(false);
   };
   const logoutHandler = () => {
-    // 로그아웃 프로세스
-    window.alert("logout!");
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      postData<string, string>("/api/user/logout", accessToken)
+        .then((data) => {
+          localStorage.removeItem("accessToken");
+          setUserInfoState({
+            isLoggedIn: false,
+            user_id: "",
+            user_email: "",
+          });
+          alert(`${data}, 세션이 만료되었습니다. 로그인 해주세요`);
+          navigate("/");
+        })
+        .catch((error) => {
+          alert(`로그아웃 에러,${error}`);
+        });
+    }
   };
   const myInfo = (
     <StyledButton
