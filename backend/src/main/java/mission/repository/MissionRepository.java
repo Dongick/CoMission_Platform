@@ -18,8 +18,6 @@ public interface MissionRepository extends MongoRepository<MissionDocument, Obje
     @Query(value= "{_id: {$in: ?0}, status: {$ne: 'COMPLETED'}}", sort = "{createdAt: -1}", fields="{id:1, title:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
     List<MissionInfo> findByMissionIdInAndStatusNotOrderByCreatedAtDesc(List<ObjectId> missionIdList);
 
-    Optional<MissionDocument> findByTitle(String title);
-
     Optional<MissionDocument> findById(String Id);
 
     List<MissionDocument> findByStatus(String status);

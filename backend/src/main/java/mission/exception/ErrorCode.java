@@ -13,7 +13,6 @@ public enum ErrorCode {
 
 
     // MISSION
-    DUPLICATE_MISSION_NAME("이미 해당 이름의 미션이 존재합니다."),
     MISSION_MODIFICATION_NOT_ALLOWED("해당 미션을 만든 사용자가 아니라 수정할 권한이 없습니다."),
     MISSION_ALREADY_STARTED("해당 미션은 이미 시작되었습니다."),
 

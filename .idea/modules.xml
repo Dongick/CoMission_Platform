@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/java.backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/java.backend.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/java.backend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/java.backend.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/progress-tracker.iml" filepath="$PROJECT_DIR$/.idea/progress-tracker.iml" />
     </modules>
   </component>
 </project>
