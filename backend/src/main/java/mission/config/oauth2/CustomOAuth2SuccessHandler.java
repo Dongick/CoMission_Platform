@@ -50,14 +50,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         if(refreshTokenEntity.isPresent()) {
             jwtUtil.updateRefreshToken(refreshTokenEntity.get(), refreshToken);
         } else {
-<<<<<<< HEAD
-            refreshTokenRepository.save(RefreshTokenEntity.builder()
-                    .refreshToken(refreshToken)
-                    .email(email)
-                    .build());
-=======
             jwtUtil.saveRefreshToken(refreshToken, email);
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         }
 
         System.out.println(accessToken);
@@ -66,11 +59,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
                 "&email=" + URLEncoder.encode(email, "UTF-8") + "&username=" + URLEncoder.encode(username, "UTF-8");
 
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", refreshToken));
-<<<<<<< HEAD
-        response.sendRedirect("http://localhost:3000/");
-=======
 
         response.sendRedirect(redirectUrl);
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     }
 }

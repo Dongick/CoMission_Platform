@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
-=======
 import mission.dto.main.MainLazyLoadingResponse;
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import mission.dto.main.MainResponse;
 import mission.exception.ErrorResponse;
 import mission.service.MainService;
@@ -40,8 +37,6 @@ public class MainController {
         MainResponse mainResponse = mainService.getInitialMissionList();
 
         return ResponseEntity.ok(mainResponse);
-<<<<<<< HEAD
-=======
     }
 
     @GetMapping("/{num}")
@@ -61,6 +56,5 @@ public class MainController {
         MainLazyLoadingResponse mainLazyLoadingResponse = mainService.getLazyLoadingMissionList(num);
 
         return ResponseEntity.ok(mainLazyLoadingResponse);
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     }
 }

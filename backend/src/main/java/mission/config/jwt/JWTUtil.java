@@ -1,9 +1,6 @@
 package mission.config.jwt;
 
-<<<<<<< HEAD
-=======
 import io.jsonwebtoken.ExpiredJwtException;
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import mission.entity.RefreshTokenEntity;
@@ -18,6 +15,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JWTUtil {
@@ -64,13 +62,6 @@ public class JWTUtil {
     }
 
     // DB에 존재하는 한번 사용된 RefreshToken 갱신 메서드
-<<<<<<< HEAD
-    @Transactional
-    public void updateRefreshToken(RefreshTokenEntity refreshTokenEntity, String refreshToken) {
-        refreshTokenEntity.setRefreshToken(refreshToken);
-
-        refreshTokenRepository.save(refreshTokenEntity);
-=======
     public void updateRefreshToken(RefreshTokenEntity refreshTokenEntity, String refreshToken) {
         refreshTokenEntity.setRefreshToken(refreshToken);
         refreshTokenEntity.setExpiration((new Date(System.currentTimeMillis() + REFRESH_TIME)).toString());
@@ -88,7 +79,6 @@ public class JWTUtil {
                 .email(email)
                 .expiration(date.toString())
                 .build());
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     }
 
     // RefreshToken cookie 생성 메서드

@@ -28,10 +28,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
-<<<<<<< HEAD
-	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-=======
->>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 	implementation ("io.jsonwebtoken:jjwt-api:0.12.3")
 	implementation ("io.jsonwebtoken:jjwt-impl:0.12.3")
 	implementation ("io.jsonwebtoken:jjwt-jackson:0.12.3")
