@@ -17,6 +17,7 @@ public class ParticipantDocument {
     private ObjectId id;
     private ObjectId missionId;
     private String userEmail;
+    private String username;
     private LocalDateTime joinedAt;
     private List<Authentication> authentication;
 }

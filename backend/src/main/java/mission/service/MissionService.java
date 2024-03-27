@@ -37,15 +37,16 @@ public class MissionService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
+        String username = customOAuth2User.getName();
 
         LocalDateTime now = LocalDateTime.now();
 
         // 미션 생성 사진을 서버에 저장
         String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
 
-        MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail);
+        MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
-        saveParticipant(missionDocument.getId(), now, userEmail);
+        saveParticipant(missionDocument.getId(), now, userEmail, username);
     }
 
     // 미션 수정 매서드
@@ -127,6 +128,7 @@ public class MissionService {
                 .status(missionDocument.getStatus())
                 .deadline(missionDocument.getDeadline())
                 .creatorEmail(missionDocument.getCreatorEmail())
+                .username(missionDocument.getUsername())
                 .participant(participant)
                 .build();
     }
@@ -141,10 +143,11 @@ public class MissionService {
     }
 
     // 미션 저장
-    private MissionDocument saveMission(MissionCreateRequest request, String fileLocation, LocalDateTime now, String userEmail) {
+    private MissionDocument saveMission(MissionCreateRequest request, String fileLocation, LocalDateTime now, String userEmail, String username) {
         MissionDocument missionDocument = MissionDocument.builder()
                 .createdAt(now)
                 .creatorEmail(userEmail)
+                .username(username)
                 .duration(request.getDuration())
                 .photoUrl(fileLocation)
                 .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
@@ -161,11 +164,12 @@ public class MissionService {
     }
 
     // 미션 참여자 저장
-    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail) {
+    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
         participantRepository.save(ParticipantDocument.builder()
                 .missionId(missionId)
                 .joinedAt(now)
                 .userEmail(userEmail)
+                .username(username)
                 .authentication(new ArrayList<>())
                 .build());
     }
