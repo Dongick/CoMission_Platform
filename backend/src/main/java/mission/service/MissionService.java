@@ -3,9 +3,13 @@ package mission.service;
 import lombok.RequiredArgsConstructor;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
+<<<<<<< HEAD
 import mission.dto.mission.MissionCreateRequest;
 import mission.dto.mission.MissionInfoResponse;
 import mission.dto.mission.MissionUpdateRequest;
+=======
+import mission.dto.mission.*;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.enums.MissionStatus;
 import mission.exception.*;
@@ -16,7 +20,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+<<<<<<< HEAD
 
+=======
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,10 +38,18 @@ import java.util.Optional;
 public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
+<<<<<<< HEAD
 
     // 미션 생성 매서드
     @Transactional
     public void createMission(MissionCreateRequest missionCreateRequest) {
+=======
+    private final FileService fileService;
+
+    // 미션 생성 매서드
+    @Transactional
+    public void createMission(MissionCreateRequest missionCreateRequest, MultipartFile photoData) throws IOException {
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -46,14 +64,25 @@ public class MissionService {
 
         LocalDateTime now = LocalDateTime.now();
 
+<<<<<<< HEAD
         MissionDocument missionDocument = saveMission(missionCreateRequest, now, userEmail);
+=======
+        // 미션 생성 사진을 서버에 저장
+        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
+
+        MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
         saveParticipant(missionDocument.getId(), now, userEmail);
     }
 
     // 미션 수정 매서드
     @Transactional
+<<<<<<< HEAD
     public void updateMission(MissionUpdateRequest missionUpdateRequest, String title) {
+=======
+    public void updateMission(MissionUpdateRequest missionUpdateRequest, MultipartFile photoData, String title) throws IOException {
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -77,10 +106,24 @@ public class MissionService {
 
         // 미션을 수정하는 사용자가 해당 미션의 작성자와 동일한지 확인
         if(missionDocument.getCreatorEmail().equals(userEmail)) {
+<<<<<<< HEAD
+=======
+
+            // 기존 미션에 존재하는 사진 서버에서 삭제
+            fileService.deleteFile(missionDocument.getPhotoUrl());
+
+            // 미션 사진 서버에 저장
+            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
+
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
             LocalDateTime now = LocalDateTime.now();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
             missionDocument.setDescription(missionUpdateRequest.getDescription());
+<<<<<<< HEAD
+=======
+            missionDocument.setPhotoUrl(fileLocation);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
             missionDocument.setDuration(missionUpdateRequest.getDuration());
             missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
             missionDocument.setFrequency(missionUpdateRequest.getFrequency());
@@ -97,12 +140,17 @@ public class MissionService {
     // 미션 상세정보 매서드
     @Transactional
     public MissionInfoResponse missionInfo(String title) {
+<<<<<<< HEAD
         Boolean participant = true;
+=======
+        Boolean participant = false;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
         MissionDocument missionDocument = getMissionDocument(title);
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+<<<<<<< HEAD
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
@@ -111,6 +159,18 @@ public class MissionService {
         // 해당 미션이 끝나지 않은 상태에서 해당 미션에 참여한 사용자인지 확인
         if(optionalParticipantDocument.isEmpty() && !missionDocument.getStatus().equals(MissionStatus.COMPLETED.name())) {
             participant = false;
+=======
+        if (principal instanceof CustomOAuth2User) {
+            CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
+            String userEmail = customOAuth2User.getEmail();
+
+            Optional<ParticipantDocument> optionalParticipantDocument = participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail);
+
+            // 해당 미션에 참여한 사용자인지 확인
+            if(optionalParticipantDocument.isPresent()) {
+                participant = true;
+            }
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         }
 
         return MissionInfoResponse.builder()
@@ -126,12 +186,30 @@ public class MissionService {
                 .build();
     }
 
+<<<<<<< HEAD
     // 미션 저장
     private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now, String userEmail) {
+=======
+    public MissionSearchResponse missionSearch(MissionSearchRequest missionSearchRequest) {
+        List<MissionInfo> missionInfoList = missionRepository.findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(missionSearchRequest.getTitle());
+
+        MissionSearchResponse missionSearchResponse = new MissionSearchResponse(missionInfoList);
+
+        return missionSearchResponse;
+
+    }
+
+    // 미션 저장
+    private MissionDocument saveMission(MissionCreateRequest request, String fileLocation, LocalDateTime now, String userEmail) {
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         MissionDocument missionDocument = MissionDocument.builder()
                 .createdAt(now)
                 .creatorEmail(userEmail)
                 .duration(request.getDuration())
+<<<<<<< HEAD
+=======
+                .photoUrl(fileLocation)
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
                 .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
                 .description(request.getDescription())
                 .title(request.getTitle())

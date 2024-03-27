@@ -6,6 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
+=======
+import mission.dto.main.MainLazyLoadingResponse;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import mission.dto.main.MainResponse;
 import mission.exception.ErrorResponse;
 import mission.service.MainService;
@@ -36,5 +40,27 @@ public class MainController {
         MainResponse mainResponse = mainService.getInitialMissionList();
 
         return ResponseEntity.ok(mainResponse);
+<<<<<<< HEAD
+=======
+    }
+
+    @GetMapping("/{num}")
+    @Operation(
+            summary = "lazy loading 시 main 화면",
+            description = "사용자가 main화면 스크롤을 내릴 시 초기 정보 이후의 정보를 제공"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "미션 정보 제공 성공"),
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401",
+                    description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<MainLazyLoadingResponse> getLazyLoadingList(@PathVariable int num) {
+        MainLazyLoadingResponse mainLazyLoadingResponse = mainService.getLazyLoadingMissionList(num);
+
+        return ResponseEntity.ok(mainLazyLoadingResponse);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     }
 }

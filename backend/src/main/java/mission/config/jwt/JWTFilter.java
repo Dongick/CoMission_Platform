@@ -2,6 +2,10 @@ package mission.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+<<<<<<< HEAD
+=======
+import io.jsonwebtoken.security.SignatureException;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +35,12 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
 
+<<<<<<< HEAD
         if (requestUri.matches("^\\/oauth2(?:\\/.*)?$") || requestUri.matches("^\\/swagger-ui(?:\\/.*)?$") || requestUri.matches("^\\/v3\\/api-docs(?:\\/.*)?$")) {
+=======
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$") || requestUri.matches("^\\/swagger-ui(?:\\/.*)?$") || requestUri.matches("^\\/api\\/mission\\/search") ||
+                requestUri.matches("^\\/v3\\/api-docs(?:\\/.*)?$") || requestUri.matches("^\\/api\\/reissue")) {
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
             filterChain.doFilter(request, response);
             return;
@@ -48,6 +57,7 @@ public class JWTFilter extends OncePerRequestFilter {
             } else {
 
                 sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
+<<<<<<< HEAD
             }
 
             return;
@@ -73,6 +83,44 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+=======
+            }
+
+            return;
+        }
+
+        // 토큰 만료 여부 확인
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch (ExpiredJwtException e) {
+
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.ACCESS_TOKEN_EXPIRED, ErrorCode.ACCESS_TOKEN_EXPIRED.getMessage());
+
+            return;
+        } catch (SignatureException e) {
+            sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+            return;
+        }
+
+        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
+        try {
+            String category = jwtUtil.getCategory(accessToken);
+
+            if (!category.equals("access")) {
+
+                sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+                return;
+            }
+
+        } catch (SignatureException e) {
+            sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+            return;
+        }
+
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         setAuthentication(accessToken);
 
         filterChain.doFilter(request, response);
@@ -104,6 +152,10 @@ public class JWTFilter extends OncePerRequestFilter {
         ErrorResponse errorResponse = new ErrorResponse(errorCode, errorMessage);
 
         ResponseEntity<ErrorResponse> responseEntity = ResponseEntity.status(status).body(errorResponse);
+<<<<<<< HEAD
+=======
+        response.setCharacterEncoding("UTF-8");
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(new ObjectMapper().writeValueAsString(responseEntity.getBody()));

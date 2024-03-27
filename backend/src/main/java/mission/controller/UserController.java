@@ -5,6 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+<<<<<<< HEAD
+=======
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import lombok.RequiredArgsConstructor;
 import mission.exception.ErrorResponse;
 import mission.service.UserService;
@@ -24,6 +29,7 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 로그아웃 성공"),
+<<<<<<< HEAD
             @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
@@ -32,6 +38,16 @@ public class UserController {
     })
     public ResponseEntity<String> logout() {
         userService.logout();
+=======
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. REFRESH_TOKEN_INVALID : refresh token 값 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401",
+                    description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음 \t\n 3. REFRESH_TOKEN_EXPIRED : refresh token 만료",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        userService.logout(request, response);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
         return ResponseEntity.ok("good");
     }

@@ -2,6 +2,10 @@ package mission.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+<<<<<<< HEAD
+=======
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -11,7 +15,10 @@ import mission.dto.authentication.*;
 import mission.exception.ErrorResponse;
 import mission.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
+<<<<<<< HEAD
 import org.springframework.http.MediaType;
+=======
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +44,12 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+<<<<<<< HEAD
+=======
+            @ApiResponse(responseCode = "403",
+                    description = "1. EXCEEDED_AUTHENTICATION_LIMIT : 인증글 작성 횟수 초과",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
             @ApiResponse(responseCode = "404",
                     description = "1. MISSION_NOT_FOUND : 해당 미션을 찾을 수 없음 \t\n 2. PARTICIPANT_NOT_FOUND : 해당 미션의 참여자가 아님",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -102,13 +115,27 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body("good");
     }
 
+<<<<<<< HEAD
     @GetMapping("/{title}")
+=======
+    @GetMapping("/{title}/{num}")
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     @Operation(
             summary = "인증글 보기",
             description = "해당 미션의 오늘의 인증글 보기"
     )
     @ApiResponses(value = {
+<<<<<<< HEAD
             @ApiResponse(responseCode = "200", description = "인증글 보기 성공"),
+=======
+            @ApiResponse(responseCode = "200", description = "인증글 보기 성공",
+                    content = @Content(
+                            schema = @Schema(implementation = AuthenticationListResponse.class),
+                            examples = @ExampleObject(
+                                    value = "{\"authenticationData\": [{\"date\": \"2024-03-09\", \"photoData\": \"string\", \"textData\": \"string\", \"userEmail\": \"string\"} ]}"
+                            )
+                    )),
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
             @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. MISSION_NOT_STARTED : 시작되지 않은 미션",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
@@ -119,8 +146,13 @@ public class AuthenticationController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
+<<<<<<< HEAD
     public ResponseEntity<AuthenticationListResponse> authenticationList(@PathVariable String title) {
         AuthenticationListResponse result = authenticationService.authenticationList(title);
+=======
+    public ResponseEntity<AuthenticationListResponse> authenticationList(@PathVariable String title, @PathVariable int num) {
+        AuthenticationListResponse result = authenticationService.authenticationList(title, num);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
         return ResponseEntity.ok(result);
     }
 }

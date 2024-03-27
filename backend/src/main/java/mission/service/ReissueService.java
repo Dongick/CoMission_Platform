@@ -1,16 +1,24 @@
 package mission.service;
 
+<<<<<<< HEAD
 import io.jsonwebtoken.ExpiredJwtException;
+=======
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import mission.config.jwt.JWTUtil;
 import mission.entity.RefreshTokenEntity;
+<<<<<<< HEAD
 import mission.exception.BadRequestException;
 import mission.exception.ErrorCode;
 import mission.exception.MissionAuthenticationException;
 import mission.repository.RefreshTokenRepository;
+=======
+import mission.exception.ErrorCode;
+import mission.exception.MissionAuthenticationException;
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +28,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReissueService {
     private final JWTUtil jwtUtil;
+<<<<<<< HEAD
     private final RefreshTokenRepository refreshTokenRepository;
 
+=======
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
     @Transactional
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
         // cookie에서 refresh token 찾음
         String refresh = null;
         Cookie[] cookies = request.getCookies();
+<<<<<<< HEAD
         for (Cookie cookie : cookies) {
 
             if (cookie.getName().equals("RefreshToken")) {
@@ -65,6 +77,22 @@ public class ReissueService {
 
             throw new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage());
         }
+=======
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+
+                if (cookie.getName().equals("RefreshToken")) {
+
+                    refresh = cookie.getValue();
+                }
+            }
+        } else {
+            throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
+        }
+
+        // refreshToken 검증
+        RefreshTokenEntity refreshTokenEntity = jwtUtil.validateRefreshToken(refresh);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
@@ -73,7 +101,11 @@ public class ReissueService {
         String newAccessToken = jwtUtil.createJwt("access", username, role, email);
         String newRefreshToken = jwtUtil.createJwt("refresh", username, role, email);
 
+<<<<<<< HEAD
         jwtUtil.updateRefreshToken(optionalRefreshTokenEntity.get(), newRefreshToken);
+=======
+        jwtUtil.updateRefreshToken(refreshTokenEntity, newRefreshToken);
+>>>>>>> 5a194e4b974ce7a70ddaa1fe0b0c2f51d42cec2c
 
         response.setHeader("AccessToken", newAccessToken);
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", newRefreshToken));
