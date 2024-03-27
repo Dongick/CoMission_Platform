@@ -1,16 +1,16 @@
 import styled from "styled-components";
 import Layout from "../../layouts/Layout";
 import { BannerSection, Navbar, NavButton, MainSection } from "./MissionStyles";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ConfirmPostList from "../../components/ConfirmPostList";
 import { userInfo } from "../../recoil";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
-  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const userInfoState = useRecoilValue(userInfo);
 
   return (
     <Layout>
@@ -24,7 +24,7 @@ const MissionConfirmPost = () => {
         </Link>
       </Navbar>
       <MainSection>
-        {!userInfoState.isLoggedIn ? (
+        {userInfoState.isLoggedIn ? (
           <ConfirmPostList />
         ) : (
           <NoLoginContent>

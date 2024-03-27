@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { ConfirmPostIndexType } from "../types";
-import exampleImg from "../assets/img/roadmap-77.png";
 import { theme } from "../styles/theme";
 import PostModal from "./PostModal";
 const ConfirmPost = ({ post, index }: ConfirmPostIndexType) => {

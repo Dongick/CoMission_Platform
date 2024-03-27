@@ -4,12 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
+import { AxiosError } from "axios";
 const PostListLayout = styled.div``;
 
 const ConfirmPostList = () => {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["ConfrimPostList"],
-    queryFn: () => getData<ConfirmPostDataType[]>("/api/authentication/test/1"),
+    queryFn: () => getData<ConfirmPostDataType[]>("/api/authentication/test/1"), //todo api요청 주소 변수로 바꿔야 함
   });
   if (isLoading) {
     return <div>Loading...</div>;
@@ -18,8 +19,7 @@ const ConfirmPostList = () => {
   if (isError) {
     return <div>Error fetching posts</div>;
   }
-  console.log(data);
-  console.log(error);
+
   return (
     <PostListLayout>
       {data?.map((post, index) => (
