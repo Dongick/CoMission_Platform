@@ -3,7 +3,7 @@ import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { userInfo } from "../recoil";
 import { postData } from "../axios";
 import { useNavigate } from "react-router";
@@ -13,7 +13,7 @@ interface UserMenuProps {
 const UserMenu = ({ isLogin = false }: UserMenuProps) => {
   const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const setUserInfoState = useSetRecoilState(userInfo);
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
@@ -35,7 +35,8 @@ const UserMenu = ({ isLogin = false }: UserMenuProps) => {
           navigate("/");
         })
         .catch((error) => {
-          alert(`로그아웃 에러,${error}`);
+          console.error(`로그아웃 에러 발생: ${error}`);
+          alert(`로그아웃 에러, ${error}`);
         });
     }
   };
