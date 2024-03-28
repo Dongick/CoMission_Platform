@@ -115,7 +115,7 @@ public class AuthenticationController {
                     content = @Content(
                             schema = @Schema(implementation = AuthenticationListResponse.class),
                             examples = @ExampleObject(
-                                    value = "{\"authenticationData\": [{\"date\": \"2024-03-09\", \"photoData\": \"string\", \"textData\": \"string\", \"userEmail\": \"string\"} ]}"
+                                    value = "{\"authenticationData\": [{\"date\": \"2024-03-09\", \"photoData\": \"string\", \"textData\": \"string\", \"userEmail\": \"string\", \"username\": \"string\"} ]}"
                             )
                     )),
             @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. MISSION_NOT_STARTED : 시작되지 않은 미션",
