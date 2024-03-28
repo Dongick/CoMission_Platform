@@ -223,6 +223,7 @@ public class AuthenticationService {
                             authenticationMap.put("photoData", authentication.getPhotoData());
                             authenticationMap.put("textData", authentication.getTextData());
                             authenticationMap.put("userEmail", participant.getUserEmail());
+                            authenticationMap.put("username", participant.getUsername());
                             return authenticationMap;
                         })
                 )

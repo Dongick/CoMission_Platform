@@ -22,6 +22,7 @@ public class MissionInfoResponse {
     private int duration;
     private String status;
     private String frequency;
+    private String username;
     private String creatorEmail;
     private Boolean participant;
 }
