@@ -51,3 +51,8 @@ export type UserInfoType = {
   user_email: string;
   isLoggedIn: boolean;
 };
+
+export type ErrorResponseDataType = {
+  errorCode: string;
+  errorMessage: string;
+};
