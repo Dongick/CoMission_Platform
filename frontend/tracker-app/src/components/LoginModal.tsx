@@ -2,10 +2,6 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import googleLogin from "../assets/img/google-login.svg";
 import naverLogin from "../assets/img/naver-login.png";
-import { useLocation } from "react-router";
-import { useEffect } from "react";
-import { userInfo } from "../recoil";
-import { useRecoilState } from "recoil";
 import { ModalContent, ModalOverlay } from "./StyledModal";
 interface LoginDivProps {
   naver?: string;
@@ -29,26 +25,12 @@ const SocialLoginDiv = styled.div<LoginDivProps>`
   width: 300px;
 `;
 const LoginModal = ({ onClose }: LoginModalProps) => {
-  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
-  const location = useLocation();
-  useEffect(() => {
-    const urlSearchParams = new URLSearchParams(location.search);
-    const accessToken = urlSearchParams.get("AccessToken");
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-      setUserInfoState({
-        isLoggedIn: true,
-        user_id: "user123",
-        user_email: "example@example.com",
-      });
-      onClose();
-    }
-  }, [location.search, onClose, setUserInfoState]);
+
   return (
     <ModalOverlay onClick={handleOverlayClick}>
       <ModalContent>
@@ -79,11 +61,11 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
             }}
           />
           <Span>소셜 로그인</Span>
-          <a href="http://localhost:8080/login/oauth2/code/google">
+          <a href="http://localhost:8080/oauth2/authorization/google">
             <SocialLoginDiv />
           </a>
           <br />
-          <a href="http://localhost:8080/login/oauth2/code/naver">
+          <a href="http://localhost:8080/oauth2/authorization/naver">
             <SocialLoginDiv naver="true" />
           </a>
         </div>

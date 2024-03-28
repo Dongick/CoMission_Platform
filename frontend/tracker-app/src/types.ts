@@ -1,48 +1,48 @@
-// 미션
-// ObjectId id;
-// String title;  미션 제목
-// String description;  미션 설명
-// LocalDateTime createdAt;  미션 생성일
-// LocalDate startDate;  미션 시작일
-// LocalDate deadline;  미션 마감일
-// int minParticipants;  ex 최소 참가 인원수
-// int participants;  미션 참가 인원수
-// int duration;   ex 365일
-// String status;   ex 미션 상태  CREATED, STARTED, COMPLETED
-// String frequency; 인증 주기 ex 매일, 주1~6회
-// String creatorEmail;  ex 미션 생성한 사용자
-export type MissionType = {
+export type SimpleMissionInfoType = {
+  id: string;
+  username: string;
   title: string;
-  description: string;
-  created: Date;
-  start: Date;
-  deadline: Date;
   minParticipants: number;
   participants: number;
-  duration: number | string;
+  duration: number;
   status: string;
   frequency: string;
+};
+
+export type MainServerResponseType = {
+  participantMissionInfoList: SimpleMissionInfoType[];
+  missionInfoList: SimpleMissionInfoType[];
+};
+
+// 미션 상세 정보
+export type MissionType = {
+  id: string;
+  username: string;
+  title: string;
   creatorEmail: string;
+  description: string;
+  createdAt: string;
+  startDate: string;
+  deadline: string;
+  photoUrl: string;
+  minParticipants: number;
+  participants: number;
+  duration: number;
+  status: string;
+  frequency: string;
+  participant: boolean;
 };
 
-// 인증글
-// LocalDate date;
-// boolean completed;
-// String photoData;
-// String textData;
-export type MissionConfirmPostType = {
-  //todo 글쓴이가 추가되어야 함.
-  date: Date;
-  completed: boolean;
-  photo: string;
-  text: string;
-};
-export type ConfirmPostListType = {
-  postList: MissionConfirmPostType[];
+export type ConfirmPostDataType = {
+  username?: string;
+  userEmail: string;
+  date: string;
+  photoData: string;
+  textData: string;
 };
 
-export type ConfirmPostType = {
-  post: MissionConfirmPostType;
+export type ConfirmPostIndexType = {
+  post: ConfirmPostDataType;
   index: number;
 };
 
@@ -50,4 +50,9 @@ export type UserInfoType = {
   user_id: string;
   user_email: string;
   isLoggedIn: boolean;
+};
+
+export type ErrorResponseDataType = {
+  errorCode: string;
+  errorMessage: string;
 };

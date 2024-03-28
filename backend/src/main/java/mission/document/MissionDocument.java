@@ -26,4 +26,5 @@ public class MissionDocument {
     private String status;
     private String frequency;
     private String creatorEmail;
+    private String username;
 }
