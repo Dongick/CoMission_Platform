@@ -1,4 +1,6 @@
 export type SimpleMissionInfoType = {
+  id: string;
+  username: string;
   title: string;
   minParticipants: number;
   participants: number;
@@ -14,22 +16,25 @@ export type MainServerResponseType = {
 
 // 미션 상세 정보
 export type MissionType = {
+  id: string;
+  username: string;
   title: string;
-  creatorEmail?: string;
+  creatorEmail: string;
   description: string;
-  created?: string;
-  start?: string;
-  deadline?: string;
+  createdAt: string;
+  startDate: string;
+  deadline: string;
+  photoUrl: string;
   minParticipants: number;
   participants: number;
   duration: number;
-  status?: string;
+  status: string;
   frequency: string;
   participant: boolean;
 };
 
 export type ConfirmPostDataType = {
-  author?: string;
+  username?: string;
   userEmail: string;
   date: string;
   photoData: string;

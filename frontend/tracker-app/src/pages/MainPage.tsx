@@ -7,15 +7,31 @@ import Card from "../components/Card";
 import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import Input from "../components/StyledInput";
 import { useQuery } from "@tanstack/react-query";
 import { MainServerResponseType } from "../types";
 import { getData } from "../axios";
-
+import { useEffect } from "react";
 const MainPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const accessToken = urlSearchParams.get("AccessToken");
+    const email = urlSearchParams.get("email");
+    const name = urlSearchParams.get("username");
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      setUserInfoState({
+        isLoggedIn: true,
+        user_id: `${name}`,
+        user_email: `${email}`,
+      });
+      navigate("/");
+    }
+  }, [location.search, setUserInfoState, navigate]);
 
   const fetchData = () => getData<MainServerResponseType>("/api/main");
   const { data, isLoading, isError } = useQuery({
@@ -57,7 +73,7 @@ const MainPage = () => {
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
         onClick={() => {
-          if (userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+          if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
           else {
             navigate("/mission-create");
           }
@@ -90,7 +106,8 @@ const MainPage = () => {
               {myMissionData?.map((mission, index) => (
                 <MyCard
                   key={index}
-                  id={index + 1}
+                  id={mission.id}
+                  username={mission.username}
                   title={mission.title}
                   duration={mission.duration}
                   frequency={mission.frequency}
@@ -105,9 +122,9 @@ const MainPage = () => {
         {totalMissionData?.map((mission, index) => (
           <Card
             key={index}
-            id={index + 1}
+            id={mission.id}
             title={mission.title}
-            author="author name"
+            username={mission.username}
             minPar={mission.minParticipants}
             par={mission.participants}
             duration={mission.duration}
