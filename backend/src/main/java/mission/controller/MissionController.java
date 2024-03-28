@@ -34,9 +34,6 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409",
-                    description = "1. DUPLICATE_MISSION_NAME : 이미 존재하는 미션 명",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
@@ -66,7 +63,7 @@ public class MissionController {
                     description = "1. MISSION_NOT_FOUND : 해당 미션을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409",
-                    description = "1. DUPLICATE_MISSION_NAME : 이미 존재하는 미션 명 \t\n 2. MISSION_ALREADY_STARTED : 미션이 이미 시작되서 수정할 수 없음",
+                    description = "1. MISSION_ALREADY_STARTED : 미션이 이미 시작되서 수정할 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })

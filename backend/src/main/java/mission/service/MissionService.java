@@ -38,13 +38,6 @@ public class MissionService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionCreateRequest.getTitle());
-
-        // 해당 미션과 같은 제목을 가진 미션이 존재하는지 확인
-        if(optionalMissionDocument.isPresent()) {
-            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
-        }
-
         LocalDateTime now = LocalDateTime.now();
 
         // 미션 생성 사진을 서버에 저장
@@ -70,13 +63,6 @@ public class MissionService {
             throw new ConflictException(ErrorCode.MISSION_ALREADY_STARTED, ErrorCode.MISSION_ALREADY_STARTED.getMessage());
         } else if(missionDocument.getStatus().equals(MissionStatus.COMPLETED.name())) {
             throw new BadRequestException(ErrorCode.MISSION_ALREADY_COMPLETED, ErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
-        }
-
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionUpdateRequest.getAfterTitle());
-
-        // 새로 바꾼 미션 제목이 기존에 존재하는지 확인
-        if(optionalMissionDocument.isPresent()) {
-            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
         }
 
         // 미션을 수정하는 사용자가 해당 미션의 작성자와 동일한지 확인

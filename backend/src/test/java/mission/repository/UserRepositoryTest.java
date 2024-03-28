@@ -2,6 +2,7 @@ package mission.repository;
 
 import mission.entity.UserEntity;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,12 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @BeforeEach
+    void tearDown() {
+        userRepository.deleteAll(); // 테스트가 시작 전 모든 데이터 삭제
+    }
+
     @Test
     @DisplayName("해당 사용자가 존재할 때 email로 해당 사용자를 찾을 수 있는지 테스트")
     void testFindByEmail_Exist() {
