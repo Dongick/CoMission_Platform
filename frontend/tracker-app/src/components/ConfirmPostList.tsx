@@ -13,7 +13,8 @@ interface ConfirmPostListProps {
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["authenticationData"],
-    queryFn: () => getData<ConfirmPostDataType[]>(`/api/authentication/${id}`),
+    queryFn: () =>
+      getData<ConfirmPostDataType[]>(`/api/authentication/${id}/1`),
   });
   if (isLoading) {
     return <div>Loading...</div>;
@@ -22,7 +23,6 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   if (isError) {
     const axiosError = error as AxiosError<ErrorResponseDataType>;
     const errorCode = axiosError.response?.data.errorCode;
-    console.error(`인증 글 로드 실패: ${axiosError}`);
     if (errorCode === "UNAUTHORIZED") {
       return (
         <NoLoginContent>
@@ -32,7 +32,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         </NoLoginContent>
       );
     }
-    if (axiosError.status === 400) {
+    if (errorCode === "MISSION_NOT_STARTED") {
       return (
         <NoLoginContent>
           <span>❌</span>
@@ -41,7 +41,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         </NoLoginContent>
       );
     }
-    if (axiosError.status === 404) {
+    if (errorCode === "PARTICIPANT_NOT_FOUND") {
       return (
         <NoLoginContent>
           <span>❌</span>
@@ -51,7 +51,6 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
       );
     }
   }
-
   return (
     <PostListLayout>
       {data?.map((post, index) => (

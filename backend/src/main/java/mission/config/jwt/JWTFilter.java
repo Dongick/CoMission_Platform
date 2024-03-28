@@ -40,9 +40,9 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         //request에서 AccessToken 헤더를 찾음
-        String accessToken = request.getHeader("AccessToken");
+        String accessTokenHeader = request.getHeader("Authorization");
 
-        if (accessToken == null) {
+        if (accessTokenHeader == null) {
 
             if(requestUri.matches("^\\/api\\/main(?:\\/.*)?$") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
 
@@ -54,6 +54,14 @@ public class JWTFilter extends OncePerRequestFilter {
 
             return;
         }
+
+        if(!accessTokenHeader.startsWith("Bearer ")) {
+            sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
+
+            return;
+        }
+
+        String accessToken = accessTokenHeader.substring(7);
 
         // 토큰 만료 여부 확인
         try {

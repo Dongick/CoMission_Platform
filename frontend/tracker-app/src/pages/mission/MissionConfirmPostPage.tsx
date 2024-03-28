@@ -17,16 +17,21 @@ import { MissionType } from "../../types";
 import StyledButton from "../../components/StyledButton";
 import example from "../../assets/img/roadmap-77.png";
 import { theme } from "../../styles/theme";
+import { useEffect } from "react";
+
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const userInfoState = useRecoilValue(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
+  useEffect(() => {
+    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
+  }, [refetch]);
   if (isLoading) {
     return <div>Loading...</div>;
   }

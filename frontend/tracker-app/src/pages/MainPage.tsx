@@ -34,15 +34,20 @@ const MainPage = () => {
   }, [location.search, setUserInfoState, navigate]);
 
   const fetchData = () => getData<MainServerResponseType>("/api/main");
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["myMissionData", "totalMissionData"],
     queryFn: fetchData,
   });
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (isError) {
+    console.error(error);
     return <div>Error fetching data</div>;
   }
   const totalMissionData = data?.missionInfoList;

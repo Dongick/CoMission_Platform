@@ -20,6 +20,7 @@ import { useRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { MissionType } from "../../types";
 import { getData } from "../../axios";
+import { useEffect } from "react";
 
 const MissionDetail = () => {
   //todo: cardId -> _id로 변경, title 얻어오는 방식 변경
@@ -28,10 +29,13 @@ const MissionDetail = () => {
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
+  useEffect(() => {
+    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
+  }, [refetch]);
   if (isLoading) {
     return <div>Loading...</div>;
   }
