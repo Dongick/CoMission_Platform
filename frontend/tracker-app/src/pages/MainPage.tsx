@@ -138,6 +138,8 @@ const MainPage = () => {
             minPar={mission.minParticipants}
             par={mission.participants}
             duration={mission.duration}
+            status={mission.status}
+            frequency={mission.frequency}
           />
         ))}
       </MainSection>

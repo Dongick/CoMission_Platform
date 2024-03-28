@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
@@ -8,8 +7,6 @@ import { userInfo } from "../recoil";
 import { postData } from "../axios";
 import { useNavigate } from "react-router";
 import useLogout from "../useLogout";
-import { refreshAccessToken } from "../axios";
-import { customAxios } from "../axios";
 const UserMenu = () => {
   const navigate = useNavigate();
   const logout = useLogout();

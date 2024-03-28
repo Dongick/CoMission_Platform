@@ -34,8 +34,9 @@ const MissionDetail = () => {
     queryFn: fetchData,
   });
   useEffect(() => {
-    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
+    refetch();
   }, [refetch]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -48,7 +49,7 @@ const MissionDetail = () => {
   }
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // Format the date as needed
+    return date.toLocaleDateString();
   };
   return (
     <Layout>
@@ -85,21 +86,39 @@ const MissionDetail = () => {
             <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
             <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
-          <StyledButton
-            bgcolor={theme.subGreen}
-            style={{
-              margin: "20px 0px 0px 0px",
-              fontSize: "large",
-              borderRadius: "10px",
-              padding: "15px 20px",
-              width: "100%",
-            }}
-            onClick={() => {
-              if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
-            }}
-          >
-            미션 참가하기
-          </StyledButton>
+          {!data.participant ? (
+            <StyledButton
+              bgcolor={theme.subGreen}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+                backgroundColor: `${theme.subGray}`,
+                cursor: "auto",
+              }}
+            >
+              이미 참가한 미션입니다!
+            </StyledButton>
+          ) : (
+            <StyledButton
+              bgcolor={theme.subGreen}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+              }}
+              onClick={() => {
+                if (!userInfoState.isLoggedIn)
+                  window.alert("로그인을 해주세요!");
+              }}
+            >
+              미션 참가하기
+            </StyledButton>
+          )}
         </TitleDiv>
       </BannerSection>
       <Navbar>
@@ -148,11 +167,6 @@ const MissionDetail = () => {
             <div>
               <MissionSubTitle>⚫ 미션 상세 소개</MissionSubTitle>
               <MissionSubContent>{data?.description}</MissionSubContent>
-            </div>
-            <HrDivider />
-            <div>
-              <MissionSubTitle>⚫ 이렇게 인증해 주세요!</MissionSubTitle>
-              <MissionSubContent>미션 인증 규칙에 대한 내용</MissionSubContent>
             </div>
           </div>
           <HrDivider />

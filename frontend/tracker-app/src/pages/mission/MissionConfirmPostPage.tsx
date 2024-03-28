@@ -81,21 +81,39 @@ const MissionConfirmPost = () => {
             <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
             <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
-          <StyledButton
-            bgcolor={theme.subGreen}
-            style={{
-              margin: "20px 0px 0px 0px",
-              fontSize: "large",
-              borderRadius: "10px",
-              padding: "15px 20px",
-              width: "100%",
-            }}
-            onClick={() => {
-              if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
-            }}
-          >
-            미션 참가하기
-          </StyledButton>
+          {!data.participant ? (
+            <StyledButton
+              bgcolor={theme.subGreen}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+                backgroundColor: `${theme.subGray}`,
+                cursor: "auto",
+              }}
+            >
+              이미 참가한 미션입니다!
+            </StyledButton>
+          ) : (
+            <StyledButton
+              bgcolor={theme.subGreen}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+              }}
+              onClick={() => {
+                if (!userInfoState.isLoggedIn)
+                  window.alert("로그인을 해주세요!");
+              }}
+            >
+              미션 참가하기
+            </StyledButton>
+          )}
         </TitleDiv>
       </BannerSection>
       <Navbar>

@@ -66,7 +66,7 @@ export const MissionSubTitle = styled.h2`
 export const MissionSubContent = styled.div`
   text-align: left;
   padding: 1rem;
-  min-height: 20vh;
+  min-height: 30vh;
 `;
 
 export const HrDivider = styled.hr`
