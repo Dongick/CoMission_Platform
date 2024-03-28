@@ -3,7 +3,7 @@ import { recoilPersist } from "recoil-persist";
 import { UserInfoType } from "./types";
 
 const { persistAtom } = recoilPersist({
-  key: "localStorage", //원하는 key 값 입력
+  key: "localStorage",
   storage: localStorage,
 });
 

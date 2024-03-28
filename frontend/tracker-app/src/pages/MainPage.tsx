@@ -12,10 +12,13 @@ import Input from "../components/StyledInput";
 import { useQuery } from "@tanstack/react-query";
 import { MainServerResponseType } from "../types";
 import { getData } from "../axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import useLogout from "../useLogout";
 const MainPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const logout = useLogout();
+
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
@@ -47,7 +50,9 @@ const MainPage = () => {
   }
 
   if (isError) {
-    console.error(error);
+    console.error("query 오류: ", error);
+    // logout();
+    // reissue에서 에러 반환되면 -> logout();
     return <div>Error fetching data</div>;
   }
   const totalMissionData = data?.missionInfoList;
