@@ -22,9 +22,9 @@ const MyCard = (props: CardProps) => {
       <MyImgDiv />
       <MyContentDiv>
         <p>{props.title}</p>
-        <p>{props.duration}</p>
-        <p>{props.frequency}</p>
-        <p>멤버 {props.people}</p>
+        <p>🕧 {props.duration}일</p>
+        <p> 🖌 {props.frequency}</p>
+        <p>👨‍👧‍👧 {props.people}명</p>
       </MyContentDiv>
     </MyStyledCard>
   );
@@ -47,15 +47,14 @@ const MyImgDiv = styled(ImgDiv)`
 `;
 
 const MyContentDiv = styled(ContentDiv)`
-  padding: 5px;
+  padding: 10px;
   overflow: hidden;
   p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* text-align: left; */
     font-family: "noto";
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
   & > p:first-child {
     font-family: "notoBold";

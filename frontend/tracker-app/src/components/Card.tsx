@@ -9,9 +9,20 @@ interface CardProps {
   minPar: number;
   par: number;
   duration: number;
+  status: string;
+  frequency: string;
 }
 
-const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
+const Card = ({
+  id,
+  title,
+  username,
+  minPar,
+  par,
+  duration,
+  status,
+  frequency,
+}: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate(`/mission/${id}/detail`);
@@ -27,9 +38,10 @@ const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
               style={{
                 fontFamily: "notoBold",
                 fontSize: "1.2rem",
-                paddingBottom: "5px",
+                padding: "10px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
+                textAlign: "left",
                 textOverflow: "ellipsis",
               }}
             >
@@ -61,19 +73,40 @@ const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              필요 인원: {minPar}명
+              👨‍👧‍👧 {par}/{minPar} 명
             </p>
           </div>
           <div
             style={{
-              fontFamily: "gmarket1",
               padding: "5px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              maxWidth: "100%",
             }}
           >
-            미션 진행 기간: {duration}일
+            <div
+              style={{
+                padding: "5px",
+                fontSize: "0.9rem",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              🕧 진행 기간: {duration}일
+            </div>
+            <div
+              style={{
+                padding: "5px",
+                fontSize: "0.9rem",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              📆 인증 주기: {frequency}
+            </div>
           </div>
         </ContentDiv>
       </StyledCard>
@@ -102,5 +135,10 @@ export const ImgDiv = styled.div`
 export const ContentDiv = styled.div`
   padding: 15px;
   font-family: "noto";
+  text-align: left;
   overflow: hidden;
+  p,
+  div {
+    text-align: left;
+  }
 `;
