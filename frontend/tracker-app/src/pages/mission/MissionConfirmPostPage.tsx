@@ -81,7 +81,7 @@ const MissionConfirmPost = () => {
             <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
             <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
-          {!data.participant ? (
+          {data.participant ? (
             <StyledButton
               bgcolor={theme.subGreen}
               style={{

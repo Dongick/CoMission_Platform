@@ -51,6 +51,21 @@ const MissionDetail = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+  const lackBtn = (
+    <StyledButton
+      bgcolor={theme.subGray}
+      style={{
+        margin: "20px 0px 0px 0px",
+        fontSize: "large",
+        borderRadius: "10px",
+        padding: "15px 20px",
+        width: "100%",
+        cursor: "auto",
+      }}
+    >
+      멤버가 부족합니다!
+    </StyledButton>
+  );
   return (
     <Layout>
       <BannerSection>
@@ -86,21 +101,22 @@ const MissionDetail = () => {
             <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
             <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
-          {!data.participant ? (
+          {data.participant ? (
             <StyledButton
-              bgcolor={theme.subGreen}
+              bgcolor={theme.subGray}
               style={{
                 margin: "20px 0px 0px 0px",
                 fontSize: "large",
                 borderRadius: "10px",
                 padding: "15px 20px",
                 width: "100%",
-                backgroundColor: `${theme.subGray}`,
                 cursor: "auto",
               }}
             >
               이미 참가한 미션입니다!
             </StyledButton>
+          ) : data.status === "CREATED" ? (
+            lackBtn
           ) : (
             <StyledButton
               bgcolor={theme.subGreen}

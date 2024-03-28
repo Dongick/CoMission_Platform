@@ -7,7 +7,7 @@ import Form from "../../components/StyledForm";
 import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
-
+import example from "../../assets/img/roadmap-77.png";
 const MissionCreatePage = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -33,6 +33,17 @@ const MissionCreatePage = () => {
       if (e.target.files) {
         setPhoto(e.target.files[0]);
       }
+      //   if (selectedFile) {
+      //     // Read the selected file as a data URL
+      //     const reader = new FileReader();
+      //     reader.onload = () => {
+      //       const base64String = reader.result as string; // Convert data URL to string
+      //       setPhoto(selectedFile);
+      //       setPhotoData(base64String); // Store Base64 encoded string in state
+      //     };
+      //     reader.readAsDataURL(selectedFile);
+      //   }
+      // };
     },
     []
   );
@@ -50,6 +61,7 @@ const MissionCreatePage = () => {
     },
     []
   );
+
   const durationChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setDuration(parseInt(e.target.value));
@@ -63,15 +75,19 @@ const MissionCreatePage = () => {
       window.alert("모든 값을 입력해주세요!");
     }
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
+    const missionInfo = {
+      title: title,
+      description: description,
+      minParticipants: minParticipants,
+      duration: duration,
+      frequency: frequency,
+    };
+    formData.append("missionInfo", JSON.stringify(missionInfo));
     if (photo) {
-      formData.append("photo", photo);
+      formData.append("photoData", photo);
     }
-    formData.append("minParticipants", minParticipants.toString());
-    formData.append("frequency", frequency);
-    formData.append("duration", duration.toString());
     console.log(...formData);
+    console.log(formData.get("missionInfo"));
 
     // Send formData to the server using Axios
     // header에 'Content-Type': 'multipart/form-data'
