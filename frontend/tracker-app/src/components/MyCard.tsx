@@ -5,10 +5,11 @@ import exampleImg from "../assets/img/wave-haikei.svg";
 import { useNavigate } from "react-router-dom";
 interface CardProps {
   title: string;
+  username: string;
   duration: number;
   frequency: string;
   people: number;
-  id: number;
+  id: string;
 }
 
 const MyCard = (props: CardProps) => {

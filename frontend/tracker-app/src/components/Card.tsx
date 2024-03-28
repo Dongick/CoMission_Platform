@@ -3,18 +3,18 @@ import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
 interface CardProps {
-  id: number;
+  id: string;
   title: string;
-  author: string;
+  username: string;
   minPar: number;
   par: number;
   duration: number;
 }
 
-const Card = ({ id, title, author, minPar, par, duration }: CardProps) => {
+const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate(`/mission/${id}/detail`, { state: { title } });
+    navigate(`/mission/${id}/detail`);
   };
 
   return (
@@ -52,7 +52,7 @@ const Card = ({ id, title, author, minPar, par, duration }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              {author}
+              {username}
             </p>
             <p
               style={{
