@@ -38,6 +38,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation ("com.h2database:h2")
 	testImplementation ("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.3")
+	testImplementation ("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {

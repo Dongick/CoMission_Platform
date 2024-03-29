@@ -37,7 +37,7 @@ public class MainService {
             CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
             String userEmail = customOAuth2User.getEmail();
 
-            List<ParticipantMissionId> participantMissionIdList = participantRepository.findByUserEmailAndStatusNot(userEmail);
+            List<ParticipantMissionId> participantMissionIdList = participantRepository.findByUserEmail(userEmail);
 
             List<ObjectId> missionIdList = participantMissionIdList.stream()
                     .map(ParticipantMissionId::getMissionId)
