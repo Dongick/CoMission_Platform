@@ -19,21 +19,22 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @BeforeEach
-    void tearDown() {
-        userRepository.deleteAll(); // 테스트가 시작 전 모든 데이터 삭제
+    void setUp() {
+        userRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("해당 사용자가 존재할 때 email로 해당 사용자를 찾을 수 있는지 테스트")
-    void testFindByEmail_Exist() {
+    @DisplayName("UserRepository의 findByEmail 매서드 테스트")
+    void findByEmail() {
 
         //given
-        String email = "test@example.com";
+        String email1 = "test1@example.com";
+        String email2 = "test2@example.com";
         String username = "testUser";
         String role = "USER";
 
         UserEntity userEntity = UserEntity.builder()
-                .email(email)
+                .email(email1)
                 .username(username)
                 .role(role)
                 .build();
@@ -41,24 +42,13 @@ class UserRepositoryTest {
         userRepository.save(userEntity);
 
         //when
-        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(email);
+        Optional<UserEntity> userEntityOptional1 = userRepository.findByEmail(email1);
+        Optional<UserEntity> userEntityOptional2 = userRepository.findByEmail(email2);
 
         //then
-        Assertions.assertThat(userEntityOptional.isPresent());
-        Assertions.assertThat(email).isEqualTo(userEntityOptional.get().getEmail());
-    }
+        Assertions.assertThat(userEntityOptional1.isPresent());
+        Assertions.assertThat(email1).isEqualTo(userEntityOptional1.get().getEmail());
 
-    @Test
-    @DisplayName("존재하지 않는 이메일을 가진 사용자를 찾을 때 빈 Optional을 반환하는지 확인하는 테스트")
-    void testFindByEmail_NonExist() {
-
-        //given
-        String email = "test@example.com";
-
-        //when
-        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(email);
-
-        //then
-        Assertions.assertThat(userEntityOptional.isEmpty());
+        Assertions.assertThat(userEntityOptional2.isEmpty());
     }
 }

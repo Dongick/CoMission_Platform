@@ -4,8 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java.backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/java.backend.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java.backend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/java.backend.test.iml" />
     </modules>
   </component>
 </project>
