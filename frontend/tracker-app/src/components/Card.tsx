@@ -2,25 +2,24 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
-import { MissionType } from "../types";
 interface CardProps {
+  id: string;
   title: string;
-  author: string;
-  people: number;
-  id: number;
-  missionData: MissionType;
+  username: string;
+  minPar: number;
+  par: number;
+  duration: number;
 }
 
-const Card = ({ title, author, people, id, missionData }: CardProps) => {
+const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
   const navigate = useNavigate();
-
-  // todo: react-query에 저장되어 있는 값으로 받기
   const handleClick = () => {
-    navigate(`/mission/${id}/detail`, { state: { mission: missionData } });
+    navigate(`/mission/${id}/detail`);
   };
+
   return (
-    <div onClick={handleClick}>
-      <StyledCard>
+    <div>
+      <StyledCard onClick={handleClick}>
         <ImgDiv />
         <ContentDiv>
           <div>
@@ -53,7 +52,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              {author}
+              {username}
             </p>
             <p
               style={{
@@ -62,7 +61,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              필요 인원: {people}명
+              필요 인원: {minPar}명
             </p>
           </div>
           <div
@@ -74,7 +73,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
               textOverflow: "ellipsis",
             }}
           >
-            여기에 뭘 넣을까요
+            미션 진행 기간: {duration}일
           </div>
         </ContentDiv>
       </StyledCard>
@@ -83,7 +82,7 @@ const Card = ({ title, author, people, id, missionData }: CardProps) => {
 };
 export default Card;
 
-const StyledCard = styled.section`
+export const StyledCard = styled.section`
   height: 40vh;
   width: 15vw;
   border-radius: 10px;
@@ -91,15 +90,16 @@ const StyledCard = styled.section`
   box-shadow: ${theme.boxShadow};
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 `;
-const ImgDiv = styled.div`
+export const ImgDiv = styled.div`
   background-image: url(${Img});
   background-size: cover;
   background-position: center;
   min-height: 60%;
   width: 100%;
 `;
-const ContentDiv = styled.div`
+export const ContentDiv = styled.div`
   padding: 15px;
   font-family: "noto";
   overflow: hidden;

@@ -183,7 +183,7 @@ class MissionRepositoryTest {
         Assertions.assertThat(missionInfoList3.size()).isEqualTo(0);
 
         Assertions.assertThat(missionInfoList4.size()).isEqualTo(1);
-        Assertions.assertThat(missionInfoList2.get(0).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missionInfoList4.get(0).getTitle()).isEqualTo(title[1]);
 
         Assertions.assertThat(missionInfoList5.size()).isEqualTo(0);
     }

@@ -3,12 +3,18 @@ import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
 import { useState } from "react";
-interface UserMenuProps {
-  isLogin: boolean;
-}
-const UserMenu = ({ isLogin = false }: UserMenuProps) => {
+import { useRecoilState } from "recoil";
+import { userInfo } from "../recoil";
+import { postData } from "../axios";
+import { useNavigate } from "react-router";
+import useLogout from "../useLogout";
+import { refreshAccessToken } from "../axios";
+import { customAxios } from "../axios";
+const UserMenu = () => {
+  const navigate = useNavigate();
+  const logout = useLogout();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-
+  const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
@@ -16,12 +22,20 @@ const UserMenu = ({ isLogin = false }: UserMenuProps) => {
     setShowLoginModal(false);
   };
   const logoutHandler = () => {
-    // 로그아웃 프로세스
-    window.alert("logout!");
+    postData<string, string>("/api/user/logout", "")
+      .then((data) => {
+        console.log(data);
+        logout();
+      })
+      .catch((error) => {
+        if (typeof error === "string") {
+          alert("토큰 재발급 실패! 재로그인 해주세요");
+          logout();
+        }
+      });
   };
-  const myInfo = (
+  const myInfoButton = (
     <StyledButton
-      onClick={logoutHandler}
       bgcolor="##363636"
       color="black"
       style={{
@@ -35,9 +49,10 @@ const UserMenu = ({ isLogin = false }: UserMenuProps) => {
   );
   return (
     <Wrapper>
-      {!isLogin ? (
+      {userInfoState.isLoggedIn}
+      {userInfoState.isLoggedIn ? (
         <div>
-          {myInfo}
+          {myInfoButton}
           <StyledButton
             onClick={logoutHandler}
             bgcolor="##363636"

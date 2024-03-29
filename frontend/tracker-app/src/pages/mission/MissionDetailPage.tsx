@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import Layout from "../../layouts/Layout";
-import { useParams, useLocation, Link } from "react-router-dom";
-import { MissionType } from "../../types";
+import { useParams, Link } from "react-router-dom";
 import { theme } from "../../styles/theme";
 import example from "../../assets/img/roadmap-77.png";
 import StyledButton from "../../components/StyledButton";
@@ -18,15 +17,39 @@ import {
 } from "./MissionStyles";
 import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
+import { useQuery } from "@tanstack/react-query";
+import { MissionType } from "../../types";
+import { getData } from "../../axios";
+import { useEffect } from "react";
+
 const MissionDetail = () => {
+  //todo: cardId -> _id로 변경, title 얻어오는 방식 변경
   const { cardId } = useParams();
-  const location = useLocation();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
-  const missionData = location.state.mission as MissionType;
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["missionDetailInfo"],
+    queryFn: fetchData,
+  });
+  useEffect(() => {
+    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
+  }, [refetch]);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  //todo 여기서 mission의 ID를 알고, api요청을 해서 상세 정보를 가져와야 한다
+  if (isError) {
+    return <div>Error fetching: detail mission data</div>;
+  }
+  if (!data) {
+    return <div>No data available</div>;
+  }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // Format the date as needed
+  };
   return (
     <Layout>
       <BannerSection>
@@ -41,18 +64,14 @@ const MissionDetail = () => {
           }}
         />
         <TitleDiv>
-          <div style={{ marginBottom: "30px" }}>
-            김영한의 스프링 부트와 JPA 실무 완전 정복 로드맵
-          </div>
+          <div style={{ marginBottom: "30px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
-              미션 생성일 : {missionData.created.toLocaleDateString()} &nbsp;/
+              미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
             </p>
             <p>
-              ⏱ 미션 진행일 : {missionData.start.toLocaleDateString()} -&nbsp;
-              {missionData.deadline.toLocaleDateString()} (
-              {missionData.duration}
-              일간)
+              ⏱ 미션 진행일 : {formatDate(data.startDate)} -{" "}
+              {formatDate(data.deadline)} ({data?.duration} 일간)
             </p>
           </div>
           <div
@@ -62,9 +81,9 @@ const MissionDetail = () => {
               width: "80%",
             }}
           >
-            <p>인증주기: {missionData.frequency}</p>
-            <p>👨‍👧‍👧최소 필요인원: {missionData.minParticipants}</p>
-            <p>👨‍👧‍👧현재 참가인원: {missionData.participants}</p>
+            <p>인증주기: {data.frequency}</p>
+            <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
+            <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
           <StyledButton
             bgcolor={theme.subGreen}
@@ -100,21 +119,35 @@ const MissionDetail = () => {
               paddingTop: "20px",
             }}
           >
-            {missionData.creatorEmail} 님이 만든 미션
+            {data.username} 님이 만든 미션
           </h1>
           <h2 style={{ paddingTop: "15px", fontSize: "1.2rem" }}>
-            <span
-              style={{ fontFamily: "notoBold", color: `${theme.subGreen}` }}
-            >
-              {missionData.minParticipants - missionData.participants}명
-            </span>
-            이 더 참가시 미션 시작 🚩
+            {data.status === "CREATED" && (
+              <div>
+                <span
+                  style={{ fontFamily: "notoBold", color: `${theme.subGreen}` }}
+                >
+                  {(data.minParticipants ?? 0) - (data?.participants ?? 0)}명
+                </span>
+                이 더 참가시 미션 시작 🚩
+              </div>
+            )}
+            {data.status === "STARTED" && !data.participant && (
+              <div>
+                <span
+                  style={{ fontFamily: "notoBold", color: `${theme.subGreen}` }}
+                >
+                  미션
+                </span>
+                에 참가해보세요! 🚩
+              </div>
+            )}
           </h2>
           <HrDivider />
           <div>
             <div>
               <MissionSubTitle>⚫ 미션 상세 소개</MissionSubTitle>
-              <MissionSubContent>미션에 대한 내용</MissionSubContent>
+              <MissionSubContent>{data?.description}</MissionSubContent>
             </div>
             <HrDivider />
             <div>
