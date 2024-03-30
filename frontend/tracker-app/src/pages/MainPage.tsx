@@ -83,7 +83,7 @@ const MainPage = () => {
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
         onClick={() => {
-          if (userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+          if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
           else {
             navigate("/mission-create");
           }

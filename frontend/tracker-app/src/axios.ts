@@ -1,5 +1,4 @@
 import axios, {
-  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
@@ -10,19 +9,22 @@ import axios, {
 export const customAxios: AxiosInstance = axios.create({
   baseURL: "http://localhost:8080", // BASE URL
   timeout: 5000,
+  withCredentials: true,
 });
 
 // 요청 interceptor
 customAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = localStorage.getItem("accessToken");
+    console.log("요청 Config: ", config);
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
-      console.log("요청 헤더: ", config.headers);
     }
-    // if (config.data instanceof FormData) {
-    //   config.headers["Content-Type"] = "multipart/form-data";
-    // }
+    if (config.data instanceof FormData) {
+      config.headers["Content-Type"] = "multipart/form-data";
+    } else {
+      config.headers["Content-Type"] = "application/json";
+    }
     return config;
   },
   (error) => {
@@ -34,6 +36,7 @@ customAxios.interceptors.request.use(
 //응답 interceptor
 customAxios.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log("응답 Config: ", response.config);
     return response;
   },
   async (error) => {
@@ -49,7 +52,7 @@ customAxios.interceptors.response.use(
     else if (errorStatus === 401) {
       console.log("재발급해야됨", requestUrl, errorStatus);
       try {
-        console.log("여기서 액세스토큰 재발급 요청해야댐");
+        console.log("여기서 액세스토큰 재발급 요청");
         const newAccessToken = await refreshAccessToken();
         console.log("재발급 successful: ", newAccessToken);
         if (error.config) {
