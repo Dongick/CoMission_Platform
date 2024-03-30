@@ -19,11 +19,11 @@ import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { MissionType } from "../../types";
-import { getData } from "../../axios";
+import { getData, postData } from "../../axios";
 import { useEffect } from "react";
+import example2 from "../../assets/img/no-pictures.png";
 
 const MissionDetail = () => {
-  //todo: cardId -> _id로 변경, title 얻어오는 방식 변경
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
@@ -35,7 +35,7 @@ const MissionDetail = () => {
   });
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -50,6 +50,14 @@ const MissionDetail = () => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  };
+  const partipateHandler = async () => {
+    try {
+      const data = await postData("/api/participant", { id: cardId });
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
   const lackBtn = (
     <StyledButton
@@ -69,16 +77,29 @@ const MissionDetail = () => {
   return (
     <Layout>
       <BannerSection>
-        <img
-          src={example}
-          alt="img"
-          style={{
-            width: "20%",
-            height: "90%",
-            marginRight: "30px",
-            borderRadius: "10px",
-          }}
-        />
+        {data.photoUrl ? (
+          <img
+            src={example}
+            alt="img"
+            style={{
+              width: "20%",
+              height: "90%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        ) : (
+          <img
+            src={example2}
+            alt="img"
+            style={{
+              width: "15%",
+              height: "80%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        )}
         <TitleDiv>
           <div style={{ marginBottom: "30px" }}>{data.title}</div>
           <div>
@@ -130,6 +151,9 @@ const MissionDetail = () => {
               onClick={() => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
+                else {
+                  partipateHandler();
+                }
               }}
             >
               미션 참가하기

@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
-import noImg from "../assets/img/no-pictures2.png";
+import noImg from "../assets/img/no-pictures.png";
 interface CardProps {
   id: string;
   title: string;

@@ -21,7 +21,13 @@ const MyCard = (props: CardProps) => {
   };
   return (
     <MyStyledCard onClick={handleClick}>
-      <img src={noImg} alt="" width="100%" height="60%" />
+      <img
+        src={noImg}
+        alt=""
+        width="100%"
+        height="60%"
+        style={{ margin: "0 auto" }}
+      />
       {/* <MyImgDiv /> */}
       <MyContentDiv>
         <p>{props.title}</p>
@@ -38,7 +44,7 @@ export default MyCard;
 const MyStyledCard = styled(StyledCard)`
   background-color: white;
   height: 100%;
-  width: 12vw;
+  width: 10vw;
   margin: 0;
   margin-right: 2vw;
   flex: 0 0 auto;
@@ -50,14 +56,14 @@ const MyImgDiv = styled(ImgDiv)`
 `;
 
 const MyContentDiv = styled(ContentDiv)`
-  padding: 10px;
+  padding: 5px;
   overflow: hidden;
   p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: "noto";
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   & > p:first-child {
     font-family: "notoBold";

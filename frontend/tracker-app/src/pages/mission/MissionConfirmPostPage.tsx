@@ -12,10 +12,11 @@ import ConfirmPostList from "../../components/ConfirmPostList";
 import { userInfo } from "../../recoil";
 import { useRecoilValue } from "recoil";
 import { useQuery } from "@tanstack/react-query";
-import { getData } from "../../axios";
+import { getData, postData } from "../../axios";
 import { MissionType } from "../../types";
 import StyledButton from "../../components/StyledButton";
 import example from "../../assets/img/roadmap-77.png";
+import example2 from "../../assets/img/no-pictures.png";
 import { theme } from "../../styles/theme";
 import { useEffect } from "react";
 
@@ -31,7 +32,7 @@ const MissionConfirmPost = () => {
   });
   useEffect(() => {
     refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
-  }, [refetch]);
+  }, []);
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -46,19 +47,40 @@ const MissionConfirmPost = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // Format the date as needed
   };
+  const partipateHandler = async () => {
+    try {
+      const data = await postData("/api/participant", { id: cardId });
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <Layout>
       <BannerSection>
-        <img
-          src={example}
-          alt="img"
-          style={{
-            width: "20%",
-            height: "90%",
-            marginRight: "30px",
-            borderRadius: "10px",
-          }}
-        />
+        {data.photoUrl ? (
+          <img
+            src={example}
+            alt="img"
+            style={{
+              width: "20%",
+              height: "90%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        ) : (
+          <img
+            src={example2}
+            alt="img"
+            style={{
+              width: "15%",
+              height: "80%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        )}
         <TitleDiv>
           <div style={{ marginBottom: "30px" }}>{data.title}</div>
           <div>
@@ -109,6 +131,9 @@ const MissionConfirmPost = () => {
               onClick={() => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
+                else {
+                  partipateHandler();
+                }
               }}
             >
               미션 참가하기
