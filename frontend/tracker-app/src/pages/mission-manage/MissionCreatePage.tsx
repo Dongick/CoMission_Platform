@@ -4,10 +4,11 @@ import { SearchSection } from "../MainPage";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
 import Form from "../../components/StyledForm";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
 import example from "../../assets/img/roadmap-77.png";
+import { postData } from "../../axios";
 const MissionCreatePage = () => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -69,7 +70,7 @@ const MissionCreatePage = () => {
     []
   );
 
-  const formSubmitHandler = (e: React.FormEvent) => {
+  const formSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description) {
       window.alert("모든 값을 입력해주세요!");
@@ -82,16 +83,23 @@ const MissionCreatePage = () => {
       duration: duration,
       frequency: frequency,
     };
-    formData.append("missionInfo", JSON.stringify(missionInfo));
     if (photo) {
       formData.append("photoData", photo);
+      // const reader = new FileReader(); // fileReader 생성
+      // reader.onload = function (e: any) {
+      //   console.log(e.target.result);
+      // };
+      // reader.readAsText(photo);
     }
-    console.log(...formData);
-    console.log(formData.get("missionInfo"));
-
-    // Send formData to the server using Axios
-    // header에 'Content-Type': 'multipart/form-data'
+    formData.append("missionInfo", JSON.stringify(missionInfo));
+    try {
+      const data = await postData("/api/mission", formData);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   return (
     <Layout footer={false}>
       <div
