@@ -3,6 +3,8 @@ import { theme } from "../styles/theme";
 import { StyledCard, ImgDiv, ContentDiv } from "./Card";
 import exampleImg from "../assets/img/wave-haikei.svg";
 import { useNavigate } from "react-router-dom";
+import noImg from "../assets/img/no-pictures.png";
+
 interface CardProps {
   title: string;
   username: string;
@@ -19,7 +21,8 @@ const MyCard = (props: CardProps) => {
   };
   return (
     <MyStyledCard onClick={handleClick}>
-      <MyImgDiv />
+      <img src={noImg} alt="" width="100%" height="60%" />
+      {/* <MyImgDiv /> */}
       <MyContentDiv>
         <p>{props.title}</p>
         <p>🕧 {props.duration}일</p>

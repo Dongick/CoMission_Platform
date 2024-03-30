@@ -21,7 +21,6 @@ const UserMenu = () => {
   const logoutHandler = () => {
     postData<string, string>("/api/user/logout", "")
       .then((data) => {
-        console.log(data);
         logout();
       })
       .catch((error) => {
