@@ -3,18 +3,22 @@ import { ConfirmPostDataType } from "../types";
 import { useQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
+import { theme } from "../styles/theme";
 import { NoLoginContent } from "../pages/mission/MissionConfirmPostPage";
 import { AxiosError } from "axios";
-import { ErrorResponseDataType } from "../types";
+import { ErrorResponseDataType, ConfirmPostListType } from "../types";
+import StyledButton from "./StyledButton";
+import { useState } from "react";
+import NewPostModal from "./NewPostModal";
 const PostListLayout = styled.div``;
 interface ConfirmPostListProps {
   id: string;
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
-  const { data, isLoading, isError, error } = useQuery({
+  const [showPostModal, setShowPostModal] = useState<boolean>(false);
+  const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["authenticationData"],
-    queryFn: () =>
-      getData<ConfirmPostDataType[]>(`/api/authentication/${id}/1`),
+    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/1`),
   });
   if (isLoading) {
     return <div>Loading...</div>;
@@ -51,11 +55,39 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
       );
     }
   }
+
+  if (isSuccess) {
+    console.log(data);
+  }
+
+  const openPostModalHandler = () => {
+    setShowPostModal(true);
+  };
+  const closePostModalHandler = () => {
+    setShowPostModal(false);
+  };
   return (
     <PostListLayout>
-      {data?.map((post, index) => (
-        <ConfirmPost index={index + 1} post={post} />
-      ))}
+      <StyledButton
+        bgcolor={theme.subGreen}
+        style={{ margin: "10px", fontSize: "large", borderRadius: "10px" }}
+        onClick={openPostModalHandler}
+      >
+        인증 글 작성
+      </StyledButton>
+
+      {data && Array.isArray(data) ? (
+        data?.map((post, index) => (
+          <ConfirmPost index={index + 1} post={post} />
+        ))
+      ) : (
+        <NoLoginContent>
+          <span>❌</span>
+          <h1>등록된 인증글이 없습니다</h1>
+          <p>첫 인증을 해보세요!</p>
+        </NoLoginContent>
+      )}
+      {showPostModal && <NewPostModal onClose={closePostModalHandler} />}
     </PostListLayout>
   );
 };

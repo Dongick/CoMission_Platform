@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { theme } from "../styles/theme";
 import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
+import noImg from "../assets/img/no-pictures.png";
 interface CardProps {
   id: string;
   title: string;
@@ -9,9 +10,20 @@ interface CardProps {
   minPar: number;
   par: number;
   duration: number;
+  status: string;
+  frequency: string;
 }
 
-const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
+const Card = ({
+  id,
+  title,
+  username,
+  minPar,
+  par,
+  duration,
+  status,
+  frequency,
+}: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate(`/mission/${id}/detail`);
@@ -20,16 +32,18 @@ const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
   return (
     <div>
       <StyledCard onClick={handleClick}>
-        <ImgDiv />
+        <img src={noImg} alt="" width="100%" height="60%" />
+        {/* <ImgDiv /> */}
         <ContentDiv>
           <div>
             <h2
               style={{
                 fontFamily: "notoBold",
                 fontSize: "1.2rem",
-                paddingBottom: "5px",
+                padding: "10px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
+                textAlign: "left",
                 textOverflow: "ellipsis",
               }}
             >
@@ -41,7 +55,7 @@ const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
               padding: "5px",
               display: "flex",
               flexDirection: "row",
-              justifyContent: "space-around",
+              justifyContent: "space-evenly",
               maxWidth: "100%",
             }}
           >
@@ -61,19 +75,40 @@ const Card = ({ id, title, username, minPar, par, duration }: CardProps) => {
                 textOverflow: "ellipsis",
               }}
             >
-              필요 인원: {minPar}명
+              👨‍👧‍👧인원: {par}/{minPar} 명
             </p>
           </div>
           <div
             style={{
-              fontFamily: "gmarket1",
               padding: "5px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              maxWidth: "100%",
             }}
           >
-            미션 진행 기간: {duration}일
+            <div
+              style={{
+                padding: "5px",
+                fontSize: "0.9rem",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              📆 진행 기간: {duration}일
+            </div>
+            <div
+              style={{
+                padding: "5px",
+                fontSize: "0.9rem",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              🖌 인증 주기: {frequency}
+            </div>
           </div>
         </ContentDiv>
       </StyledCard>
@@ -93,14 +128,19 @@ export const StyledCard = styled.section`
   cursor: pointer;
 `;
 export const ImgDiv = styled.div`
-  background-image: url(${Img});
+  background-image: url(${noImg});
   background-size: cover;
   background-position: center;
   min-height: 60%;
   width: 100%;
 `;
 export const ContentDiv = styled.div`
-  padding: 15px;
+  padding: 5px;
   font-family: "noto";
+  text-align: left;
   overflow: hidden;
+  p,
+  div {
+    text-align: left;
+  }
 `;

@@ -8,18 +8,28 @@ import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate, useLocation } from "react-router";
-import Input from "../components/StyledInput";
-import { useQuery } from "@tanstack/react-query";
-import { MainServerResponseType } from "../types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  MainServerResponseType,
+  SearchedMissionInfoType,
+  SimpleMissionInfoType,
+} from "../types";
 import { getData } from "../axios";
 import { useEffect, useState } from "react";
 import useLogout from "../useLogout";
+import MissionSearch from "../components/MissionSearch";
 const MainPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const logout = useLogout();
-
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const [totalMissionData, setTotalMissionData] = useState<
+    SimpleMissionInfoType[]
+  >([]);
+  const [myMissionData, setMyMissionData] = useState<SimpleMissionInfoType[]>(
+    []
+  );
+
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
@@ -37,48 +47,27 @@ const MainPage = () => {
   }, [location.search, setUserInfoState, navigate]);
 
   const fetchData = () => getData<MainServerResponseType>("/api/main");
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["myMissionData", "totalMissionData"],
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ["totalMissionData"],
     queryFn: fetchData,
   });
+
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (isSuccess || data) {
+      setTotalMissionData(data.missionInfoList);
+      setMyMissionData(data.participantMissionInfoList);
+    }
+  }, [isSuccess, data]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const updateData = (newData: SearchedMissionInfoType) => {
+    setTotalMissionData(newData.missionInfoList);
+  };
 
-  if (isError) {
-    console.error("query 오류: ", error);
-    // logout();
-    // reissue에서 에러 반환되면 -> logout();
-    return <div>Error fetching data</div>;
-  }
-  const totalMissionData = data?.missionInfoList;
-  const myMissionData = data?.participantMissionInfoList;
   return (
     <Layout>
-      <SearchSection>
-        <div style={{ padding: "10px" }}>미션을 검색해보세요!</div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            padding: "10px",
-          }}
-        >
-          <Input type="text" placeholder="미션명 검색하기" size={25} />
-          <StyledButton
-            bgcolor={theme.subGreen}
-            color="white"
-            style={{ fontSize: "medium" }}
-          >
-            검색
-          </StyledButton>
-        </div>
-      </SearchSection>
+      <MissionSearch updateData={updateData} />
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Error fetching data</p>}
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
@@ -101,7 +90,7 @@ const MainPage = () => {
             style={{
               fontSize: "1.3rem",
               fontFamily: "gmarket2",
-              padding: "20px 0px",
+              padding: "15px 0px",
               width: "40%",
               margin: "0 auto",
             }}
@@ -138,6 +127,8 @@ const MainPage = () => {
             minPar={mission.minParticipants}
             par={mission.participants}
             duration={mission.duration}
+            status={mission.status}
+            frequency={mission.frequency}
           />
         ))}
       </MainSection>
@@ -172,7 +163,7 @@ const MainSection = styled.section`
 `;
 
 const MyMissionSection = styled.section`
-  padding: 10px;
+  padding-bottom: 3vh;
   margin: 0 auto;
   margin-bottom: 5vh;
   height: 30vh;

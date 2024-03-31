@@ -19,11 +19,11 @@ import { userInfo } from "../../recoil";
 import { useRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { MissionType } from "../../types";
-import { getData } from "../../axios";
+import { getData, postData } from "../../axios";
 import { useEffect } from "react";
+import example2 from "../../assets/img/no-pictures.png";
 
 const MissionDetail = () => {
-  //todo: cardId -> _id로 변경, title 얻어오는 방식 변경
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
@@ -33,9 +33,11 @@ const MissionDetail = () => {
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
+
   useEffect(() => {
-    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
-  }, [refetch]);
+    refetch();
+  }, [data]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -48,31 +50,60 @@ const MissionDetail = () => {
   }
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // Format the date as needed
+    return date.toLocaleDateString();
   };
+  const partipateHandler = async () => {
+    try {
+      const data = await postData("/api/participant", { id: cardId });
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const isStartedDate = (
+    <p>
+      ⏱ 미션 진행일 : {formatDate(data.startDate)} - {formatDate(data.deadline)}{" "}
+      ({data?.duration} 일간)
+    </p>
+  );
   return (
     <Layout>
       <BannerSection>
-        <img
-          src={example}
-          alt="img"
-          style={{
-            width: "20%",
-            height: "90%",
-            marginRight: "30px",
-            borderRadius: "10px",
-          }}
-        />
+        {data.photoUrl ? (
+          <img
+            src={data.photoUrl}
+            alt="img"
+            style={{
+              width: "20%",
+              height: "90%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        ) : (
+          <img
+            src={example2}
+            alt="img"
+            style={{
+              width: "15%",
+              height: "80%",
+              marginRight: "30px",
+              borderRadius: "10px",
+            }}
+          />
+        )}
         <TitleDiv>
           <div style={{ marginBottom: "30px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
             </p>
-            <p>
-              ⏱ 미션 진행일 : {formatDate(data.startDate)} -{" "}
-              {formatDate(data.deadline)} ({data?.duration} 일간)
-            </p>
+            {data.status === "CREATED" ? (
+              <p>⏱ 멤버모집이 완료되어야 시작됩니다!</p>
+            ) : (
+              isStartedDate
+            )}
           </div>
           <div
             style={{
@@ -85,21 +116,41 @@ const MissionDetail = () => {
             <p>👨‍👧‍👧최소 필요인원: {data.minParticipants}</p>
             <p>👨‍👧‍👧현재 참가인원: {data.participants}</p>
           </div>
-          <StyledButton
-            bgcolor={theme.subGreen}
-            style={{
-              margin: "20px 0px 0px 0px",
-              fontSize: "large",
-              borderRadius: "10px",
-              padding: "15px 20px",
-              width: "100%",
-            }}
-            onClick={() => {
-              if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
-            }}
-          >
-            미션 참가하기
-          </StyledButton>
+          {data.participant ? (
+            <StyledButton
+              bgcolor={theme.subGray}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+                cursor: "auto",
+              }}
+            >
+              이미 참가한 미션입니다!
+            </StyledButton>
+          ) : (
+            <StyledButton
+              bgcolor={theme.subGreen}
+              style={{
+                margin: "20px 0px 0px 0px",
+                fontSize: "large",
+                borderRadius: "10px",
+                padding: "15px 20px",
+                width: "100%",
+              }}
+              onClick={() => {
+                if (!userInfoState.isLoggedIn)
+                  window.alert("로그인을 해주세요!");
+                else {
+                  partipateHandler();
+                }
+              }}
+            >
+              미션 참가하기
+            </StyledButton>
+          )}
         </TitleDiv>
       </BannerSection>
       <Navbar>
@@ -148,11 +199,6 @@ const MissionDetail = () => {
             <div>
               <MissionSubTitle>⚫ 미션 상세 소개</MissionSubTitle>
               <MissionSubContent>{data?.description}</MissionSubContent>
-            </div>
-            <HrDivider />
-            <div>
-              <MissionSubTitle>⚫ 이렇게 인증해 주세요!</MissionSubTitle>
-              <MissionSubContent>미션 인증 규칙에 대한 내용</MissionSubContent>
             </div>
           </div>
           <HrDivider />
