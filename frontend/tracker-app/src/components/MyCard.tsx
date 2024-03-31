@@ -12,6 +12,7 @@ interface CardProps {
   frequency: string;
   people: number;
   id: string;
+  photoUrl: string;
 }
 
 const MyCard = (props: CardProps) => {
@@ -21,14 +22,23 @@ const MyCard = (props: CardProps) => {
   };
   return (
     <MyStyledCard onClick={handleClick}>
-      <img
-        src={noImg}
-        alt=""
-        width="100%"
-        height="60%"
-        style={{ margin: "0 auto" }}
-      />
-      {/* <MyImgDiv /> */}
+      {props.photoUrl ? (
+        <img
+          src={props.photoUrl}
+          alt=""
+          width="100%"
+          height="60%"
+          style={{ margin: "0 auto" }}
+        />
+      ) : (
+        <img
+          src={noImg}
+          alt=""
+          width="100%"
+          height="60%"
+          style={{ margin: "0 auto" }}
+        />
+      )}
       <MyContentDiv>
         <p>{props.title}</p>
         <p>🕧 {props.duration}일</p>

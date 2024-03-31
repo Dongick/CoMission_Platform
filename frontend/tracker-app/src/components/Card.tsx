@@ -11,6 +11,7 @@ interface CardProps {
   par: number;
   duration: number;
   status: string;
+  photoUrl: string;
   frequency: string;
 }
 
@@ -22,18 +23,22 @@ const Card = ({
   par,
   duration,
   status,
+  photoUrl,
   frequency,
 }: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate(`/mission/${id}/detail`);
   };
-
+  console.log(photoUrl);
   return (
     <div>
       <StyledCard onClick={handleClick}>
-        <img src={noImg} alt="" width="100%" height="60%" />
-        {/* <ImgDiv /> */}
+        {photoUrl ? (
+          <img src={photoUrl} alt="Img" width="100%" height="60%" />
+        ) : (
+          <img src={noImg} alt="Img" width="100%" height="60%" />
+        )}
         <ContentDiv>
           <div>
             <h2

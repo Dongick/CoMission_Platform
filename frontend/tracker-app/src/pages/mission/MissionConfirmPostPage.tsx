@@ -15,7 +15,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getData, postData } from "../../axios";
 import { MissionType } from "../../types";
 import StyledButton from "../../components/StyledButton";
-import example from "../../assets/img/roadmap-77.png";
 import example2 from "../../assets/img/no-pictures.png";
 import { theme } from "../../styles/theme";
 import { useEffect } from "react";

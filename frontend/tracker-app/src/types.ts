@@ -7,6 +7,7 @@ export type SimpleMissionInfoType = {
   duration: number;
   status: string;
   frequency: string;
+  photoUrl: string;
 };
 
 export type MainServerResponseType = {

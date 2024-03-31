@@ -111,6 +111,7 @@ const MainPage = () => {
                   duration={mission.duration}
                   frequency={mission.frequency}
                   people={mission.participants}
+                  photoUrl={mission.photoUrl}
                 />
               ))}
             </MyMissionSection>
@@ -129,6 +130,7 @@ const MainPage = () => {
             duration={mission.duration}
             status={mission.status}
             frequency={mission.frequency}
+            photoUrl={mission.photoUrl}
           />
         ))}
       </MainSection>
