@@ -14,6 +14,9 @@ export type MainServerResponseType = {
   missionInfoList: SimpleMissionInfoType[];
 };
 
+export type SearchedMissionInfoType = {
+  missionInfoList: SimpleMissionInfoType[];
+};
 // 미션 상세 정보
 export type MissionType = {
   id: string;

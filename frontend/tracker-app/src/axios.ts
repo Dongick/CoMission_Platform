@@ -17,7 +17,8 @@ customAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = localStorage.getItem("accessToken");
     console.log("요청 Config: ", config);
-    if (accessToken) {
+    if (accessToken && accessToken !== undefined) {
+      console.log("요청시 보낸 액세스토큰: ", accessToken);
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     if (config.data instanceof FormData) {
@@ -36,7 +37,7 @@ customAxios.interceptors.request.use(
 //응답 interceptor
 customAxios.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log("응답 Config: ", response.config);
+    console.log("응답 response: ", response);
     return response;
   },
   async (error) => {
@@ -56,8 +57,9 @@ customAxios.interceptors.response.use(
         const newAccessToken = await refreshAccessToken();
         console.log("재발급 successful: ", newAccessToken);
         if (error.config) {
-          error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-          console.log("Retry request headers: ", error.config.headers);
+          localStorage.setItem("accessToken", newAccessToken);
+          // error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+          // console.log("Retry request headers: ", error.config.headers);
           return customAxios.request(error.config);
         }
       } catch (error) {
@@ -102,7 +104,13 @@ export const postData = async <T, R>(
 ): Promise<R> => {
   try {
     const response = await customAxios.post<R>(url, data, config);
-    return response.data;
+    let returnData = response.data;
+    if (url === "/api/reissue") {
+      console.log("/api/reissue의 response: ", response);
+      console.log("/api/reissue의 response.headers: ", response.headers);
+      returnData = response.headers?.AccessToken;
+    }
+    return returnData;
   } catch (error) {
     throw error;
   }

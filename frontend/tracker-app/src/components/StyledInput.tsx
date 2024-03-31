@@ -1,10 +1,25 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
+import { forwardRef } from "react";
 
 interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
   size?: number;
+  ref?: any;
 }
+
+// input tag or textarea tag 사용가능
+
+const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
+  ({ size = 10, ...props }, ref) => {
+    if (props.type === "textarea") {
+      return <StyledTextArea size={size} {...props} />;
+    } else {
+      return <StyledInput size={size} {...props} ref={ref} />;
+    }
+  }
+);
+export default Input;
 
 const StyledInput = styled.input<InputProps>`
   width: ${(props) => props.size}vw;
@@ -30,14 +45,3 @@ const StyledTextArea = styled.textarea<InputProps>`
     box-shadow: ${theme.boxShadowHover};
   }
 `;
-
-// input tag or textarea tag 사용가능
-const Input = ({ size = 10, ...props }: InputProps) => {
-  if (props.type === "textarea") {
-    return <StyledTextArea size={size} {...props} />;
-  } else {
-    return <StyledInput size={size} {...props} />;
-  }
-};
-
-export default Input;
