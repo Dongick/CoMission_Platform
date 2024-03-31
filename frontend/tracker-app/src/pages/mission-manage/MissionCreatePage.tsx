@@ -274,7 +274,7 @@ const MissionCreateBanner = styled(SearchSection)`
   }
 `;
 
-const MissionFormWrapper = styled.section`
+export const MissionFormWrapper = styled.section`
   min-height: 100vh;
   padding: 3vh;
   width: 50%;
@@ -289,7 +289,7 @@ const MissionFormWrapper = styled.section`
   }
 `;
 
-const MissionFormView = styled.div`
+export const MissionFormView = styled.div`
   width: 100%;
   min-height: 250px;
   background-color: white;
@@ -298,7 +298,7 @@ const MissionFormView = styled.div`
   font-family: "gmarket2  ";
 `;
 
-const InputDiv = styled.div`
+export const InputDiv = styled.div`
   padding: 20px;
   width: 100%;
   text-align: left;

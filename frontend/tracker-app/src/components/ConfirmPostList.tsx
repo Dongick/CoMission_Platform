@@ -8,18 +8,24 @@ import { NoLoginContent } from "../pages/mission/MissionConfirmPostPage";
 import { AxiosError } from "axios";
 import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewPostModal from "./NewPostModal";
-const PostListLayout = styled.div``;
+const PostListLayout = styled.div`
+  padding: 5px;
+`;
 interface ConfirmPostListProps {
   id: string;
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
-  const { data, isLoading, isError, error, isSuccess } = useQuery({
+  const { data, isLoading, isError, error, isSuccess, refetch } = useQuery({
     queryKey: ["authenticationData"],
     queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/0`),
   });
+  useEffect(() => {
+    refetch();
+  }, [data]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -70,7 +76,11 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
     <PostListLayout>
       <StyledButton
         bgcolor={theme.subGreen}
-        style={{ margin: "10px", fontSize: "large", borderRadius: "10px" }}
+        style={{
+          fontSize: "large",
+          borderRadius: "10px",
+          marginBottom: "30px",
+        }}
         onClick={openPostModalHandler}
       >
         인증 글 작성
@@ -78,7 +88,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
 
       {data?.authenticationData ? (
         data?.authenticationData.map((post, index) => (
-          <ConfirmPost index={index + 1} post={post} />
+          <ConfirmPost index={index + 1} post={post} key={index} />
         ))
       ) : (
         <NoLoginContent>
@@ -87,7 +97,9 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           <p>첫 인증을 해보세요!</p>
         </NoLoginContent>
       )}
-      {showPostModal && <NewPostModal onClose={closePostModalHandler} />}
+      {showPostModal && (
+        <NewPostModal onClose={closePostModalHandler} id={id} />
+      )}
     </PostListLayout>
   );
 };
