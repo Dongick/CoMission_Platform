@@ -8,6 +8,7 @@ public class MissionInfo {
     private String username;
     private String creatorEmail;
     private String title;
+    private String photoUrl;
     private int minParticipants;
     private int participants;
     private int duration;

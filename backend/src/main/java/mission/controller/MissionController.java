@@ -40,7 +40,7 @@ public class MissionController {
     })
     public ResponseEntity<String> createMission(
             @Valid @RequestPart(value="missionInfo") MissionCreateRequest missionCreateRequest,
-            @RequestPart(value = "photoData", required = true) MultipartFile photoData) throws IOException {
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData) throws IOException {
         missionService.createMission(missionCreateRequest, photoData);
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
@@ -70,7 +70,7 @@ public class MissionController {
     })
     public ResponseEntity<String> updateMission(
             @Valid @RequestPart(value="missionInfo") MissionUpdateRequest missionUpdateRequest,
-            @RequestPart(value = "photoData", required = true) MultipartFile photoData,
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData,
             @PathVariable String id) throws IOException{
         missionService.updateMission(missionUpdateRequest, photoData, id);
 
