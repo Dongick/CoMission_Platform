@@ -41,7 +41,7 @@ public class MissionService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 미션 생성 사진을 서버에 저장
+        // 미션에 이미지가 존재하면 서버에 저장
         String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
@@ -69,10 +69,13 @@ public class MissionService {
         // 미션을 수정하는 사용자가 해당 미션의 작성자와 동일한지 확인
         if(missionDocument.getCreatorEmail().equals(userEmail)) {
 
-            // 기존 미션에 존재하는 사진 서버에서 삭제
-            fileService.deleteFile(missionDocument.getPhotoUrl());
+            // 기존 미션에 이미지가 존재하면 삭제
+            if(missionDocument.getPhotoUrl() != null) {
 
-            // 미션 사진 서버에 저장
+                fileService.deleteFile(missionDocument.getPhotoUrl());
+            }
+
+            // 미션에 이미지가 존재하면 서버에 저장
             String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
 
             LocalDateTime now = LocalDateTime.now();
