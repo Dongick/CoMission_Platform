@@ -17,6 +17,7 @@ export const TitleDiv = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   height: 70%;
+  min-width: 30%;
   font-size: 1.7rem;
 
   & > div:nth-child(n + 2) {
