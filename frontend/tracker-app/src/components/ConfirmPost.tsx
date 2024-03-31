@@ -21,7 +21,10 @@ const ConfirmPost = ({ post, index }: ConfirmPostIndexType) => {
             fontFamily: "notoBold",
           }}
         >
-          {post.username}({post.userEmail})
+          {post.username}{" "}
+          <span style={{ fontSize: "0.8rem", fontFamily: "noto" }}>
+            ({post.userEmail})
+          </span>
         </p>
         <p
           style={{

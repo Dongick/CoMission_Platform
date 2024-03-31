@@ -18,7 +18,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["authenticationData"],
-    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/1`),
+    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/0`),
   });
   if (isLoading) {
     return <div>Loading...</div>;
@@ -76,8 +76,8 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         인증 글 작성
       </StyledButton>
 
-      {data && Array.isArray(data) ? (
-        data?.map((post, index) => (
+      {data?.authenticationData ? (
+        data?.authenticationData.map((post, index) => (
           <ConfirmPost index={index + 1} post={post} />
         ))
       ) : (

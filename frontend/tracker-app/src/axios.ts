@@ -106,9 +106,7 @@ export const postData = async <T, R>(
     const response = await customAxios.post<R>(url, data, config);
     let returnData = response.data;
     if (url === "/api/reissue") {
-      console.log("/api/reissue의 response: ", response);
-      console.log("/api/reissue의 response.headers: ", response.headers);
-      returnData = response.headers?.AccessToken;
+      returnData = response.headers?.authorization;
     }
     return returnData;
   } catch (error) {
