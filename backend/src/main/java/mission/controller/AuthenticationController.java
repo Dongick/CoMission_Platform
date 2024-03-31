@@ -12,6 +12,7 @@ import mission.dto.authentication.*;
 import mission.exception.ErrorResponse;
 import mission.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ import java.io.IOException;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/{id}")
+    @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "인증글 작성",
             description = "해당 미션의 오늘의 인증글 작성"
@@ -55,7 +56,7 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "인증글 수정",
             description = "해당 미션의 오늘의 인증글 수정"
@@ -115,7 +116,7 @@ public class AuthenticationController {
                     content = @Content(
                             schema = @Schema(implementation = AuthenticationListResponse.class),
                             examples = @ExampleObject(
-                                    value = "{\"authenticationData\": [{\"date\": \"2024-03-09\", \"photoData\": \"string\", \"textData\": \"string\", \"userEmail\": \"string\"} ]}"
+                                    value = "{\"authenticationData\": [{\"date\": \"2024-03-09\", \"photoData\": \"string\", \"textData\": \"string\", \"userEmail\": \"string\", \"username\": \"string\"} ]}"
                             )
                     )),
             @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류 \t\n 2. MISSION_NOT_STARTED : 시작되지 않은 미션",
