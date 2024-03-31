@@ -5,6 +5,8 @@ import { useCallback, useState } from "react";
 import StyledButton from "./StyledButton";
 import { postData } from "../axios";
 import { useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { AUTHENTICATION_ERROR } from "../constant";
 interface NewPostModalProps {
   onClose: () => void;
   id: string;
@@ -55,7 +57,9 @@ const NewPostModal = ({ onClose, id }: NewPostModalProps) => {
       await queryClient.invalidateQueries({ queryKey: ["authenticationData"] });
       onClose();
     } catch (error) {
-      console.error(error);
+      if (error instanceof AxiosError) {
+        alert(error?.response?.data?.errorCode);
+      }
     }
   };
   return (
