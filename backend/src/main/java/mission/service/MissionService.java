@@ -29,6 +29,8 @@ public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
     private final FileService fileService;
+    private final AWSS3Service awss3Service;
+    private static final String MISSION_DIR = "missions/";
 
     // 미션 생성 매서드
     @Transactional
@@ -41,8 +43,9 @@ public class MissionService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 미션에 이미지가 존재하면 서버에 저장
-        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
+        // 미션에 이미지가 존재하면 AWS S3에 저장
+        String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
@@ -72,11 +75,12 @@ public class MissionService {
             // 기존 미션에 이미지가 존재하면 삭제
             if(missionDocument.getPhotoUrl() != null) {
 
-                fileService.deleteFile(missionDocument.getPhotoUrl());
+                awss3Service.deleteFile(missionDocument.getPhotoUrl(), MISSION_DIR);
             }
 
-            // 미션에 이미지가 존재하면 서버에 저장
-            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadMissionFile(photoData);
+            // 미션에 이미지가 존재하면 AWS S3에 저장
+            String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+
 
             LocalDateTime now = LocalDateTime.now();
 
