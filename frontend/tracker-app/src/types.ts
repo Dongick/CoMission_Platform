@@ -49,6 +49,10 @@ export type ConfirmPostIndexType = {
   index: number;
 };
 
+export type ConfirmPostListType = {
+  authenticationData: ConfirmPostDataType[];
+};
+
 export type UserInfoType = {
   user_id: string;
   user_email: string;

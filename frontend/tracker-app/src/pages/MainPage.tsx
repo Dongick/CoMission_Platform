@@ -8,7 +8,7 @@ import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate, useLocation } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MainServerResponseType,
   SearchedMissionInfoType,
@@ -53,11 +53,11 @@ const MainPage = () => {
   });
 
   useEffect(() => {
-    if (isSuccess) {
-      setTotalMissionData(data?.missionInfoList);
-      setMyMissionData(data?.participantMissionInfoList);
+    if (isSuccess || data) {
+      setTotalMissionData(data.missionInfoList);
+      setMyMissionData(data.participantMissionInfoList);
     }
-  }, [isSuccess]);
+  }, [isSuccess, data]);
 
   const updateData = (newData: SearchedMissionInfoType) => {
     setTotalMissionData(newData.missionInfoList);

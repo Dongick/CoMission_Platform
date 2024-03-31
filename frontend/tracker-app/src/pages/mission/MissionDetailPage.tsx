@@ -33,9 +33,10 @@ const MissionDetail = () => {
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
+
   useEffect(() => {
     refetch();
-  }, []);
+  }, [data]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -74,6 +75,12 @@ const MissionDetail = () => {
       멤버가 부족합니다!
     </StyledButton>
   );
+  const isStartedDate = (
+    <p>
+      ⏱ 미션 진행일 : {formatDate(data.startDate)} - {formatDate(data.deadline)}{" "}
+      ({data?.duration} 일간)
+    </p>
+  );
   return (
     <Layout>
       <BannerSection>
@@ -106,10 +113,11 @@ const MissionDetail = () => {
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
             </p>
-            <p>
-              ⏱ 미션 진행일 : {formatDate(data.startDate)} -{" "}
-              {formatDate(data.deadline)} ({data?.duration} 일간)
-            </p>
+            {data.status === "CREATED" ? (
+              <p>⏱ 멤버모집이 완료되어야 시작됩니다!</p>
+            ) : (
+              isStartedDate
+            )}
           </div>
           <div
             style={{

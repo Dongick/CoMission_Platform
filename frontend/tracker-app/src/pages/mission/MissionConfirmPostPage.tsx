@@ -30,9 +30,11 @@ const MissionConfirmPost = () => {
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
+
   useEffect(() => {
-    refetch(); // 컴포넌트가 마운트될 때마다 데이터 요청
-  }, []);
+    refetch();
+  }, [data]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -55,6 +57,12 @@ const MissionConfirmPost = () => {
       console.error(error);
     }
   };
+  const isStartedDate = (
+    <p>
+      ⏱ 미션 진행일 : {formatDate(data.startDate)} - {formatDate(data.deadline)}{" "}
+      ({data?.duration} 일간)
+    </p>
+  );
   return (
     <Layout>
       <BannerSection>
@@ -87,10 +95,11 @@ const MissionConfirmPost = () => {
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
             </p>
-            <p>
-              ⏱ 미션 진행일 : {formatDate(data.startDate)} -{" "}
-              {formatDate(data.deadline)} ({data?.duration} 일간)
-            </p>
+            {data.status === "CREATED" ? (
+              <p>⏱ 멤버모집이 완료되어야 시작됩니다!</p>
+            ) : (
+              isStartedDate
+            )}
           </div>
           <div
             style={{

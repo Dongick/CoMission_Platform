@@ -4,12 +4,15 @@ import { SearchSection } from "../MainPage";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
 import Form from "../../components/StyledForm";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
-import example from "../../assets/img/roadmap-77.png";
 import { postData } from "../../axios";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 const MissionCreatePage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -31,20 +34,10 @@ const MissionCreatePage = () => {
 
   const photoChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
+      if (e.target.files && e.target.files.length > 0) {
+        // If the user uploads a file, set it as the photo state
         setPhoto(e.target.files[0]);
       }
-      //   if (selectedFile) {
-      //     // Read the selected file as a data URL
-      //     const reader = new FileReader();
-      //     reader.onload = () => {
-      //       const base64String = reader.result as string; // Convert data URL to string
-      //       setPhoto(selectedFile);
-      //       setPhotoData(base64String); // Store Base64 encoded string in state
-      //     };
-      //     reader.readAsDataURL(selectedFile);
-      //   }
-      // };
     },
     []
   );
@@ -85,16 +78,15 @@ const MissionCreatePage = () => {
     };
     if (photo) {
       formData.append("photoData", photo);
-      // const reader = new FileReader(); // fileReader 생성
-      // reader.onload = function (e: any) {
-      //   console.log(e.target.result);
-      // };
-      // reader.readAsText(photo);
-    }
-    formData.append("missionInfo", JSON.stringify(missionInfo));
+    } else formData.append("photoData", "");
+    formData.append(
+      "missionInfo",
+      new Blob([JSON.stringify(missionInfo)], { type: "application/json" })
+    );
     try {
-      const data = await postData("/api/mission", formData);
-      console.log(data);
+      await postData("/api/mission", formData);
+      await queryClient.invalidateQueries({ queryKey: ["totalMissionData"] });
+      navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -103,7 +95,7 @@ const MissionCreatePage = () => {
   return (
     <Layout footer={false}>
       <div
-        style={{ backgroundColor: `${theme.mainGray}`, paddingBottom: "50px" }}
+        style={{ backgroundColor: `${theme.mainGray}`, paddingBottom: "200px" }}
       >
         <MissionCreateBanner>
           <div>

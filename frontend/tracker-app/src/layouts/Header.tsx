@@ -17,7 +17,7 @@ const Header = () => {
   return (
     <div style={{ position: "relative" }}>
       <StyledHeader>
-        <Link to="/">Comission Platform</Link>
+        <a href="/">Comission Platform</a>
       </StyledHeader>
       <UserMenu />
     </div>
