@@ -46,7 +46,7 @@ public class ReissueService {
 
         jwtUtil.updateRefreshToken(refreshTokenEntity, newRefreshToken);
 
-        response.setHeader("AccessToken", newAccessToken);
+        response.setHeader("Authorization", newAccessToken);
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", newRefreshToken));
     }
 }

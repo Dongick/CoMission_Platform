@@ -33,6 +33,7 @@ dependencies {
 	implementation ("io.jsonwebtoken:jjwt-jackson:0.12.3")
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	implementation ("org.springframework.boot:spring-boot-starter-validation")
+	implementation ("io.awspring.cloud:spring-cloud-aws-s3:3.0.2")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
