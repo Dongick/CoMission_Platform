@@ -55,7 +55,7 @@ const Card = ({
               padding: "5px",
               display: "flex",
               flexDirection: "row",
-              justifyContent: "space-around",
+              justifyContent: "space-evenly",
               maxWidth: "100%",
             }}
           >
@@ -75,7 +75,7 @@ const Card = ({
                 textOverflow: "ellipsis",
               }}
             >
-              👨‍👧‍👧 {par}/{minPar} 명
+              👨‍👧‍👧인원: {par}/{minPar} 명
             </p>
           </div>
           <div
@@ -96,7 +96,7 @@ const Card = ({
                 textOverflow: "ellipsis",
               }}
             >
-              🕧 진행 기간: {duration}일
+              📆 진행 기간: {duration}일
             </div>
             <div
               style={{
@@ -107,7 +107,7 @@ const Card = ({
                 textOverflow: "ellipsis",
               }}
             >
-              📆 인증 주기: {frequency}
+              🖌 인증 주기: {frequency}
             </div>
           </div>
         </ContentDiv>
@@ -135,7 +135,7 @@ export const ImgDiv = styled.div`
   width: 100%;
 `;
 export const ContentDiv = styled.div`
-  padding: 15px;
+  padding: 5px;
   font-family: "noto";
   text-align: left;
   overflow: hidden;

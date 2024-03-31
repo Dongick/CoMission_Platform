@@ -60,21 +60,7 @@ const MissionDetail = () => {
       console.error(error);
     }
   };
-  const lackBtn = (
-    <StyledButton
-      bgcolor={theme.subGray}
-      style={{
-        margin: "20px 0px 0px 0px",
-        fontSize: "large",
-        borderRadius: "10px",
-        padding: "15px 20px",
-        width: "100%",
-        cursor: "auto",
-      }}
-    >
-      멤버가 부족합니다!
-    </StyledButton>
-  );
+
   const isStartedDate = (
     <p>
       ⏱ 미션 진행일 : {formatDate(data.startDate)} - {formatDate(data.deadline)}{" "}
@@ -86,7 +72,7 @@ const MissionDetail = () => {
       <BannerSection>
         {data.photoUrl ? (
           <img
-            src={example}
+            src={data.photoUrl}
             alt="img"
             style={{
               width: "20%",
@@ -144,8 +130,6 @@ const MissionDetail = () => {
             >
               이미 참가한 미션입니다!
             </StyledButton>
-          ) : data.status === "CREATED" ? (
-            lackBtn
           ) : (
             <StyledButton
               bgcolor={theme.subGreen}

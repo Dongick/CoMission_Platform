@@ -6,17 +6,19 @@ import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
 import { NoLoginContent } from "../pages/mission/MissionConfirmPostPage";
 import { AxiosError } from "axios";
-import { ErrorResponseDataType } from "../types";
+import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
+import { useState } from "react";
+import NewPostModal from "./NewPostModal";
 const PostListLayout = styled.div``;
 interface ConfirmPostListProps {
   id: string;
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
+  const [showPostModal, setShowPostModal] = useState<boolean>(false);
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["authenticationData"],
-    queryFn: () =>
-      getData<ConfirmPostDataType[]>(`/api/authentication/${id}/1`),
+    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/1`),
   });
   if (isLoading) {
     return <div>Loading...</div>;
@@ -54,13 +56,22 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
     }
   }
 
-  const newPostHandler = () => {};
+  if (isSuccess) {
+    console.log(data);
+  }
+
+  const openPostModalHandler = () => {
+    setShowPostModal(true);
+  };
+  const closePostModalHandler = () => {
+    setShowPostModal(false);
+  };
   return (
     <PostListLayout>
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "10px", fontSize: "large", borderRadius: "10px" }}
-        onClick={newPostHandler}
+        onClick={openPostModalHandler}
       >
         인증 글 작성
       </StyledButton>
@@ -76,6 +87,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           <p>첫 인증을 해보세요!</p>
         </NoLoginContent>
       )}
+      {showPostModal && <NewPostModal onClose={closePostModalHandler} />}
     </PostListLayout>
   );
 };

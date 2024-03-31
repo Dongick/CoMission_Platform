@@ -68,7 +68,7 @@ const MissionConfirmPost = () => {
       <BannerSection>
         {data.photoUrl ? (
           <img
-            src={example}
+            src={data.photoUrl}
             alt="img"
             style={{
               width: "20%",

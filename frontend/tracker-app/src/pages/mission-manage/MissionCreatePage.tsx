@@ -78,7 +78,9 @@ const MissionCreatePage = () => {
     };
     if (photo) {
       formData.append("photoData", photo);
-    } else formData.append("photoData", "");
+    } else {
+      formData.append("photoData", "");
+    }
     formData.append(
       "missionInfo",
       new Blob([JSON.stringify(missionInfo)], { type: "application/json" })

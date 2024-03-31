@@ -50,10 +50,9 @@ const MyStyledCard = styled(StyledCard)`
   flex: 0 0 auto;
 `;
 
-const MyImgDiv = styled(ImgDiv)`
-  background-image: url(${exampleImg});
-  /* height: 60%; */
-`;
+// const MyImgDiv = styled(ImgDiv)`
+//   background-image: url(${});
+// `;
 
 const MyContentDiv = styled(ContentDiv)`
   padding: 5px;
