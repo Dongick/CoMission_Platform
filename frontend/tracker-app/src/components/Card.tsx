@@ -30,7 +30,6 @@ const Card = ({
   const handleClick = () => {
     navigate(`/mission/${id}/detail`);
   };
-  console.log(photoUrl);
   return (
     <div>
       <StyledCard onClick={handleClick}>

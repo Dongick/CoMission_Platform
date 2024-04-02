@@ -9,7 +9,9 @@ export type SimpleMissionInfoType = {
   frequency: string;
   photoUrl: string;
 };
-
+export type LazyMissionInfoListType = {
+  missionInfoList: SimpleMissionInfoType[];
+};
 export type MainServerResponseType = {
   participantMissionInfoList: SimpleMissionInfoType[];
   missionInfoList: SimpleMissionInfoType[];

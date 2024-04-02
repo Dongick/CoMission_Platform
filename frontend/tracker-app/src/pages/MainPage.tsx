@@ -8,11 +8,12 @@ import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate, useLocation } from "react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   MainServerResponseType,
   SearchedMissionInfoType,
   SimpleMissionInfoType,
+  LazyMissionInfoListType,
 } from "../types";
 import { getData } from "../axios";
 import { useEffect, useState } from "react";
@@ -45,8 +46,30 @@ const MainPage = () => {
       navigate("/");
     }
   }, [location.search, setUserInfoState, navigate]);
+  const [currentNum, setCurrentNum] = useState<number>(1);
+  const fetchLazyData = async (pageParam: unknown) =>
+    await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
+  // const {
+  //   data: lazyData,
+  //   hasNextPage,
+  //   fetchNextPage,
+  //   isFetchingNextPage,
+  // } = useInfiniteQuery({
+  //   queryKey: ["lazyMissionData"],
+  //   queryFn: fetchLazyData,
+  //   initialPageParam: 0,
+  //   getNextPageParam: (lastList) => {
+  //     if (lastList.missionInfoList.length < 20) {
+  //       return undefined;
+  //     }
+  //     setCurrentNum((prev) => prev + 1);
+  //     return currentNum;
+  //   },
+  //   select: (data) => data.pages.flatMap((page) => page.missionInfoList),
+  // });
 
-  const fetchData = () => getData<MainServerResponseType>("/api/main");
+  const fetchData = async () =>
+    await getData<MainServerResponseType>("/api/main");
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["totalMissionData"],
     queryFn: fetchData,
@@ -59,15 +82,19 @@ const MainPage = () => {
     }
   }, [isSuccess, data]);
 
+  if (isError) {
+    if (userInfoState.isLoggedIn) logout();
+  }
+
   const updateData = (newData: SearchedMissionInfoType) => {
     setTotalMissionData(newData.missionInfoList);
   };
-
+  console.log(totalMissionData);
   return (
     <Layout>
       <MissionSearch updateData={updateData} />
       {isLoading && <p>Loading...</p>}
-      {isError && <p>Error fetching data</p>}
+      {isError && <p>Data Fetching Error</p>}
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
@@ -133,6 +160,12 @@ const MainPage = () => {
             photoUrl={mission.photoUrl}
           />
         ))}
+        <p>여기가 구분선</p>
+        {/* {isFetchingNextPage
+          ? "로딩 중"
+          : hasNextPage
+          ? "미션을 더 보고싶으면, 스크롤을 내려주세요!"
+          : "더 이상 미션이 존재하지 않습니다!"} */}
       </MainSection>
     </Layout>
   );
