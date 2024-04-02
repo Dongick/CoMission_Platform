@@ -77,6 +77,12 @@ export default UserMenu;
 
 const Wrapper = styled.div`
   position: absolute;
-  top: 40%;
+  top: 30%;
   right: 15%;
+  & > div {
+    @media screen and (max-width: 1024px) {
+      top: 10%;
+      right: 5%;
+    }
+  }
 `;

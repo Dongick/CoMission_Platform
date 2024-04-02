@@ -33,7 +33,7 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
 
   return (
     <ModalOverlay onClick={handleOverlayClick}>
-      <ModalContent>
+      <ModalContent style={{ minHeight: "25%" }}>
         <button
           onClick={onClose}
           style={{

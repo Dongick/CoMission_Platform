@@ -216,6 +216,13 @@ const MyMissionSection = styled.section`
   display: flex;
   overflow-x: auto;
   align-items: center;
+  height: 260px;
+  @media screen and (max-height: 700px) {
+    height: 210px;
+  }
+  @media screen and (max-height: 500px) {
+    height: 160px;
+  }
   &::-webkit-scrollbar {
     width: 100%;
   }

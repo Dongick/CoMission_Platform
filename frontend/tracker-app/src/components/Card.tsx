@@ -33,9 +33,9 @@ const Card = ({
     <div>
       <StyledCard onClick={handleClick}>
         {photoUrl ? (
-          <img src={photoUrl} alt="Img" width="100%" height="50%" />
+          <img src={photoUrl} alt="Img" width="100%" height="220px" />
         ) : (
-          <img src={noImg} alt="Img" width="100%" height="60%" />
+          <img src={noImg} alt="Img" width="100%" height="220px" />
         )}
         <ContentDiv>
           <div>
@@ -124,15 +124,18 @@ export const StyledCard = styled.section`
   border-radius: 10px;
   margin-bottom: 5vh;
   box-shadow: ${theme.boxShadow};
+  cursor: pointer;
+  height: 350px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
+  justify-content: space-between;
 `;
 export const ContentDiv = styled.div`
   padding: 5px;
   font-family: "noto";
   text-align: left;
   overflow: hidden;
+  height: 120px;
   p,
   div {
     text-align: left;

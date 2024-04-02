@@ -24,17 +24,17 @@ const MyCard = (props: CardProps) => {
       {props.photoUrl ? (
         <img
           src={props.photoUrl}
-          alt=""
+          alt="Img"
           width="100%"
-          height="60%"
+          height="55%"
           style={{ margin: "0 auto" }}
         />
       ) : (
         <img
           src={noImg}
-          alt=""
+          alt="Img"
           width="100%"
-          height="60%"
+          height="55%"
           style={{ margin: "0 auto" }}
         />
       )}
@@ -60,8 +60,8 @@ const MyStyledCard = styled(StyledCard)`
 `;
 
 const MyContentDiv = styled(ContentDiv)`
-  padding: 5px;
   overflow: hidden;
+  height: auto;
   p {
     white-space: nowrap;
     overflow: hidden;
