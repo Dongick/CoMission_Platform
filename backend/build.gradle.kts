@@ -33,11 +33,13 @@ dependencies {
 	implementation ("io.jsonwebtoken:jjwt-jackson:0.12.3")
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 	implementation ("org.springframework.boot:spring-boot-starter-validation")
+	implementation ("io.awspring.cloud:spring-cloud-aws-s3:3.0.2")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation ("com.h2database:h2")
 	testImplementation ("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.3")
+	testImplementation ("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {

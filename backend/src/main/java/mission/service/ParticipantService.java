@@ -35,8 +35,9 @@ public class ParticipantService {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
+        String username = customOAuth2User.getName();
 
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(participantRequest.getTitle());
+        Optional<MissionDocument> optionalMissionDocument = missionRepository.findById(participantRequest.getId());
 
         // 미션이 존재하는지 확인
         if(optionalMissionDocument.isEmpty()) {
@@ -63,10 +64,10 @@ public class ParticipantService {
             // 해당 미션의 최소 참여자 수를 충족하면 미션을 시작 상태로 바꿈
             if(participants == missionDocument.getMinParticipants()) {
 
-                handleMissionStarted(missionDocument, now, userEmail);
+                handleMissionStarted(missionDocument, now, userEmail, username);
             } else {
 
-                saveParticipant(missionDocument.getId(), now, userEmail);
+                saveParticipant(missionDocument.getId(), now, userEmail, username);
             }
 
             missionRepository.save(missionDocument);
@@ -77,23 +78,24 @@ public class ParticipantService {
     }
 
     // 미션 참여자 저장
-    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail) {
+    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
         participantRepository.save(ParticipantDocument.builder()
                 .missionId(missionId)
                 .joinedAt(now)
                 .userEmail(userEmail)
+                .username(username)
                 .authentication(new ArrayList<>())
                 .build());
     }
 
     // 최소 인원수를 만족한 미션을 시작으로 바꿈
-    private void handleMissionStarted(MissionDocument missionDocument, LocalDateTime now, String userEmail) {
+    private void handleMissionStarted(MissionDocument missionDocument, LocalDateTime now, String userEmail, String username) {
         LocalDate deadline = now.toLocalDate().plusDays(missionDocument.getDuration());
 
         missionDocument.setStartDate(LocalDate.from(now));
         missionDocument.setDeadline(deadline);
         missionDocument.setStatus(MissionStatus.STARTED.name());
 
-        saveParticipant(missionDocument.getId(), now, userEmail);
+        saveParticipant(missionDocument.getId(), now, userEmail, username);
     }
 }

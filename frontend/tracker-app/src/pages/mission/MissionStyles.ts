@@ -17,6 +17,7 @@ export const TitleDiv = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   height: 70%;
+  min-width: 30%;
   font-size: 1.7rem;
 
   & > div:nth-child(n + 2) {
@@ -66,7 +67,7 @@ export const MissionSubTitle = styled.h2`
 export const MissionSubContent = styled.div`
   text-align: left;
   padding: 1rem;
-  min-height: 20vh;
+  min-height: 30vh;
 `;
 
 export const HrDivider = styled.hr`

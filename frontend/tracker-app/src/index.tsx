@@ -7,6 +7,7 @@ import { theme } from "./styles/theme";
 import reportWebVitals from "./reportWebVitals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import useLogout from "./useLogout";
 
 // react-qeury Client instance 생성
 const queryClient = new QueryClient({
@@ -17,6 +18,12 @@ const queryClient = new QueryClient({
     },
     mutations: {
       retry: 1,
+      onSuccess(data, variables, context) {
+        console.log("Query succeeded:", { data, variables, context });
+      },
+      onError(error, variables, context) {
+        console.error("Query failed:", { error, variables, context });
+      },
     },
   },
 });

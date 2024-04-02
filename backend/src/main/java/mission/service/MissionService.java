@@ -14,7 +14,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,38 +28,39 @@ import java.util.Optional;
 public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
+    private final FileService fileService;
+    private final AWSS3Service awss3Service;
+    private static final String MISSION_DIR = "missions/";
 
     // 미션 생성 매서드
     @Transactional
-    public void createMission(MissionCreateRequest missionCreateRequest) {
+    public void createMission(MissionCreateRequest missionCreateRequest, MultipartFile photoData) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
-
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionCreateRequest.getTitle());
-
-        // 해당 미션과 같은 제목을 가진 미션이 존재하는지 확인
-        if(optionalMissionDocument.isPresent()) {
-            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
-        }
+        String username = customOAuth2User.getName();
 
         LocalDateTime now = LocalDateTime.now();
 
-        MissionDocument missionDocument = saveMission(missionCreateRequest, now, userEmail);
+        // 미션에 이미지가 존재하면 AWS S3에 저장
+        String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
 
-        saveParticipant(missionDocument.getId(), now, userEmail);
+
+        MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
+
+        saveParticipant(missionDocument.getId(), now, userEmail, username);
     }
 
     // 미션 수정 매서드
     @Transactional
-    public void updateMission(MissionUpdateRequest missionUpdateRequest, String title) {
+    public void updateMission(MissionUpdateRequest missionUpdateRequest, MultipartFile photoData, String id) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         // 해당 미션의 상태 확인
         if(missionDocument.getStatus().equals(MissionStatus.STARTED.name())) {
@@ -66,19 +69,24 @@ public class MissionService {
             throw new BadRequestException(ErrorCode.MISSION_ALREADY_COMPLETED, ErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
         }
 
-        Optional<MissionDocument> optionalMissionDocument = missionRepository.findByTitle(missionUpdateRequest.getAfterTitle());
-
-        // 새로 바꾼 미션 제목이 기존에 존재하는지 확인
-        if(optionalMissionDocument.isPresent()) {
-            throw new ConflictException(ErrorCode.DUPLICATE_MISSION_NAME, ErrorCode.DUPLICATE_MISSION_NAME.getMessage());
-        }
-
         // 미션을 수정하는 사용자가 해당 미션의 작성자와 동일한지 확인
         if(missionDocument.getCreatorEmail().equals(userEmail)) {
+
+            // 기존 미션에 이미지가 존재하면 삭제
+            if(missionDocument.getPhotoUrl() != null) {
+
+                awss3Service.deleteFile(missionDocument.getPhotoUrl(), MISSION_DIR);
+            }
+
+            // 미션에 이미지가 존재하면 AWS S3에 저장
+            String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+
+
             LocalDateTime now = LocalDateTime.now();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
             missionDocument.setDescription(missionUpdateRequest.getDescription());
+            missionDocument.setPhotoUrl(fileLocation);
             missionDocument.setDuration(missionUpdateRequest.getDuration());
             missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
             missionDocument.setFrequency(missionUpdateRequest.getFrequency());
@@ -94,10 +102,10 @@ public class MissionService {
 
     // 미션 상세정보 매서드
     @Transactional
-    public MissionInfoResponse missionInfo(String title) {
+    public MissionInfoResponse missionInfo(String id) {
         Boolean participant = false;
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -114,14 +122,20 @@ public class MissionService {
         }
 
         return MissionInfoResponse.builder()
+                .id(missionDocument.getId().toString())
                 .title(missionDocument.getTitle())
                 .description(missionDocument.getDescription())
+                .photoUrl(missionDocument.getPhotoUrl())
+                .createdAt(missionDocument.getCreatedAt())
+                .startDate(missionDocument.getStartDate())
                 .minParticipants(missionDocument.getMinParticipants())
                 .participants(missionDocument.getParticipants())
                 .frequency(missionDocument.getFrequency())
                 .duration(missionDocument.getDuration())
                 .status(missionDocument.getStatus())
                 .deadline(missionDocument.getDeadline())
+                .creatorEmail(missionDocument.getCreatorEmail())
+                .username(missionDocument.getUsername())
                 .participant(participant)
                 .build();
     }
@@ -136,11 +150,13 @@ public class MissionService {
     }
 
     // 미션 저장
-    private MissionDocument saveMission(MissionCreateRequest request, LocalDateTime now, String userEmail) {
+    private MissionDocument saveMission(MissionCreateRequest request, String fileLocation, LocalDateTime now, String userEmail, String username) {
         MissionDocument missionDocument = MissionDocument.builder()
                 .createdAt(now)
                 .creatorEmail(userEmail)
+                .username(username)
                 .duration(request.getDuration())
+                .photoUrl(fileLocation)
                 .deadline(request.getMinParticipants() == 1 ? now.toLocalDate().plusDays(request.getDuration()) : null)
                 .description(request.getDescription())
                 .title(request.getTitle())
@@ -155,11 +171,12 @@ public class MissionService {
     }
 
     // 미션 참여자 저장
-    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail) {
+    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
         participantRepository.save(ParticipantDocument.builder()
                 .missionId(missionId)
                 .joinedAt(now)
                 .userEmail(userEmail)
+                .username(username)
                 .authentication(new ArrayList<>())
                 .build());
     }
@@ -172,8 +189,8 @@ public class MissionService {
     }
 
     // 해당 미션이 존재하는지 확인
-    private MissionDocument getMissionDocument(String title) {
-        return missionRepository.findByTitle(title)
+    private MissionDocument getMissionDocument(String id) {
+        return missionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
     }
 

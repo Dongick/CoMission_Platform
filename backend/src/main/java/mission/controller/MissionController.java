@@ -11,8 +11,12 @@ import mission.dto.mission.*;
 import mission.exception.ErrorResponse;
 import mission.service.MissionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/mission")
@@ -20,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class MissionController {
     private final MissionService missionService;
 
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "미션 생성",
             description = "새로운 미션을 생성"
@@ -31,18 +35,17 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401",
                     description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409",
-                    description = "1. DUPLICATE_MISSION_NAME : 이미 존재하는 미션 명",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> createMission(final @Valid @RequestBody MissionCreateRequest missionCreateRequest) {
-        missionService.createMission(missionCreateRequest);
+    public ResponseEntity<String> createMission(
+            @Valid @RequestPart(value="missionInfo") MissionCreateRequest missionCreateRequest,
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData) throws IOException {
+        missionService.createMission(missionCreateRequest, photoData);
         return ResponseEntity.status(HttpStatus.CREATED).body("good");
     }
 
-    @PutMapping("/{title}")
+    @PutMapping(value ="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "미션 수정",
             description = "미션을 수정"
@@ -61,17 +64,20 @@ public class MissionController {
                     description = "1. MISSION_NOT_FOUND : 해당 미션을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409",
-                    description = "1. DUPLICATE_MISSION_NAME : 이미 존재하는 미션 명 \t\n 2. MISSION_ALREADY_STARTED : 미션이 이미 시작되서 수정할 수 없음",
+                    description = "1. MISSION_ALREADY_STARTED : 미션이 이미 시작되서 수정할 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<String> updateMission(final @Valid @RequestBody MissionUpdateRequest missionUpdateRequest, @PathVariable String title) {
-        missionService.updateMission(missionUpdateRequest, title);
+    public ResponseEntity<String> updateMission(
+            @Valid @RequestPart(value="missionInfo") MissionUpdateRequest missionUpdateRequest,
+            @RequestPart(value = "photoData", required = false) MultipartFile photoData,
+            @PathVariable String id) throws IOException{
+        missionService.updateMission(missionUpdateRequest, photoData, id);
 
         return ResponseEntity.ok("good");
     }
 
-    @GetMapping("/info/{title}")
+    @GetMapping("/info/{id}")
     @Operation(
             summary = "미션 정보",
             description = "해당 미션 정보 보기"
@@ -88,8 +94,8 @@ public class MissionController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<MissionInfoResponse> missionInfo(@PathVariable String title) {
-        MissionInfoResponse missionInfoResponse = missionService.missionInfo(title);
+    public ResponseEntity<MissionInfoResponse> missionInfo(@PathVariable String id) {
+        MissionInfoResponse missionInfoResponse = missionService.missionInfo(id);
         return ResponseEntity.ok(missionInfoResponse);
     }
 

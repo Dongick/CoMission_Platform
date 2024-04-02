@@ -7,8 +7,12 @@ import Form from "../../components/StyledForm";
 import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
-
+import { postData } from "../../axios";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 const MissionCreatePage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -30,7 +34,8 @@ const MissionCreatePage = () => {
 
   const photoChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
+      if (e.target.files && e.target.files.length > 0) {
+        // If the user uploads a file, set it as the photo state
         setPhoto(e.target.files[0]);
       }
     },
@@ -50,6 +55,7 @@ const MissionCreatePage = () => {
     },
     []
   );
+
   const durationChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setDuration(parseInt(e.target.value));
@@ -57,29 +63,41 @@ const MissionCreatePage = () => {
     []
   );
 
-  const formSubmitHandler = (e: React.FormEvent) => {
+  const formSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description) {
       window.alert("모든 값을 입력해주세요!");
     }
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
+    const missionInfo = {
+      title: title,
+      description: description,
+      minParticipants: minParticipants,
+      duration: duration,
+      frequency: frequency,
+    };
     if (photo) {
-      formData.append("photo", photo);
+      formData.append("photoData", photo);
+    } else {
+      formData.append("photoData", "");
     }
-    formData.append("minParticipants", minParticipants.toString());
-    formData.append("frequency", frequency);
-    formData.append("duration", duration.toString());
-    console.log(...formData);
-
-    // Send formData to the server using Axios
-    // header에 'Content-Type': 'multipart/form-data'
+    formData.append(
+      "missionInfo",
+      new Blob([JSON.stringify(missionInfo)], { type: "application/json" })
+    );
+    try {
+      await postData("/api/mission", formData);
+      await queryClient.invalidateQueries({ queryKey: ["totalMissionData"] });
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   return (
     <Layout footer={false}>
       <div
-        style={{ backgroundColor: `${theme.mainGray}`, paddingBottom: "50px" }}
+        style={{ backgroundColor: `${theme.mainGray}`, paddingBottom: "200px" }}
       >
         <MissionCreateBanner>
           <div>
@@ -256,7 +274,7 @@ const MissionCreateBanner = styled(SearchSection)`
   }
 `;
 
-const MissionFormWrapper = styled.section`
+export const MissionFormWrapper = styled.section`
   min-height: 100vh;
   padding: 3vh;
   width: 50%;
@@ -271,7 +289,7 @@ const MissionFormWrapper = styled.section`
   }
 `;
 
-const MissionFormView = styled.div`
+export const MissionFormView = styled.div`
   width: 100%;
   min-height: 250px;
   background-color: white;
@@ -280,7 +298,7 @@ const MissionFormView = styled.div`
   font-family: "gmarket2  ";
 `;
 
-const InputDiv = styled.div`
+export const InputDiv = styled.div`
   padding: 20px;
   width: 100%;
   text-align: left;

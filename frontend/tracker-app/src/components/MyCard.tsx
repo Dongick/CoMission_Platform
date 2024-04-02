@@ -3,12 +3,16 @@ import { theme } from "../styles/theme";
 import { StyledCard, ImgDiv, ContentDiv } from "./Card";
 import exampleImg from "../assets/img/wave-haikei.svg";
 import { useNavigate } from "react-router-dom";
+import noImg from "../assets/img/no-pictures.png";
+
 interface CardProps {
   title: string;
-  start: Date;
-  deadline: Date;
+  username: string;
+  duration: number;
+  frequency: string;
   people: number;
-  id: number;
+  id: string;
+  photoUrl: string;
 }
 
 const MyCard = (props: CardProps) => {
@@ -18,14 +22,28 @@ const MyCard = (props: CardProps) => {
   };
   return (
     <MyStyledCard onClick={handleClick}>
-      <MyImgDiv />
+      {props.photoUrl ? (
+        <img
+          src={props.photoUrl}
+          alt=""
+          width="100%"
+          height="60%"
+          style={{ margin: "0 auto" }}
+        />
+      ) : (
+        <img
+          src={noImg}
+          alt=""
+          width="100%"
+          height="60%"
+          style={{ margin: "0 auto" }}
+        />
+      )}
       <MyContentDiv>
         <p>{props.title}</p>
-        <p>
-          {props.start.toLocaleDateString()} ~{" "}
-          {props.deadline.toLocaleDateString()}
-        </p>
-        <p>멤버 {props.people}</p>
+        <p>🕧 {props.duration}일</p>
+        <p> 🖌 {props.frequency}</p>
+        <p>👨‍👧‍👧 {props.people}명</p>
       </MyContentDiv>
     </MyStyledCard>
   );
@@ -36,15 +54,10 @@ export default MyCard;
 const MyStyledCard = styled(StyledCard)`
   background-color: white;
   height: 100%;
-  width: 12vw;
+  width: 10vw;
   margin: 0;
   margin-right: 2vw;
   flex: 0 0 auto;
-`;
-
-const MyImgDiv = styled(ImgDiv)`
-  background-image: url(${exampleImg});
-  /* height: 60%; */
 `;
 
 const MyContentDiv = styled(ContentDiv)`
@@ -54,7 +67,6 @@ const MyContentDiv = styled(ContentDiv)`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* text-align: left; */
     font-family: "noto";
     font-size: 0.8rem;
   }

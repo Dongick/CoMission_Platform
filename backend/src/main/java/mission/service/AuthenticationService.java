@@ -30,10 +30,12 @@ public class AuthenticationService {
     private final ParticipantRepository participantRepository;
     private final MissionRepository missionRepository;
     private final FileService fileService;
+    private final AWSS3Service awss3Service;
+    private static final String AUTHENTICATION_DIR = "authentications/";
 
     // 인증글 생성 매서드
     @Transactional
-    public void createAuthentication(AuthenticationCreateRequest authenticationCreateRequest, MultipartFile file, String title) throws IOException {
+    public void createAuthentication(AuthenticationCreateRequest authenticationCreateRequest, MultipartFile file, String id) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -44,7 +46,7 @@ public class AuthenticationService {
 
         LocalDate startDate = LocalDate.from(now.minusDays(dayOfWeek - 1));
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
@@ -58,10 +60,9 @@ public class AuthenticationService {
         if(!authenticationList.isEmpty()) {
 
             // 이번주에 사용자가 해당 미션에 작성한 인증글 확인
-            List<Authentication> dayOfWeekAuthenticationList =
-                    authenticationList.stream()
-                            .filter(auth -> !auth.getDate().toLocalDate().isBefore(startDate) && !auth.getDate().toLocalDate().isAfter(LocalDate.from(now)))
-                            .collect(Collectors.toList());
+            List<Authentication> dayOfWeekAuthenticationList = authenticationList.stream()
+                    .filter(auth -> !auth.getDate().toLocalDate().isBefore(startDate) && !auth.getDate().toLocalDate().isAfter(LocalDate.from(now)))
+                    .collect(Collectors.toList());
 
             // 이번주에 작성한 인증글의 횟수가 이번주에 허용된 작성 횟수를 초과했는지 확인
             if(dayOfWeekAuthenticationList.size() == authCount) {
@@ -76,7 +77,8 @@ public class AuthenticationService {
             }
         }
 
-        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
+        // 인증 사진을 AWS S3에 저장
+        String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
 
         authenticationList.add(saveAuthentication(now, fileLocation, authenticationCreateRequest.getTextData()));
         participantRepository.save(participantDocument);
@@ -84,7 +86,7 @@ public class AuthenticationService {
 
     // 인증글 수정 매서드
     @Transactional
-    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest, MultipartFile file, String title) throws IOException {
+    public void updateAuthentication(AuthenticationUpdateRequest authenticationUpdateRequest, MultipartFile file, String id) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -92,7 +94,7 @@ public class AuthenticationService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
@@ -109,10 +111,11 @@ public class AuthenticationService {
 
                 // 기존 인증글에 사진 데이터가 존재하면 삭제
                 if (lastAuthentication.getPhotoData() != null) {
-                    fileService.deleteFile(lastAuthentication.getPhotoData());
+                    awss3Service.deleteFile(lastAuthentication.getPhotoData(), AUTHENTICATION_DIR);
                 }
 
-                String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file);
+                // 인증글에 사진이 존재하면 AWS S3에 저장
+                String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
 
                 lastAuthentication.setPhotoData(fileLocation);
                 lastAuthentication.setTextData(authenticationUpdateRequest.getTextData());
@@ -129,7 +132,7 @@ public class AuthenticationService {
 
     // 인증글 삭제 매서드
     @Transactional
-    public void deleteAuthentication(String title) throws IOException {
+    public void deleteAuthentication(String id) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
@@ -137,7 +140,7 @@ public class AuthenticationService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
@@ -152,8 +155,9 @@ public class AuthenticationService {
             // 당일 인증글을 작성했는지 확인
             if(LocalDate.from(lastAuthentication.getDate()).isEqual(LocalDate.from(now))) {
 
+                // 당일 인증글에 사진 데이터가 존재하면 삭제
                 if (lastAuthentication.getPhotoData() != null) {
-                    fileService.deleteFile(lastAuthentication.getPhotoData());
+                    awss3Service.deleteFile(lastAuthentication.getPhotoData(), AUTHENTICATION_DIR);
                 }
 
                 authenticationList.remove(authenticationList.size() - 1);
@@ -171,13 +175,13 @@ public class AuthenticationService {
 
     // 해당 미션의 인증글 보기 매서드
     @Transactional
-    public AuthenticationListResponse authenticationList(String title, int num) {
+    public AuthenticationListResponse authenticationList(String id, int num) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        MissionDocument missionDocument = getMissionDocument(title);
+        MissionDocument missionDocument = getMissionDocument(id);
 
         // 해당 미션의 상태 확인
         if(missionDocument.getStatus().equals(MissionStatus.CREATED.name())) {
@@ -222,6 +226,7 @@ public class AuthenticationService {
                             authenticationMap.put("photoData", authentication.getPhotoData());
                             authenticationMap.put("textData", authentication.getTextData());
                             authenticationMap.put("userEmail", participant.getUserEmail());
+                            authenticationMap.put("username", participant.getUsername());
                             return authenticationMap;
                         })
                 )
@@ -241,8 +246,8 @@ public class AuthenticationService {
     }
 
     // 해당 미션이 존재하는지 확인
-    private MissionDocument getMissionDocument(String title) {
-        return missionRepository.findByTitle(title)
+    private MissionDocument getMissionDocument(String id) {
+        return missionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
     }
 

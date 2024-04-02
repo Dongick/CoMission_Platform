@@ -7,143 +7,99 @@ import Card from "../components/Card";
 import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
-import { useNavigate } from "react-router";
-import Input from "../components/StyledInput";
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { MissionType } from "../types";
-import axios from "axios";
+import { useNavigate, useLocation } from "react-router";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  MainServerResponseType,
+  SearchedMissionInfoType,
+  SimpleMissionInfoType,
+  LazyMissionInfoListType,
+} from "../types";
 import { getData } from "../axios";
-const cardsData = [
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-  {
-    title: "Title 1",
-    author: "Author 1",
-    participants: 3,
-    description: "이것은 설명입니다",
-    minParticipants: 10,
-    duration: 365,
-    status: "CREATED",
-    frequency: "daily",
-    creatorEmail: "qkrcksdyd99@gmail.com",
-    created: new Date(),
-    start: new Date(),
-    deadline: new Date(),
-  },
-];
+import { useEffect, useState } from "react";
+import useLogout from "../useLogout";
+import MissionSearch from "../components/MissionSearch";
 const MainPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const logout = useLogout();
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
+  const [totalMissionData, setTotalMissionData] = useState<
+    SimpleMissionInfoType[]
+  >([]);
+  const [myMissionData, setMyMissionData] = useState<SimpleMissionInfoType[]>(
+    []
+  );
 
-  const fetchData = () => getData<MissionType>("/api/main/1");
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["missionData"],
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const accessToken = urlSearchParams.get("AccessToken");
+    const email = urlSearchParams.get("email");
+    const name = urlSearchParams.get("username");
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      setUserInfoState({
+        isLoggedIn: true,
+        user_id: `${name}`,
+        user_email: `${email}`,
+      });
+      navigate("/");
+    }
+  }, [location.search, setUserInfoState, navigate]);
+  const [currentNum, setCurrentNum] = useState<number>(1);
+  const fetchLazyData = async (pageParam: unknown) =>
+    await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
+  // const {
+  //   data: lazyData,
+  //   hasNextPage,
+  //   fetchNextPage,
+  //   isFetchingNextPage,
+  // } = useInfiniteQuery({
+  //   queryKey: ["lazyMissionData"],
+  //   queryFn: fetchLazyData,
+  //   initialPageParam: 0,
+  //   getNextPageParam: (lastList) => {
+  //     if (lastList.missionInfoList.length < 20) {
+  //       return undefined;
+  //     }
+  //     setCurrentNum((prev) => prev + 1);
+  //     return currentNum;
+  //   },
+  //   select: (data) => data.pages.flatMap((page) => page.missionInfoList),
+  // });
+
+  const fetchData = async () =>
+    await getData<MainServerResponseType>("/api/main");
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ["totalMissionData"],
     queryFn: fetchData,
   });
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+
+  useEffect(() => {
+    if (isSuccess || data) {
+      setTotalMissionData(data.missionInfoList);
+      setMyMissionData(data.participantMissionInfoList);
+    }
+  }, [isSuccess, data]);
 
   if (isError) {
-    return <div>Error fetching data</div>;
+    if (userInfoState.isLoggedIn) logout();
   }
-  console.log(data);
+
+  const updateData = (newData: SearchedMissionInfoType) => {
+    setTotalMissionData(newData.missionInfoList);
+  };
+  console.log(totalMissionData);
   return (
     <Layout>
-      <SearchSection>
-        <div style={{ padding: "10px" }}>미션을 검색해보세요!</div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            padding: "10px",
-          }}
-        >
-          <Input type="text" placeholder="미션명 검색하기" size={25} />
-          <StyledButton
-            bgcolor={theme.subGreen}
-            color="white"
-            style={{ fontSize: "medium" }}
-          >
-            검색
-          </StyledButton>
-        </div>
-      </SearchSection>
+      <MissionSearch updateData={updateData} />
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Data Fetching Error</p>}
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
         onClick={() => {
-          if (userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
+          if (!userInfoState.isLoggedIn) window.alert("로그인을 해주세요!");
           else {
             navigate("/mission-create");
           }
@@ -161,41 +117,55 @@ const MainPage = () => {
             style={{
               fontSize: "1.3rem",
               fontFamily: "gmarket2",
-              paddingTop: "20px",
+              padding: "15px 0px",
               width: "40%",
               margin: "0 auto",
             }}
           >
             내가 참가한 미션
             <span style={{ color: `${theme.subGreen}`, paddingLeft: "10px" }}>
-              {cardsData.length}
+              {myMissionData?.length || 0}
             </span>
           </h2>
-          <MyMissionSection>
-            {cardsData.map((card, index) => (
-              <MyCard
-                key={index}
-                id={index + 1}
-                title={card.title}
-                start={card.start}
-                deadline={card.deadline}
-                people={card.participants}
-              />
-            ))}
-          </MyMissionSection>
+          {myMissionData?.length && (
+            <MyMissionSection>
+              {myMissionData?.map((mission, index) => (
+                <MyCard
+                  key={index}
+                  id={mission.id}
+                  username={mission.username}
+                  title={mission.title}
+                  duration={mission.duration}
+                  frequency={mission.frequency}
+                  people={mission.participants}
+                  photoUrl={mission.photoUrl}
+                />
+              ))}
+            </MyMissionSection>
+          )}
         </div>
       )}
       <MainSection>
-        {cardsData.map((card, index) => (
+        {totalMissionData?.map((mission, index) => (
           <Card
             key={index}
-            id={index + 1}
-            title={card.title}
-            author={card.author}
-            people={card.participants}
-            missionData={card}
+            id={mission.id}
+            title={mission.title}
+            username={mission.username}
+            minPar={mission.minParticipants}
+            par={mission.participants}
+            duration={mission.duration}
+            status={mission.status}
+            frequency={mission.frequency}
+            photoUrl={mission.photoUrl}
           />
         ))}
+        <p>여기가 구분선</p>
+        {/* {isFetchingNextPage
+          ? "로딩 중"
+          : hasNextPage
+          ? "미션을 더 보고싶으면, 스크롤을 내려주세요!"
+          : "더 이상 미션이 존재하지 않습니다!"} */}
       </MainSection>
     </Layout>
   );
@@ -228,7 +198,7 @@ const MainSection = styled.section`
 `;
 
 const MyMissionSection = styled.section`
-  padding: 10px;
+  padding-bottom: 3vh;
   margin: 0 auto;
   margin-bottom: 5vh;
   height: 30vh;
