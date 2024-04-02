@@ -50,6 +50,9 @@ const MissionSearch = ({ updateData }: MissionSearchProps) => {
           type="text"
           placeholder="미션명 검색하기"
           size={25}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") searchHandler();
+          }}
         />
         <StyledButton
           bgcolor={theme.subGreen}
