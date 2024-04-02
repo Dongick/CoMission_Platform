@@ -54,26 +54,23 @@ class UserServiceTest {
     @Test
     @DisplayName("UserService의 logout 매서드 성공")
     void logout_Success() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
         String email = "test@example.com";
 
-        // Mock cookie 생성
         Cookie cookie = new Cookie("RefreshToken", "testRefreshToken");
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
 
         // jwtUtil.validateRefreshToken 메서드가 예외를 던지지 않도록 Mock 처리
         when(jwtUtil.validateRefreshToken(anyString())).thenReturn(null);
 
-        // userService.logout 메서드 호출
+        // when
         userService.logout(request, response);
 
-        // refreshTokenRepository.deleteByEmail 메서드가 호출되었는지 확인
+        // then
         verify(refreshTokenRepository, times(1)).deleteByEmail(email);
-
-        // response에 addCookie 메서드가 호출되었는지 확인
         verify(response).addCookie(any(Cookie.class));
 
         // addCookie 메서드가 null 값을 가진 쿠키를 추가했는지 확인
@@ -86,20 +83,20 @@ class UserServiceTest {
     @Test
     @DisplayName("UserService의 logout 매서드 cookie가 존재하지 않아 실패")
     void logout_cookieIsNull() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
         when(request.getCookies()).thenReturn(null);
 
-        // userService.logout 메서드 호출
+        // when, then
         assertThrows(MissionAuthenticationException.class, () -> userService.logout(request, response));
     }
 
     @Test
     @DisplayName("UserService의 logout 매서드 RefreshToken cookie의 값이 null 이어서 실패")
     void logout_refreshTokenIsNull() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -109,14 +106,14 @@ class UserServiceTest {
         // jwtUtil.validateRefreshToken 메서드가 예외를 던지도록 Mock 처리
         when(jwtUtil.validateRefreshToken(null)).thenThrow(new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage()));
 
-        // userService.logout 메서드 호출
+        // when, then
         assertThrows(MissionAuthenticationException.class, () -> userService.logout(request, response));
     }
 
     @Test
     @DisplayName("UserService의 logout 매서드 RefreshToken cookie가 만료되어서 실패")
     void logout_refreshTokenIsExpired() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -126,14 +123,14 @@ class UserServiceTest {
         // jwtUtil.validateRefreshToken 메서드가 예외를 던지도록 Mock 처리
         when(jwtUtil.validateRefreshToken(anyString())).thenThrow(new MissionAuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED, ErrorCode.REFRESH_TOKEN_EXPIRED.getMessage()));
 
-        // userService.logout 메서드 호출
+        // when, then
         assertThrows(MissionAuthenticationException.class, () -> userService.logout(request, response));
     }
 
     @Test
     @DisplayName("UserService의 logout 매서드 RefreshToken cookie의 payload값이 refresh가 아니어서 실패")
     void logout_refreshTokenIsNotRefreshCategory() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -143,14 +140,14 @@ class UserServiceTest {
         // jwtUtil.validateRefreshToken 메서드가 예외를 던지도록 Mock 처리
         when(jwtUtil.validateRefreshToken(anyString())).thenThrow(new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage()));
 
-        // userService.logout 메서드 호출
+        // when, then
         assertThrows(BadRequestException.class, () -> userService.logout(request, response));
     }
 
     @Test
     @DisplayName("UserService의 logout 매서드 RefreshToken cookie의 값이 db에 저장되어 있는 값과 달라서 실패")
     void logout_refreshTokenNotInDatabase() {
-        // Mock HttpServletRequest와 HttpServletResponse 생성
+        // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -160,7 +157,7 @@ class UserServiceTest {
         // jwtUtil.validateRefreshToken 메서드가 예외를 던지도록 Mock 처리
         when(jwtUtil.validateRefreshToken(anyString())).thenThrow(new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage()));
 
-        // userService.logout 메서드 호출
+        // when, then
         assertThrows(BadRequestException.class, () -> userService.logout(request, response));
     }
 }
