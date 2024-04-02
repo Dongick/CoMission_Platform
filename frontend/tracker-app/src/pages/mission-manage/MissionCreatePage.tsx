@@ -1,6 +1,6 @@
 import Layout from "../../layouts/Layout";
 import styled from "styled-components";
-import { SearchSection } from "../MainPage";
+import { SearchSection } from "../../components/MissionSearch";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
 import Form from "../../components/StyledForm";

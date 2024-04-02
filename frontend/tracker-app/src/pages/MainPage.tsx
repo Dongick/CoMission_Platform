@@ -2,7 +2,6 @@ import { theme } from "../styles/theme";
 import StyledButton from "../components/StyledButton";
 import Layout from "../layouts/Layout";
 import styled from "styled-components";
-import sectionSVG from "../assets/img/wave-haikei.svg";
 import Card from "../components/Card";
 import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
@@ -19,6 +18,7 @@ import { getData } from "../axios";
 import { useEffect, useState } from "react";
 import useLogout from "../useLogout";
 import MissionSearch from "../components/MissionSearch";
+import { NoLoginContent } from "./mission/MissionConfirmPostPage";
 const MainPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +89,7 @@ const MainPage = () => {
   const updateData = (newData: SearchedMissionInfoType) => {
     setTotalMissionData(newData.missionInfoList);
   };
-  console.log(totalMissionData);
+
   return (
     <Layout>
       <MissionSearch updateData={updateData} />
@@ -145,6 +145,15 @@ const MainPage = () => {
           )}
         </div>
       )}
+      {totalMissionData.length === 0 && (
+        <NoLoginContent
+          style={{ backgroundColor: `${theme.mainGray}`, padding: "10%" }}
+        >
+          <span>❌</span>
+          <h1>생성된 미션이 없습니다.</h1>
+          <p>첫 미션을 생성해보세요!</p>
+        </NoLoginContent>
+      )}
       <MainSection>
         {totalMissionData?.map((mission, index) => (
           <Card
@@ -173,20 +182,6 @@ const MainPage = () => {
 
 export default MainPage;
 
-export const SearchSection = styled.section`
-  background-image: url(${sectionSVG});
-  background-size: cover;
-  background-position: center;
-  height: 20vh;
-  padding: 10px;
-  font-family: "gmarket2";
-  font-size: 2rem;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
 const MainSection = styled.section`
   min-height: 100vh;
   padding: 3vh;
@@ -194,6 +189,12 @@ const MainSection = styled.section`
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
+  @media screen and (max-width: 1600px) {
+    grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
+  }
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
+  }
   gap: 20px; /* Adjust the gap between cards */
 `;
 
@@ -201,7 +202,6 @@ const MyMissionSection = styled.section`
   padding-bottom: 3vh;
   margin: 0 auto;
   margin-bottom: 5vh;
-  height: 30vh;
   width: 50%;
   display: flex;
   overflow-x: auto;

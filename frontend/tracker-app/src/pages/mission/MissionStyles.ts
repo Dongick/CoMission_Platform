@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { SearchSection } from "../MainPage";
+import { SearchSection } from "../../components/MissionSearch";
 import { theme } from "../../styles/theme";
 
 export const BannerSection = styled(SearchSection)`
@@ -9,14 +9,14 @@ export const BannerSection = styled(SearchSection)`
   height: 30vh;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 0;
+  margin-bottom: 0px;
 `;
 export const TitleDiv = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: flex-start;
-  height: 70%;
+  height: 80%;
   min-width: 30%;
   font-size: 1.7rem;
 
@@ -30,7 +30,6 @@ export const TitleDiv = styled.div`
 `;
 export const Navbar = styled.nav`
   border-bottom: 2px solid #e9ecef;
-  height: 5%;
 `;
 export const NavButton = styled.button<{ clicked: string }>`
   height: 100%;

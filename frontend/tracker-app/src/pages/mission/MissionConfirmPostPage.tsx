@@ -89,7 +89,7 @@ const MissionConfirmPost = () => {
           />
         )}
         <TitleDiv>
-          <div style={{ marginBottom: "30px" }}>{data.title}</div>
+          <div style={{ marginBottom: "10px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
@@ -104,7 +104,7 @@ const MissionConfirmPost = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              width: "80%",
+              width: "100%",
             }}
           >
             <p>인증주기: {data.frequency}</p>

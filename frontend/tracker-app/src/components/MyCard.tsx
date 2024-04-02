@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
-import { StyledCard, ImgDiv, ContentDiv } from "./Card";
-import exampleImg from "../assets/img/wave-haikei.svg";
+import { StyledCard, ContentDiv } from "./Card";
 import { useNavigate } from "react-router-dom";
 import noImg from "../assets/img/no-pictures.png";
 
@@ -69,9 +68,15 @@ const MyContentDiv = styled(ContentDiv)`
     text-overflow: ellipsis;
     font-family: "noto";
     font-size: 0.8rem;
+    @media (max-width: 1080px) {
+      font-size: 0.7rem;
+    }
   }
   & > p:first-child {
     font-family: "notoBold";
     font-size: 1rem;
+    @media (max-width: 1080px) {
+      font-size: 0.9rem;
+    }
   }
 `;

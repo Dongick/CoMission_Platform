@@ -1,4 +1,6 @@
-import { SearchSection } from "../pages/MainPage";
+// import { SearchSection } from "../pages/MainPage";
+import sectionSVG from "../assets/img/wave-haikei.svg";
+import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import Input from "./StyledInput";
 import { theme } from "../styles/theme";
@@ -63,3 +65,17 @@ const MissionSearch = ({ updateData }: MissionSearchProps) => {
 };
 
 export default MissionSearch;
+
+export const SearchSection = styled.section`
+  background-image: url(${sectionSVG});
+  background-size: cover;
+  background-position: center;
+  height: 20vh;
+  padding: 10px;
+  font-family: "gmarket2";
+  font-size: 2rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;

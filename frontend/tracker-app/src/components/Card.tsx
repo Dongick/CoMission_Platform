@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
-import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
 import noImg from "../assets/img/no-pictures.png";
 interface CardProps {
@@ -34,7 +33,7 @@ const Card = ({
     <div>
       <StyledCard onClick={handleClick}>
         {photoUrl ? (
-          <img src={photoUrl} alt="Img" width="100%" height="60%" />
+          <img src={photoUrl} alt="Img" width="100%" height="50%" />
         ) : (
           <img src={noImg} alt="Img" width="100%" height="60%" />
         )}
@@ -122,21 +121,12 @@ const Card = ({
 export default Card;
 
 export const StyledCard = styled.section`
-  height: 40vh;
-  width: 15vw;
   border-radius: 10px;
   margin-bottom: 5vh;
   box-shadow: ${theme.boxShadow};
   display: flex;
   flex-direction: column;
   cursor: pointer;
-`;
-export const ImgDiv = styled.div`
-  background-image: url(${noImg});
-  background-size: cover;
-  background-position: center;
-  min-height: 60%;
-  width: 100%;
 `;
 export const ContentDiv = styled.div`
   padding: 5px;

@@ -2,7 +2,6 @@ import styled from "styled-components";
 import Layout from "../../layouts/Layout";
 import { useParams, Link } from "react-router-dom";
 import { theme } from "../../styles/theme";
-import example from "../../assets/img/roadmap-77.png";
 import StyledButton from "../../components/StyledButton";
 import {
   BannerSection,
@@ -94,7 +93,7 @@ const MissionDetail = () => {
           />
         )}
         <TitleDiv>
-          <div style={{ marginBottom: "30px" }}>{data.title}</div>
+          <div style={{ marginBottom: "10px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
@@ -109,7 +108,7 @@ const MissionDetail = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              width: "80%",
+              width: "100%",
             }}
           >
             <p>인증주기: {data.frequency}</p>
