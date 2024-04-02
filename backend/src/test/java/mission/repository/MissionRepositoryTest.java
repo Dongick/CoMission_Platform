@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -49,7 +48,7 @@ class MissionRepositoryTest {
 
     @Test
     @DisplayName("MissionRepository의 findAllAndStatusNotByOrderByCreatedAtDesc 매서드 테스트")
-    void findAllAndStatusNotByOrderByCreatedAtDesc() {
+    void findAllByStatusNotOrderByCreatedAtDesc() {
         //given
         String[] title = {"Mission 1", "Mission 2", "Mission 3"};
 
@@ -57,11 +56,8 @@ class MissionRepositoryTest {
         Pageable pageable2 = PageRequest.of(0, 1);
 
         //when
-        Page<MissionInfo> missions1Page = missionRepository.findAllAndStatusNotByOrderByCreatedAtDesc(pageable1);
-        Page<MissionInfo> missions2Page = missionRepository.findAllAndStatusNotByOrderByCreatedAtDesc(pageable2);
-
-        List<MissionInfo> missions1 = missions1Page.getContent();
-        List<MissionInfo> missions2 = missions2Page.getContent();
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotOrderByCreatedAtDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotOrderByCreatedAtDesc(pageable2);
 
         //then
         Assertions.assertThat(missions1.size()).isEqualTo(2);
