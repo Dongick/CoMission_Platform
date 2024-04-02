@@ -48,10 +48,10 @@ const MissionConfirmPost = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // Format the date as needed
   };
-  const partipateHandler = async () => {
+  const participateHandler = async () => {
     try {
-      const data = await postData("/api/participant", { id: cardId });
-      console.log(data);
+      await postData("/api/participant", { id: cardId });
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -140,7 +140,7 @@ const MissionConfirmPost = () => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
                 else {
-                  partipateHandler();
+                  participateHandler();
                 }
               }}
             >

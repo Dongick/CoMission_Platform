@@ -38,7 +38,9 @@ const ConfirmPost = ({ post, index }: ConfirmPostIndexType) => {
       </PostHeader>
       <PostContent onClick={postClickHandler}>
         <p>{post.textData}</p>
-        <img src={post.photoData} alt={`Post ${index}`} width="100%" />
+        {post.photoData && (
+          <img src={post.photoData} alt={`Post ${index}`} width="100%" />
+        )}
       </PostContent>
     </PostLayout>
   );

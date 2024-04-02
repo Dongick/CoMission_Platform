@@ -18,7 +18,7 @@ interface ConfirmPostListProps {
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
-  const { data, isLoading, isError, error, isSuccess, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["authenticationData"],
     queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/0`),
   });
@@ -60,10 +60,6 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         </NoLoginContent>
       );
     }
-  }
-
-  if (isSuccess) {
-    console.log(data);
   }
 
   const openPostModalHandler = () => {

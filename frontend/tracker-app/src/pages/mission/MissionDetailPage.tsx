@@ -51,12 +51,12 @@ const MissionDetail = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
-  const partipateHandler = async () => {
+  const participateHandler = async () => {
     try {
-      const data = await postData("/api/participant", { id: cardId });
-      console.log(data);
+      await postData("/api/participant", { id: cardId });
     } catch (error) {
       console.error(error);
+      window.location.reload();
     }
   };
 
@@ -143,7 +143,7 @@ const MissionDetail = () => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
                 else {
-                  partipateHandler();
+                  participateHandler();
                 }
               }}
             >
