@@ -102,3 +102,30 @@ export const postData = async <T, R>(
     throw error;
   }
 };
+
+// PUT Method
+export const putData = async <T, R>(
+  url: string,
+  data: T,
+  config?: AxiosRequestConfig
+): Promise<R> => {
+  try {
+    const response = await customAxios.put<R>(url, data, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// DELETE Method
+export const deleteData = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  try {
+    const response = await customAxios.delete<T>(url, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
