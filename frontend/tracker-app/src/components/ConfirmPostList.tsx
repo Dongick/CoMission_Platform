@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { ConfirmPostDataType } from "../types";
 import { useQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
@@ -9,7 +8,7 @@ import { AxiosError } from "axios";
 import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
 import { useEffect, useState } from "react";
-import NewPostModal from "./NewPostModal";
+import PostEditModal from "./PostEditModal";
 const PostListLayout = styled.div`
   padding: 5px;
 `;
@@ -84,7 +83,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
 
       {data?.authenticationData ? (
         data?.authenticationData.map((post, index) => (
-          <ConfirmPost index={index + 1} post={post} key={index} />
+          <ConfirmPost index={index + 1} post={post} key={index} id={id} />
         ))
       ) : (
         <NoLoginContent>
@@ -94,7 +93,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         </NoLoginContent>
       )}
       {showPostModal && (
-        <NewPostModal onClose={closePostModalHandler} id={id} />
+        <PostEditModal onClose={closePostModalHandler} id={id} />
       )}
     </PostListLayout>
   );

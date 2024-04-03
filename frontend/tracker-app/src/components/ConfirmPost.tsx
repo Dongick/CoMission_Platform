@@ -1,43 +1,34 @@
 import styled from "styled-components";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ConfirmPostIndexType } from "../types";
 import { theme } from "../styles/theme";
-import PostModal from "./PostModal";
 import deleteImg from "../assets/img/delete.png";
 import editImg from "../assets/img/edit.png";
 import { useParams } from "react-router-dom";
-import { deleteData, putData } from "../axios";
+import { deleteData } from "../axios";
 import { useQueryClient } from "@tanstack/react-query";
-import NewPostModal from "./NewPostModal";
+import PostEditModal from "./PostEditModal";
 
 type ModalHandlerType = {
-  openModal: () => void;
-  closeModal: () => void;
-};
+  id: string;
+} & ConfirmPostIndexType;
 
-const ConfirmPost = (
-  { post, index }: ConfirmPostIndexType,
-  { openModal, closeModal }: ModalHandlerType
-) => {
-  const [clickPost, setClickPost] = useState<boolean>(false);
+const ConfirmPost = ({ post, index, id }: ModalHandlerType) => {
+  const [isEditClicked, setIsEditClicked] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { cardId } = useParams();
-  const postClickHandler = () => {
-    setClickPost(true);
-  };
-  const postCloseHandler = () => {
-    setClickPost(false);
-  };
+
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   const formattedToday = `${year}-${month}-${day}`;
+
+  const closeModal = () => {
+    setIsEditClicked(false);
+  };
   const editHandler = () => {
-    closeModal();
-    // 클릭하면 -> NewModal 띄우기
-    // 취소하면 -> closeModal
-    // 게시하면 -> put요청, closeModal
+    setIsEditClicked(true);
   };
   const deleteHandler = () => {
     const isConfirmed = window.confirm("글을 삭제하시겠습니까?");
@@ -51,7 +42,6 @@ const ConfirmPost = (
   };
   return (
     <PostLayout>
-      {clickPost && <PostModal onClose={postCloseHandler} />}
       <PostHeader>
         {formattedToday === post.date && (
           <IconWrapper>
@@ -98,6 +88,13 @@ const ConfirmPost = (
           <img src={post.photoData} alt={`Post ${index}`} width="100%" />
         )}
       </PostContent>
+      {isEditClicked && (
+        <PostEditModal
+          onClose={closeModal}
+          id={id}
+          editPost={{ editText: post.textData }}
+        />
+      )}
     </PostLayout>
   );
 };

@@ -3,17 +3,19 @@ import { theme } from "../styles/theme";
 import { ModalOverlay, ModalContent } from "./StyledModal";
 import { useCallback, useState } from "react";
 import StyledButton from "./StyledButton";
-import { postData } from "../axios";
+import { postData, putData } from "../axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { AUTHENTICATION_ERROR } from "../constant";
 interface NewPostModalProps {
   onClose: () => void;
   id: string;
+  editPost?: {
+    editText: string;
+  };
 }
-const NewPostModal = ({ onClose, id }: NewPostModalProps) => {
+const PostEditModal = ({ onClose, id, editPost }: NewPostModalProps) => {
   const queryClient = useQueryClient();
-  const [text, setText] = useState<string>("");
+  const [text, setText] = useState<string>(editPost ? editPost.editText : "");
   const [photo, setPhoto] = useState<File | null>(null);
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -53,9 +55,19 @@ const NewPostModal = ({ onClose, id }: NewPostModalProps) => {
       new Blob([JSON.stringify(textData)], { type: "application/json" })
     );
     try {
-      await postData(`/api/authentication/${id}`, formData);
-      await queryClient.invalidateQueries({ queryKey: ["authenticationData"] });
-      onClose();
+      if (editPost) {
+        await putData(`/api/authentication/${id}`, formData);
+        await queryClient.invalidateQueries({
+          queryKey: ["authenticationData"],
+        });
+        onClose();
+      } else {
+        await postData(`/api/authentication/${id}`, formData);
+        await queryClient.invalidateQueries({
+          queryKey: ["authenticationData"],
+        });
+        onClose();
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         alert(error?.response?.data?.errorCode);
@@ -78,7 +90,11 @@ const NewPostModal = ({ onClose, id }: NewPostModalProps) => {
         >
           X
         </button>
-        <ModalTitle>인증 글 작성</ModalTitle>
+        {editPost ? (
+          <ModalTitle>인증 글 수정</ModalTitle>
+        ) : (
+          <ModalTitle>인증 글 작성</ModalTitle>
+        )}
         <Hr />
         <FormWrapper>
           <textarea
@@ -96,20 +112,34 @@ const NewPostModal = ({ onClose, id }: NewPostModalProps) => {
             accept="image/*"
           />
           <Hr />
-          <StyledButton
-            type="button"
-            bgcolor={theme.subGreen}
-            onClick={formSubmitHandler}
-          >
-            게시
-          </StyledButton>
+          <p style={{ padding: "10px" }}>
+            ❗ 글 작성 후, <span style={{ fontFamily: "notoBold" }}>1일</span>{" "}
+            동안만 수정/삭제가 가능합니다
+          </p>
+          {editPost ? (
+            <StyledButton
+              type="button"
+              bgcolor={theme.subGreen}
+              onClick={formSubmitHandler}
+            >
+              수정
+            </StyledButton>
+          ) : (
+            <StyledButton
+              type="button"
+              bgcolor={theme.subGreen}
+              onClick={formSubmitHandler}
+            >
+              게시
+            </StyledButton>
+          )}
         </FormWrapper>
       </ModalContent2>
     </ModalOverlay>
   );
 };
 
-export default NewPostModal;
+export default PostEditModal;
 
 const ModalContent2 = styled(ModalContent)`
   min-width: 40%;
