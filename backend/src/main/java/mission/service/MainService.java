@@ -67,7 +67,7 @@ public class MainService {
 
     // 현재 참여 가능한 미션 목록
     private List<MissionInfo> getMissionList(int num) {
-        Pageable pageable = PageRequest.of(num, 2);
+        Pageable pageable = PageRequest.of(num, 20);
 
         return missionRepository.findAllByStatusNotOrderByCreatedAtDesc(pageable);
     }
