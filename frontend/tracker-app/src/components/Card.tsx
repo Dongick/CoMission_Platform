@@ -129,6 +129,9 @@ export const StyledCard = styled.section`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  & > img {
+    padding: 10px;
+  }
 `;
 export const ContentDiv = styled.div`
   padding: 5px;

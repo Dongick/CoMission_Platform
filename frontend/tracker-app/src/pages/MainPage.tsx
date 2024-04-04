@@ -14,7 +14,7 @@ import {
   SimpleMissionInfoType,
   LazyMissionInfoListType,
 } from "../types";
-import { getData, postData } from "../axios";
+import { getData } from "../axios";
 import { useEffect, useState } from "react";
 import useLogout from "../useLogout";
 import MissionSearch from "../components/MissionSearch";
@@ -33,6 +33,7 @@ const MainPage = () => {
   );
   const [noDataMessage, setNoDataMessage] =
     useState<string>("생성된 미션이 없습니다!");
+  const [everClicked, setEverClicked] = useState<boolean>(false);
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
@@ -49,28 +50,26 @@ const MainPage = () => {
     }
   }, [location.search, setUserInfoState, navigate]);
 
-  const [currentNum, setCurrentNum] = useState<number>(1);
   const fetchLazyData = async ({ pageParam = 1 }) =>
     await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
   const {
     data: lazyData,
-    hasNextPage,
     fetchNextPage,
+    hasNextPage,
     isFetchingNextPage,
+    isSuccess: lazySuccess,
   } = useInfiniteQuery({
     queryKey: ["lazyMissionData"],
     queryFn: fetchLazyData,
     initialPageParam: 1,
     getNextPageParam: (lastList, allLists) => {
-      console.log(lastList);
-      console.log(allLists);
-      if (lastList.missionInfoList.length < 20) {
+      if (lastList.missionInfoList.length === 20) {
+        return allLists.length + 1;
+      } else {
         return undefined;
       }
-      setCurrentNum((prev) => prev + 1);
-      return currentNum;
     },
-    select: (data) => data.pages.flatMap((page) => page.missionInfoList),
+    enabled: false,
   });
 
   const fetchData = async () =>
@@ -81,18 +80,23 @@ const MainPage = () => {
   });
 
   useEffect(() => {
-    if (isSuccess || data) {
+    if (data) {
       setTotalMissionData(data.missionInfoList);
       setMyMissionData(data.participantMissionInfoList);
     }
   }, [isSuccess, data]);
+
+  useEffect(() => {
+    const newLazyData =
+      lazyData?.pages[lazyData.pages.length - 1].missionInfoList;
+    newLazyData && setTotalMissionData((prev) => [...prev, ...newLazyData]);
+  }, [lazySuccess, lazyData]);
 
   if (isError) {
     if (userInfoState.isLoggedIn) logout();
   }
 
   const updateData = (newData: SearchedMissionInfoType) => {
-    console.log(newData.missionInfoList.length);
     if (newData.missionInfoList.length === 0) {
       setNoDataMessage("검색결과가 없습니다!");
     } else {
@@ -178,14 +182,29 @@ const MainPage = () => {
             photoUrl={mission.photoUrl}
           />
         ))}
-        <p>여기가 구분선</p>
-        <button onClick={() => fetchNextPage()}>Load More</button>
-        {isFetchingNextPage
-          ? "로딩 중"
-          : hasNextPage
-          ? "미션을 더 보고싶으면, 스크롤을 내려주세요!"
-          : "더 이상 미션이 존재하지 않습니다!"}
       </MainSection>
+      {everClicked && !hasNextPage ? (
+        <StyledButton
+          disabled
+          bgcolor={theme.mainGray}
+          color={theme.subGray}
+          style={{ fontSize: "1.1rem", boxShadow: "none", cursor: "auto" }}
+        >
+          더 이상 미션이 없습니다!
+        </StyledButton>
+      ) : (
+        <StyledButton
+          onClick={() => {
+            fetchNextPage();
+            setEverClicked(true);
+          }}
+          disabled={isFetchingNextPage}
+          bgcolor={theme.subGreen}
+          style={{ fontSize: "1.1rem" }}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </StyledButton>
+      )}
     </Layout>
   );
 };
