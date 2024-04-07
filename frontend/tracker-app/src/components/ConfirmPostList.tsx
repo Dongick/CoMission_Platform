@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
@@ -17,17 +17,27 @@ interface ConfirmPostListProps {
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["authenticationData"],
-    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/0`),
-  });
-  useEffect(() => {
-    refetch();
-  }, [data]);
+  const fetchLazyData = async ({ pageParam = 0 }) =>
+    await getData<ConfirmPostListType>(
+      `/api/authentication/${id}/${pageParam}`
+    );
+  const { data, isFetchingNextPage, isError, error, fetchNextPage, isSuccess } =
+    useInfiniteQuery({
+      queryKey: ["authenticationData"],
+      queryFn: fetchLazyData,
+      initialPageParam: 0,
+      getNextPageParam: (lastList, allLists) => {
+        if (lastList.authenticationData.length === 20) {
+          return allLists.length;
+        } else {
+          return undefined;
+        }
+      },
+    });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    console.log(data);
+  }, [data, isSuccess]);
 
   if (isError) {
     const axiosError = error as AxiosError<ErrorResponseDataType>;
@@ -81,10 +91,12 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
         인증 글 작성
       </StyledButton>
 
-      {data?.authenticationData ? (
-        data?.authenticationData.map((post, index) => (
-          <ConfirmPost index={index + 1} post={post} key={index} id={id} />
-        ))
+      {data?.pages ? (
+        data?.pages.map((page) =>
+          page.authenticationData.map((post, index) => (
+            <ConfirmPost index={index + 1} post={post} key={index} id={id} />
+          ))
+        )
       ) : (
         <NoLoginContent>
           <span>❌</span>
@@ -92,6 +104,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           <p>첫 인증을 해보세요!</p>
         </NoLoginContent>
       )}
+      {isFetchingNextPage && "Loading..."}
       {showPostModal && (
         <PostEditModal onClose={closePostModalHandler} id={id} />
       )}

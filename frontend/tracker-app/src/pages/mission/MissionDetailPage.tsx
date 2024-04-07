@@ -162,7 +162,7 @@ const MissionDetail = () => {
         </Link>
       </Navbar>
       <MainSection>
-        {userInfoState.user_id === data.username && (
+        {userInfoState.user_id === data.username && data.startDate === null && (
           <StyledButton
             style={{ position: "absolute", right: "10px", top: "10px" }}
             bgcolor={theme.subGray2}
