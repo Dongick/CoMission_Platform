@@ -7,13 +7,12 @@ import { theme } from "./styles/theme";
 import reportWebVitals from "./reportWebVitals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import useLogout from "./useLogout";
 
 // react-qeury Client instance 생성
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60,
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
     mutations: {

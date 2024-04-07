@@ -42,6 +42,7 @@ export const NavButton = styled.button<{ clicked: string }>`
   margin-right: 10px;
 `;
 export const MainSection = styled.section`
+  position: relative;
   min-height: 80vh;
   padding: 3vh 3vw;
   width: 650px;

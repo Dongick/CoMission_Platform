@@ -3,6 +3,7 @@ import MainPage from "../pages/MainPage";
 import MissionDetailPage from "../pages/mission/MissionDetailPage";
 import MissionConfirmPostPage from "../pages/mission/MissionConfirmPostPage";
 import MissionCreatePage from "../pages/mission-manage/MissionCreatePage";
+import MissionEditPage from "../pages/mission-manage/MissionEditPage";
 const Router = () => {
   return (
     <Routes>
@@ -13,6 +14,7 @@ const Router = () => {
         element={<MissionConfirmPostPage />}
       />
       <Route path="/mission-create" element={<MissionCreatePage />} />
+      <Route path="/mission-edit/:cardId" element={<MissionEditPage />} />
     </Routes>
   );
 };

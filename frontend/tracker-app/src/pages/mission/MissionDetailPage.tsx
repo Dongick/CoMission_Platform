@@ -1,6 +1,5 @@
-import styled from "styled-components";
 import Layout from "../../layouts/Layout";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { theme } from "../../styles/theme";
 import StyledButton from "../../components/StyledButton";
 import {
@@ -26,10 +25,12 @@ const MissionDetail = () => {
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
+  const missionEditURL = `/mission-edit/${cardId}`;
+  const navigate = useNavigate();
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["missionDetailInfo"],
+    queryKey: ["missionDetailInfo", `${cardId}`],
     queryFn: fetchData,
   });
 
@@ -161,6 +162,16 @@ const MissionDetail = () => {
         </Link>
       </Navbar>
       <MainSection>
+        {userInfoState.user_id === data.username && (
+          <StyledButton
+            style={{ position: "absolute", right: "10px", top: "10px" }}
+            bgcolor={theme.subGray2}
+            color="white"
+            onClick={() => navigate(missionEditURL)}
+          >
+            수정하기
+          </StyledButton>
+        )}
         <MissionContent>
           <h1
             style={{
