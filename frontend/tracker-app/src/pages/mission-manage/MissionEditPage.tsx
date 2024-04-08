@@ -18,10 +18,6 @@ const MissionEditPage = () => {
     queryKey: ["missionDetailInfo", `${cardId}`],
   });
 
-  useEffect(() => {
-    console.log(data);
-  }, []);
-
   const queryClient = useQueryClient();
   const [title, setTitle] = useState<string>(data ? data.title : "");
   const [description, setDescription] = useState<string>(
@@ -91,7 +87,7 @@ const MissionEditPage = () => {
     }
     const formData = new FormData();
     const missionInfo = {
-      title: title,
+      afterTitle: title,
       description: description,
       minParticipants: minParticipants,
       duration: duration,
