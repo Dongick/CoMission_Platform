@@ -12,6 +12,7 @@ import mission.exception.ErrorCode;
 import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.bson.types.ObjectId;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.Optional;
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final MissionRepository missionRepository;
+    private final TimeProvider timeProvider;
 
     // 미션 참가 매서드
     @Transactional
@@ -59,7 +61,8 @@ public class ParticipantService {
             int participants = missionDocument.getParticipants() + 1;
             missionDocument.setParticipants(participants);
 
-            LocalDateTime now = LocalDateTime.now();
+            //LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = timeProvider.getCurrentDateTime();
 
             // 해당 미션의 최소 참여자 수를 충족하면 미션을 시작 상태로 바꿈
             if(participants == missionDocument.getMinParticipants()) {
