@@ -13,6 +13,7 @@ import mission.exception.ForbiddenException;
 import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,8 @@ import java.util.stream.Collectors;
 public class AuthenticationService {
     private final ParticipantRepository participantRepository;
     private final MissionRepository missionRepository;
-    private final FileService fileService;
     private final AWSS3Service awss3Service;
+    private final TimeProvider timeProvider;
     private static final String AUTHENTICATION_DIR = "authentications/";
 
     // 인증글 생성 매서드
@@ -41,7 +42,8 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
         int dayOfWeek = now.getDayOfWeek().getValue();
 
         LocalDate startDate = LocalDate.from(now.minusDays(dayOfWeek - 1));
@@ -92,7 +94,8 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         MissionDocument missionDocument = getMissionDocument(id);
 
@@ -138,7 +141,8 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         MissionDocument missionDocument = getMissionDocument(id);
 
@@ -197,13 +201,13 @@ public class AuthenticationService {
         List<Map<String, Object>> authenticationList = null;
 
         // 인증글들을 lazy loading 으로 처리
-        if(allAuthenticationList.size() > 20 * num) {
-            if(allAuthenticationList.size() >= 20 * (num + 1)) {
-                authenticationList = allAuthenticationList.subList(20*num, 20*(num+1));
+        if(allAuthenticationList.size() > 5 * num) {
+            if(allAuthenticationList.size() >= 5 * (num + 1)) {
+                authenticationList = allAuthenticationList.subList(5*num, 5*(num+1));
             } else {
                 int endIndex = allAuthenticationList.size();
 
-                authenticationList = allAuthenticationList.subList(20*num, endIndex);
+                authenticationList = allAuthenticationList.subList(5*num, endIndex);
             }
 
             for(Map<String, Object> authentication : authenticationList) {
@@ -216,7 +220,7 @@ public class AuthenticationService {
     }
 
     // 인증글들을 형식에 맞춰 출력
-    public List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
+    private List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
 
         return participantDocumentList.stream()
                 .flatMap(participant -> participant.getAuthentication().stream()

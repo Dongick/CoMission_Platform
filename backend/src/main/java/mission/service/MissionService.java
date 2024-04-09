@@ -9,6 +9,7 @@ import mission.enums.MissionStatus;
 import mission.exception.*;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.bson.types.ObjectId;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
     private final AWSS3Service awss3Service;
+    private final TimeProvider timeProvider;
     private static final String MISSION_DIR = "missions/";
 
     // 미션 생성 매서드
@@ -40,7 +42,8 @@ public class MissionService {
         String userEmail = customOAuth2User.getEmail();
         String username = customOAuth2User.getName();
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 미션에 이미지가 존재하면 AWS S3에 저장
         String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
@@ -79,7 +82,8 @@ public class MissionService {
             // 미션에 이미지가 존재하면 AWS S3에 저장
             String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
 
-            LocalDateTime now = LocalDateTime.now();
+            //LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = timeProvider.getCurrentDateTime();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
             missionDocument.setDescription(missionUpdateRequest.getDescription());
@@ -195,7 +199,8 @@ public class MissionService {
     @Transactional
     public void dailyAuthentications() {
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 모든 미션 가져오기
         List<MissionDocument> missions = missionRepository.findByStatus(MissionStatus.STARTED.name());
