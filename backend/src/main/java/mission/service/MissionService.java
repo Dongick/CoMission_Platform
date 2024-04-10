@@ -9,6 +9,7 @@ import mission.enums.MissionStatus;
 import mission.exception.*;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.bson.types.ObjectId;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,8 +29,8 @@ import java.util.Optional;
 public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
-    private final FileService fileService;
     private final AWSS3Service awss3Service;
+    private final TimeProvider timeProvider;
     private static final String MISSION_DIR = "missions/";
 
     // 미션 생성 매서드
@@ -41,11 +42,11 @@ public class MissionService {
         String userEmail = customOAuth2User.getEmail();
         String username = customOAuth2User.getName();
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 미션에 이미지가 존재하면 AWS S3에 저장
         String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
-
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
@@ -81,8 +82,8 @@ public class MissionService {
             // 미션에 이미지가 존재하면 AWS S3에 저장
             String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
 
-
-            LocalDateTime now = LocalDateTime.now();
+            //LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = timeProvider.getCurrentDateTime();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
             missionDocument.setDescription(missionUpdateRequest.getDescription());
@@ -90,9 +91,9 @@ public class MissionService {
             missionDocument.setDuration(missionUpdateRequest.getDuration());
             missionDocument.setMinParticipants(missionUpdateRequest.getMinParticipants());
             missionDocument.setFrequency(missionUpdateRequest.getFrequency());
-            missionDocument.setStatus(missionUpdateRequest.getMinParticipants() == 1 ? MissionStatus.STARTED.name() : MissionStatus.CREATED.name());
-            missionDocument.setStartDate(missionUpdateRequest.getMinParticipants() == 1 ? LocalDate.from(now) : null);
-            missionDocument.setDeadline(missionUpdateRequest.getMinParticipants() == 1 ? now.toLocalDate().plusDays(missionUpdateRequest.getDuration()) : null);
+            missionDocument.setStatus(missionUpdateRequest.getMinParticipants() <= missionDocument.getParticipants() ? MissionStatus.STARTED.name() : MissionStatus.CREATED.name());
+            missionDocument.setStartDate(missionUpdateRequest.getMinParticipants() <= missionDocument.getParticipants() ? LocalDate.from(now) : null);
+            missionDocument.setDeadline(missionUpdateRequest.getMinParticipants() <= missionDocument.getParticipants() ? now.toLocalDate().plusDays(missionUpdateRequest.getDuration()) : null);
 
             missionRepository.save(missionDocument);
         } else {
@@ -146,7 +147,6 @@ public class MissionService {
         MissionSearchResponse missionSearchResponse = new MissionSearchResponse(missionInfoList);
 
         return missionSearchResponse;
-
     }
 
     // 미션 저장
@@ -199,7 +199,8 @@ public class MissionService {
     @Transactional
     public void dailyAuthentications() {
 
-        LocalDateTime now = LocalDateTime.now();
+        //LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 모든 미션 가져오기
         List<MissionDocument> missions = missionRepository.findByStatus(MissionStatus.STARTED.name());

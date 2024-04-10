@@ -11,8 +11,6 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -22,7 +20,7 @@ public class AWSS3Service {
     private static final String MISSION_DIR = "missions/";
     private static final String AUTHENTICATION_DIR = "authentications/";
     @Value("${spring.cloud.aws.s3.bucket}")
-    private String bucketName;
+    private final String bucketName;
 
     // 사진을 AWS S3에 저장
     public String uploadFile(MultipartFile multipartFile, String dirCheck) throws IOException{

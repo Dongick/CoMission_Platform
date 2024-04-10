@@ -2,11 +2,9 @@ package mission.dto.mission;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class MissionUpdateRequest {
     @NotBlank
     private String afterTitle;
