@@ -13,3 +13,7 @@ export const GLOBAL_ERROR = {
   REFRESH_TOKEN_EXPIRED: "리프레시 토큰이 만료되었습니다",
   UNAUTHORIZED: "토큰이 존재하지 않습니다",
 };
+
+export const MISSION_INFO_ERROR = {
+  MISSION_NOT_FOUND: "해당 미션을 찾을 수 없습니다.",
+};

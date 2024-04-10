@@ -18,14 +18,15 @@ import StyledButton from "../../components/StyledButton";
 import example2 from "../../assets/img/no-pictures.png";
 import { theme } from "../../styles/theme";
 import { useEffect } from "react";
-
+import { AxiosError } from "axios";
+import { ErrorResponseDataType } from "../../types";
 const MissionConfirmPost = () => {
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const userInfoState = useRecoilValue(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
@@ -39,8 +40,28 @@ const MissionConfirmPost = () => {
   }
 
   if (isError) {
-    return <div>Error fetching: detail mission data</div>;
+    const axiosError = error as AxiosError<ErrorResponseDataType>;
+    const errorCode = axiosError.response?.data.errorCode;
+    if (errorCode === "MISSION_NOT_FOUND") {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <h1 style={{ fontSize: "1.5rem", margin: "15px" }}>
+            해당 미션이 존재하지 않습니다.
+          </h1>
+          <StyledButton onClick={() => navigate("/")}>홈으로 이동</StyledButton>
+        </div>
+      );
+    }
   }
+
   if (!data) {
     return <div>No data available</div>;
   }
