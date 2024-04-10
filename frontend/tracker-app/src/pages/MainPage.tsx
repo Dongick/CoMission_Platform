@@ -104,12 +104,31 @@ const MainPage = () => {
     }
     setTotalMissionData(newData.missionInfoList);
   };
+  if (isLoading) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩중...</h1>
+      </NoLoginContent>
+    );
+  }
+  if (isError) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩 에러</h1>
+        <StyledButton
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          새로고침
+        </StyledButton>
+      </NoLoginContent>
+    );
+  }
 
   return (
     <Layout>
       <MissionSearch updateData={updateData} />
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Data Fetching Error</p>}
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}

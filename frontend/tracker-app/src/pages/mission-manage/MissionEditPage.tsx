@@ -4,7 +4,7 @@ import { SearchSection } from "../../components/MissionSearch";
 import { theme } from "../../styles/theme";
 import missionImg from "../../assets/img/mission-img.png";
 import Form from "../../components/StyledForm";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
 import { putData } from "../../axios";

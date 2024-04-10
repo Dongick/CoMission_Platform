@@ -55,9 +55,9 @@ const MissionDetail = () => {
   const participateHandler = async () => {
     try {
       await postData("/api/participant", { id: cardId });
+      window.location.reload();
     } catch (error) {
       console.error(error);
-      window.location.reload();
     }
   };
 
