@@ -20,7 +20,7 @@ public class AWSS3Service {
     private static final String MISSION_DIR = "missions/";
     private static final String AUTHENTICATION_DIR = "authentications/";
     @Value("${spring.cloud.aws.s3.bucket}")
-    private final String bucketName;
+    private String bucketName;
 
     // 사진을 AWS S3에 저장
     public String uploadFile(MultipartFile multipartFile, String dirCheck) throws IOException{
