@@ -53,6 +53,7 @@ const MyStyledCard = styled(StyledCard)`
   background-color: white;
   height: 100%;
   width: 10vw;
+  min-width: 100px;
   margin: 0;
   margin-right: 2vw;
   flex: 0 0 auto;

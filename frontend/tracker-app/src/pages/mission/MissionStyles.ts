@@ -7,6 +7,8 @@ export const BannerSection = styled(SearchSection)`
   background-image: none;
   color: white;
   height: 30vh;
+  min-height: 200px;
+  min-width: 700px;
   flex-direction: row;
   align-items: center;
   margin-bottom: 0px;
