@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
-import Img from "../assets/img/roadmap-77.png";
 import { useNavigate } from "react-router-dom";
 import noImg from "../assets/img/no-pictures.png";
 interface CardProps {
@@ -11,6 +10,7 @@ interface CardProps {
   par: number;
   duration: number;
   status: string;
+  photoUrl: string;
   frequency: string;
 }
 
@@ -21,19 +21,21 @@ const Card = ({
   minPar,
   par,
   duration,
-  status,
+  photoUrl,
   frequency,
 }: CardProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate(`/mission/${id}/detail`);
   };
-
   return (
     <div>
       <StyledCard onClick={handleClick}>
-        <img src={noImg} alt="" width="100%" height="60%" />
-        {/* <ImgDiv /> */}
+        {photoUrl ? (
+          <img src={photoUrl} alt="Img" width="100%" height="220px" />
+        ) : (
+          <img src={noImg} alt="Img" width="100%" height="220px" />
+        )}
         <ContentDiv>
           <div>
             <h2
@@ -118,27 +120,24 @@ const Card = ({
 export default Card;
 
 export const StyledCard = styled.section`
-  height: 40vh;
-  width: 15vw;
   border-radius: 10px;
   margin-bottom: 5vh;
   box-shadow: ${theme.boxShadow};
+  cursor: pointer;
+  height: 350px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
-`;
-export const ImgDiv = styled.div`
-  background-image: url(${noImg});
-  background-size: cover;
-  background-position: center;
-  min-height: 60%;
-  width: 100%;
+  justify-content: space-between;
+  & > img {
+    padding: 10px;
+  }
 `;
 export const ContentDiv = styled.div`
   padding: 5px;
   font-family: "noto";
   text-align: left;
   overflow: hidden;
+  height: 120px;
   p,
   div {
     text-align: left;

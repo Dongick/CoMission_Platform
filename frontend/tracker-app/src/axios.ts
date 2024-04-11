@@ -16,9 +16,7 @@ export const customAxios: AxiosInstance = axios.create({
 customAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("요청 Config: ", config);
-    if (accessToken && accessToken !== undefined) {
-      console.log("요청시 보낸 액세스토큰: ", accessToken);
+    if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     if (config.data instanceof FormData) {
@@ -29,7 +27,6 @@ customAxios.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log(`request interceptor 에러: ${error}`);
     return Promise.reject(error);
   }
 );
@@ -37,7 +34,6 @@ customAxios.interceptors.request.use(
 //응답 interceptor
 customAxios.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log("응답 response: ", response);
     return response;
   },
   async (error) => {
@@ -45,21 +41,16 @@ customAxios.interceptors.response.use(
     const requestUrl = error.config.url;
     // reissue가 실패한 경우
     if (requestUrl === "/api/reissue") {
-      console.log("재발급실패", errorStatus);
       // string을 반환
       return Promise.reject(error.config.url);
     }
     // 재발급 요청을 해야하는 경우
     else if (errorStatus === 401) {
-      console.log("재발급해야됨", requestUrl, errorStatus);
       try {
-        console.log("여기서 액세스토큰 재발급 요청");
         const newAccessToken = await refreshAccessToken();
-        console.log("재발급 successful: ", newAccessToken);
         if (error.config) {
           localStorage.setItem("accessToken", newAccessToken);
           // error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-          // console.log("Retry request headers: ", error.config.headers);
           return customAxios.request(error.config);
         }
       } catch (error) {
@@ -72,9 +63,7 @@ customAxios.interceptors.response.use(
 
 export const refreshAccessToken = async () => {
   try {
-    console.log("재발급받으러 왔어요");
     const newAccessToken = await postData<string, string>("/api/reissue", "");
-    console.log("재발급성공: ", newAccessToken);
     return newAccessToken;
   } catch (error) {
     if (typeof error === "string") {
@@ -106,11 +95,36 @@ export const postData = async <T, R>(
     const response = await customAxios.post<R>(url, data, config);
     let returnData = response.data;
     if (url === "/api/reissue") {
-      console.log("/api/reissue의 response: ", response);
-      console.log("/api/reissue의 response.headers: ", response.headers);
-      returnData = response.headers?.AccessToken;
+      returnData = response.headers?.authorization;
     }
     return returnData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// PUT Method
+export const putData = async <T, R>(
+  url: string,
+  data: T,
+  config?: AxiosRequestConfig
+): Promise<R> => {
+  try {
+    const response = await customAxios.put<R>(url, data, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// DELETE Method
+export const deleteData = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  try {
+    const response = await customAxios.delete<T>(url, config);
+    return response.data;
   } catch (error) {
     throw error;
   }

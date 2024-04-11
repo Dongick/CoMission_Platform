@@ -8,8 +8,6 @@ interface InputProps
   ref?: any;
 }
 
-// input tag or textarea tag 사용가능
-
 const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
   ({ size = 10, ...props }, ref) => {
     if (props.type === "textarea") {

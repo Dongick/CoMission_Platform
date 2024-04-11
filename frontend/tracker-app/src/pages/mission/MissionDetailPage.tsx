@@ -1,8 +1,6 @@
-import styled from "styled-components";
 import Layout from "../../layouts/Layout";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { theme } from "../../styles/theme";
-import example from "../../assets/img/roadmap-77.png";
 import StyledButton from "../../components/StyledButton";
 import {
   BannerSection,
@@ -22,15 +20,18 @@ import { MissionType } from "../../types";
 import { getData, postData } from "../../axios";
 import { useEffect } from "react";
 import example2 from "../../assets/img/no-pictures.png";
-
+import { AxiosError } from "axios";
+import { ErrorResponseDataType } from "../../types";
 const MissionDetail = () => {
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
+  const missionEditURL = `/mission-edit/${cardId}`;
+  const navigate = useNavigate();
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["missionDetailInfo"],
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["missionDetailInfo", `${cardId}`],
     queryFn: fetchData,
   });
 
@@ -43,8 +44,28 @@ const MissionDetail = () => {
   }
 
   if (isError) {
-    return <div>Error fetching: detail mission data</div>;
+    const axiosError = error as AxiosError<ErrorResponseDataType>;
+    const errorCode = axiosError.response?.data.errorCode;
+    if (errorCode === "MISSION_NOT_FOUND") {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <h1 style={{ fontSize: "1.5rem", margin: "15px" }}>
+            해당 미션이 존재하지 않습니다.
+          </h1>
+          <StyledButton onClick={() => navigate("/")}>홈으로 이동</StyledButton>
+        </div>
+      );
+    }
   }
+
   if (!data) {
     return <div>No data available</div>;
   }
@@ -52,10 +73,10 @@ const MissionDetail = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
-  const partipateHandler = async () => {
+  const participateHandler = async () => {
     try {
-      const data = await postData("/api/participant", { id: cardId });
-      console.log(data);
+      await postData("/api/participant", { id: cardId });
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -94,7 +115,7 @@ const MissionDetail = () => {
           />
         )}
         <TitleDiv>
-          <div style={{ marginBottom: "30px" }}>{data.title}</div>
+          <div style={{ marginBottom: "10px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
@@ -109,7 +130,7 @@ const MissionDetail = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              width: "80%",
+              width: "100%",
             }}
           >
             <p>인증주기: {data.frequency}</p>
@@ -144,7 +165,7 @@ const MissionDetail = () => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
                 else {
-                  partipateHandler();
+                  participateHandler();
                 }
               }}
             >
@@ -162,6 +183,16 @@ const MissionDetail = () => {
         </Link>
       </Navbar>
       <MainSection>
+        {userInfoState.user_id === data.username && data.startDate === null && (
+          <StyledButton
+            style={{ position: "absolute", right: "10px", top: "10px" }}
+            bgcolor={theme.subGray2}
+            color="white"
+            onClick={() => navigate(missionEditURL)}
+          >
+            수정하기
+          </StyledButton>
+        )}
         <MissionContent>
           <h1
             style={{

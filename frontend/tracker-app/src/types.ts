@@ -7,8 +7,11 @@ export type SimpleMissionInfoType = {
   duration: number;
   status: string;
   frequency: string;
+  photoUrl: string;
 };
-
+export type LazyMissionInfoListType = {
+  missionInfoList: SimpleMissionInfoType[];
+};
 export type MainServerResponseType = {
   participantMissionInfoList: SimpleMissionInfoType[];
   missionInfoList: SimpleMissionInfoType[];

@@ -7,18 +7,30 @@ import Form from "../../components/StyledForm";
 import { useState, useCallback } from "react";
 import Input from "../../components/StyledInput";
 import StyledButton from "../../components/StyledButton";
-import { postData } from "../../axios";
-import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-const MissionCreatePage = () => {
+import { putData } from "../../axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { MissionType } from "../../types";
+const MissionEditPage = () => {
   const navigate = useNavigate();
+  const { cardId } = useParams();
+  const { data, isError } = useQuery<MissionType>({
+    queryKey: ["missionDetailInfo", `${cardId}`],
+  });
+
   const queryClient = useQueryClient();
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [title, setTitle] = useState<string>(data ? data.title : "");
+  const [description, setDescription] = useState<string>(
+    data ? data.description : ""
+  );
   const [photo, setPhoto] = useState<File | null>(null);
-  const [minParticipants, setMinParticipants] = useState(2);
-  const [frequency, setFrequency] = useState<string>("매일");
-  const [duration, setDuration] = useState<number>(365);
+  const [minParticipants, setMinParticipants] = useState(
+    data ? data.minParticipants : 2
+  );
+  const [frequency, setFrequency] = useState<string>(
+    data ? data.frequency : "매일"
+  );
+  const [duration, setDuration] = useState<number>(data ? data.duration : 365);
 
   const titleChangeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +75,10 @@ const MissionCreatePage = () => {
     },
     []
   );
+  if (isError) {
+    alert("미션 수정 취소!");
+    navigate(`/mission/${cardId}/detail`);
+  }
 
   const formSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +87,7 @@ const MissionCreatePage = () => {
     }
     const formData = new FormData();
     const missionInfo = {
-      title: title,
+      afterTitle: title,
       description: description,
       minParticipants: minParticipants,
       duration: duration,
@@ -87,9 +103,11 @@ const MissionCreatePage = () => {
       new Blob([JSON.stringify(missionInfo)], { type: "application/json" })
     );
     try {
-      await postData("/api/mission", formData);
-      await queryClient.invalidateQueries({ queryKey: ["totalMissionData"] });
-      navigate("/");
+      await putData(`/api/mission/${cardId}`, formData);
+      await queryClient.invalidateQueries({
+        queryKey: ["missionDetailInfo", `${cardId}`],
+      });
+      navigate(`/mission/${cardId}/detail`);
     } catch (error) {
       console.error(error);
     }
@@ -112,7 +130,7 @@ const MissionCreatePage = () => {
           <img src={missionImg} alt="zz" width={100} height={100} />
         </MissionCreateBanner>
         <MissionFormWrapper>
-          <p>미션 상세 설정</p>
+          <p>미션 상세 수정</p>
           <MissionFormView>
             <Form>
               <InputDiv>
@@ -176,7 +194,7 @@ const MissionCreatePage = () => {
               </InputDiv>
             </Form>
           </MissionFormView>
-          <p>미션 기간과 인증 빈도 설정</p>
+          <p>미션 기간과 인증 빈도 수정</p>
           <MissionFormView>
             <Form>
               <InputDiv>
@@ -250,7 +268,7 @@ const MissionCreatePage = () => {
   );
 };
 
-export default MissionCreatePage;
+export default MissionEditPage;
 
 const MissionCreateBanner = styled(SearchSection)`
   background: none;

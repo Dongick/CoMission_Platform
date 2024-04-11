@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { ConfirmPostDataType } from "../types";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
@@ -9,21 +8,50 @@ import { AxiosError } from "axios";
 import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
 import { useState } from "react";
-import NewPostModal from "./NewPostModal";
-const PostListLayout = styled.div``;
+import PostEditModal from "./PostEditModal";
+const PostListLayout = styled.div`
+  padding: 5px;
+`;
 interface ConfirmPostListProps {
   id: string;
 }
 const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
-  const { data, isLoading, isError, error, isSuccess } = useQuery({
+  const fetchLazyData = async ({ pageParam = 0 }) =>
+    await getData<ConfirmPostListType>(
+      `/api/authentication/${id}/${pageParam}`
+    );
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ["authenticationData"],
-    queryFn: () => getData<ConfirmPostListType>(`/api/authentication/${id}/1`),
+    queryFn: fetchLazyData,
+    initialPageParam: 0,
+    getNextPageParam: (lastList, allLists) => {
+      if (
+        lastList.authenticationData &&
+        lastList.authenticationData.length === 5
+      ) {
+        return allLists.length;
+      } else {
+        return undefined;
+      }
+    },
   });
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
+  if (isLoading) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩중...</h1>
+      </NoLoginContent>
+    );
+  }
   if (isError) {
     const axiosError = error as AxiosError<ErrorResponseDataType>;
     const errorCode = axiosError.response?.data.errorCode;
@@ -56,10 +84,6 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
     }
   }
 
-  if (isSuccess) {
-    console.log(data);
-  }
-
   const openPostModalHandler = () => {
     setShowPostModal(true);
   };
@@ -70,16 +94,21 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
     <PostListLayout>
       <StyledButton
         bgcolor={theme.subGreen}
-        style={{ margin: "10px", fontSize: "large", borderRadius: "10px" }}
+        style={{
+          fontSize: "large",
+          borderRadius: "10px",
+          marginBottom: "30px",
+        }}
         onClick={openPostModalHandler}
       >
         인증 글 작성
       </StyledButton>
-
-      {data && Array.isArray(data) ? (
-        data?.map((post, index) => (
-          <ConfirmPost index={index + 1} post={post} />
-        ))
+      {data?.pages[0].authenticationData ? (
+        data?.pages.map((page) =>
+          page.authenticationData.map((post, index) => (
+            <ConfirmPost index={index + 1} post={post} key={index} id={id} />
+          ))
+        )
       ) : (
         <NoLoginContent>
           <span>❌</span>
@@ -87,7 +116,30 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           <p>첫 인증을 해보세요!</p>
         </NoLoginContent>
       )}
-      {showPostModal && <NewPostModal onClose={closePostModalHandler} />}
+      {hasNextPage ? (
+        <StyledButton
+          onClick={() => {
+            fetchNextPage();
+          }}
+          disabled={isFetchingNextPage}
+          bgcolor={theme.subGreen}
+          style={{ fontSize: "1.1rem" }}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </StyledButton>
+      ) : (
+        <StyledButton
+          disabled
+          bgcolor={theme.mainGray}
+          color={theme.subGray}
+          style={{ fontSize: "1.1rem", boxShadow: "none", cursor: "auto" }}
+        >
+          더 이상 미션이 없습니다!
+        </StyledButton>
+      )}
+      {showPostModal && (
+        <PostEditModal onClose={closePostModalHandler} id={id} />
+      )}
     </PostListLayout>
   );
 };

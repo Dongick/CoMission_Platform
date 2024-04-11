@@ -9,7 +9,6 @@ const PostModal = ({ onClose }: PostModalProps) => {
       onClose();
     }
   };
-  //todo 클릭 시, 글 내용 보이게 해야됨
 
   return (
     <ModalOverlay onClick={overlayclickHandler}>

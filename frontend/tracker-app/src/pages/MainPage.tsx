@@ -2,22 +2,24 @@ import { theme } from "../styles/theme";
 import StyledButton from "../components/StyledButton";
 import Layout from "../layouts/Layout";
 import styled from "styled-components";
-import sectionSVG from "../assets/img/wave-haikei.svg";
 import Card from "../components/Card";
 import MyCard from "../components/MyCard";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate, useLocation } from "react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   MainServerResponseType,
   SearchedMissionInfoType,
   SimpleMissionInfoType,
+  LazyMissionInfoListType,
 } from "../types";
 import { getData } from "../axios";
 import { useEffect, useState } from "react";
 import useLogout from "../useLogout";
 import MissionSearch from "../components/MissionSearch";
+import { NoLoginContent } from "./mission/MissionConfirmPostPage";
+
 const MainPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,7 +31,9 @@ const MainPage = () => {
   const [myMissionData, setMyMissionData] = useState<SimpleMissionInfoType[]>(
     []
   );
-
+  const [noDataMessage, setNoDataMessage] =
+    useState<string>("생성된 미션이 없습니다!");
+  const [everClicked, setEverClicked] = useState<boolean>(false);
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
@@ -46,28 +50,85 @@ const MainPage = () => {
     }
   }, [location.search, setUserInfoState, navigate]);
 
-  const fetchData = () => getData<MainServerResponseType>("/api/main");
+  const fetchLazyData = async ({ pageParam = 1 }) =>
+    await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
+  const {
+    data: lazyData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isSuccess: lazySuccess,
+  } = useInfiniteQuery({
+    queryKey: ["lazyMissionData"],
+    queryFn: fetchLazyData,
+    initialPageParam: 1,
+    getNextPageParam: (lastList, allLists) => {
+      if (lastList.missionInfoList.length === 20) {
+        return allLists.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+    enabled: false,
+  });
+
+  const fetchData = async () =>
+    await getData<MainServerResponseType>("/api/main");
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["totalMissionData"],
     queryFn: fetchData,
   });
 
   useEffect(() => {
-    if (isSuccess || data) {
+    if (data) {
       setTotalMissionData(data.missionInfoList);
       setMyMissionData(data.participantMissionInfoList);
     }
   }, [isSuccess, data]);
 
+  useEffect(() => {
+    const newLazyData =
+      lazyData?.pages[lazyData.pages.length - 1].missionInfoList;
+    newLazyData && setTotalMissionData((prev) => [...prev, ...newLazyData]);
+  }, [lazySuccess, lazyData]);
+
+  if (isError) {
+    if (userInfoState.isLoggedIn) logout();
+  }
+
   const updateData = (newData: SearchedMissionInfoType) => {
+    if (newData.missionInfoList.length === 0) {
+      setNoDataMessage("검색결과가 없습니다!");
+    } else {
+      setNoDataMessage("생성된 미션이 없습니다!");
+    }
     setTotalMissionData(newData.missionInfoList);
   };
+  if (isLoading) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩중...</h1>
+      </NoLoginContent>
+    );
+  }
+  if (isError) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩 에러</h1>
+        <StyledButton
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          새로고침
+        </StyledButton>
+      </NoLoginContent>
+    );
+  }
 
   return (
     <Layout>
       <MissionSearch updateData={updateData} />
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Error fetching data</p>}
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
@@ -111,11 +172,19 @@ const MainPage = () => {
                   duration={mission.duration}
                   frequency={mission.frequency}
                   people={mission.participants}
+                  photoUrl={mission.photoUrl}
                 />
               ))}
             </MyMissionSection>
           )}
         </div>
+      )}
+      {totalMissionData.length === 0 && !isLoading && (
+        <NoLoginContent style={{ padding: "10%" }}>
+          <span>❌</span>
+          <h1>{noDataMessage}</h1>
+          <p>미션을 생성해보세요!</p>
+        </NoLoginContent>
       )}
       <MainSection>
         {totalMissionData?.map((mission, index) => (
@@ -129,28 +198,37 @@ const MainPage = () => {
             duration={mission.duration}
             status={mission.status}
             frequency={mission.frequency}
+            photoUrl={mission.photoUrl}
           />
         ))}
       </MainSection>
+      {everClicked && !hasNextPage ? (
+        <StyledButton
+          disabled
+          bgcolor={theme.mainGray}
+          color={theme.subGray}
+          style={{ fontSize: "1.1rem", boxShadow: "none", cursor: "auto" }}
+        >
+          더 이상 미션이 없습니다!
+        </StyledButton>
+      ) : (
+        <StyledButton
+          onClick={() => {
+            fetchNextPage();
+            setEverClicked(true);
+          }}
+          disabled={isFetchingNextPage}
+          bgcolor={theme.subGreen}
+          style={{ fontSize: "1.1rem" }}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </StyledButton>
+      )}
     </Layout>
   );
 };
 
 export default MainPage;
-
-export const SearchSection = styled.section`
-  background-image: url(${sectionSVG});
-  background-size: cover;
-  background-position: center;
-  height: 20vh;
-  padding: 10px;
-  font-family: "gmarket2";
-  font-size: 2rem;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
 
 const MainSection = styled.section`
   min-height: 100vh;
@@ -159,6 +237,12 @@ const MainSection = styled.section`
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
+  @media screen and (max-width: 1600px) {
+    grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
+  }
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
+  }
   gap: 20px; /* Adjust the gap between cards */
 `;
 
@@ -166,11 +250,17 @@ const MyMissionSection = styled.section`
   padding-bottom: 3vh;
   margin: 0 auto;
   margin-bottom: 5vh;
-  height: 30vh;
   width: 50%;
   display: flex;
   overflow-x: auto;
   align-items: center;
+  height: 260px;
+  @media screen and (max-height: 700px) {
+    height: 210px;
+  }
+  @media screen and (max-height: 500px) {
+    height: 160px;
+  }
   &::-webkit-scrollbar {
     width: 100%;
   }

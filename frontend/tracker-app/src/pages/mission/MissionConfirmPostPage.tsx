@@ -15,18 +15,21 @@ import { useQuery } from "@tanstack/react-query";
 import { getData, postData } from "../../axios";
 import { MissionType } from "../../types";
 import StyledButton from "../../components/StyledButton";
-import example from "../../assets/img/roadmap-77.png";
 import example2 from "../../assets/img/no-pictures.png";
 import { theme } from "../../styles/theme";
 import { useEffect } from "react";
+import { AxiosError } from "axios";
+import { ErrorResponseDataType } from "../../types";
+import { useNavigate } from "react-router-dom";
 
 const MissionConfirmPost = () => {
+  const navigate = useNavigate();
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
   const userInfoState = useRecoilValue(userInfo);
   const fetchData = () => getData<MissionType>(`/api/mission/info/${cardId}`);
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["missionDetailInfo"],
     queryFn: fetchData,
   });
@@ -40,8 +43,28 @@ const MissionConfirmPost = () => {
   }
 
   if (isError) {
-    return <div>Error fetching: detail mission data</div>;
+    const axiosError = error as AxiosError<ErrorResponseDataType>;
+    const errorCode = axiosError.response?.data.errorCode;
+    if (errorCode === "MISSION_NOT_FOUND") {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <h1 style={{ fontSize: "1.5rem", margin: "15px" }}>
+            해당 미션이 존재하지 않습니다.
+          </h1>
+          <StyledButton onClick={() => navigate("/")}>홈으로 이동</StyledButton>
+        </div>
+      );
+    }
   }
+
   if (!data) {
     return <div>No data available</div>;
   }
@@ -49,10 +72,10 @@ const MissionConfirmPost = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // Format the date as needed
   };
-  const partipateHandler = async () => {
+  const participateHandler = async () => {
     try {
-      const data = await postData("/api/participant", { id: cardId });
-      console.log(data);
+      await postData("/api/participant", { id: cardId });
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -90,7 +113,7 @@ const MissionConfirmPost = () => {
           />
         )}
         <TitleDiv>
-          <div style={{ marginBottom: "30px" }}>{data.title}</div>
+          <div style={{ marginBottom: "10px" }}>{data.title}</div>
           <div>
             <p style={{ marginRight: "10px" }}>
               미션 생성일 : {formatDate(data.createdAt)} &nbsp;/
@@ -105,7 +128,7 @@ const MissionConfirmPost = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              width: "80%",
+              width: "100%",
             }}
           >
             <p>인증주기: {data.frequency}</p>
@@ -141,7 +164,7 @@ const MissionConfirmPost = () => {
                 if (!userInfoState.isLoggedIn)
                   window.alert("로그인을 해주세요!");
                 else {
-                  partipateHandler();
+                  participateHandler();
                 }
               }}
             >
@@ -177,7 +200,7 @@ export default MissionConfirmPost;
 
 export const NoLoginContent = styled.div`
   font-family: "notoBold";
-  padding-top: 30%;
+  padding-top: 20%;
   & > span,
   h1 {
     font-size: 1.5rem;
