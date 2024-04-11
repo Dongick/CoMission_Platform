@@ -21,24 +21,37 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
     await getData<ConfirmPostListType>(
       `/api/authentication/${id}/${pageParam}`
     );
-  const { data, isFetchingNextPage, isError, error, fetchNextPage, isSuccess } =
-    useInfiniteQuery({
-      queryKey: ["authenticationData"],
-      queryFn: fetchLazyData,
-      initialPageParam: 0,
-      getNextPageParam: (lastList, allLists) => {
-        if (lastList.authenticationData.length === 20) {
-          return allLists.length;
-        } else {
-          return undefined;
-        }
-      },
-    });
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["authenticationData"],
+    queryFn: fetchLazyData,
+    initialPageParam: 0,
+    getNextPageParam: (lastList, allLists) => {
+      if (
+        lastList.authenticationData &&
+        lastList.authenticationData.length === 5
+      ) {
+        return allLists.length;
+      } else {
+        return undefined;
+      }
+    },
+  });
 
-  useEffect(() => {
-    console.log(data);
-  }, [data, isSuccess]);
-
+  if (isLoading) {
+    return (
+      <NoLoginContent>
+        <h1>데이터 로딩중...</h1>
+      </NoLoginContent>
+    );
+  }
   if (isError) {
     const axiosError = error as AxiosError<ErrorResponseDataType>;
     const errorCode = axiosError.response?.data.errorCode;
@@ -90,8 +103,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
       >
         인증 글 작성
       </StyledButton>
-
-      {data?.pages ? (
+      {data?.pages[0].authenticationData ? (
         data?.pages.map((page) =>
           page.authenticationData.map((post, index) => (
             <ConfirmPost index={index + 1} post={post} key={index} id={id} />
@@ -104,7 +116,27 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           <p>첫 인증을 해보세요!</p>
         </NoLoginContent>
       )}
-      {isFetchingNextPage && "Loading..."}
+      {hasNextPage ? (
+        <StyledButton
+          onClick={() => {
+            fetchNextPage();
+          }}
+          disabled={isFetchingNextPage}
+          bgcolor={theme.subGreen}
+          style={{ fontSize: "1.1rem" }}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load More"}
+        </StyledButton>
+      ) : (
+        <StyledButton
+          disabled
+          bgcolor={theme.mainGray}
+          color={theme.subGray}
+          style={{ fontSize: "1.1rem", boxShadow: "none", cursor: "auto" }}
+        >
+          더 이상 미션이 없습니다!
+        </StyledButton>
+      )}
       {showPostModal && (
         <PostEditModal onClose={closePostModalHandler} id={id} />
       )}

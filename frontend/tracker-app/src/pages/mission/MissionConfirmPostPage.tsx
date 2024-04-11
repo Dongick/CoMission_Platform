@@ -20,7 +20,10 @@ import { theme } from "../../styles/theme";
 import { useEffect } from "react";
 import { AxiosError } from "axios";
 import { ErrorResponseDataType } from "../../types";
+import { useNavigate } from "react-router-dom";
+
 const MissionConfirmPost = () => {
+  const navigate = useNavigate();
   const { cardId } = useParams();
   const detailURL = `/mission/${cardId}/detail`;
   const confirmURL = `/mission/${cardId}/confirm-post`;
@@ -197,7 +200,7 @@ export default MissionConfirmPost;
 
 export const NoLoginContent = styled.div`
   font-family: "notoBold";
-  padding-top: 30%;
+  padding-top: 20%;
   & > span,
   h1 {
     font-size: 1.5rem;
