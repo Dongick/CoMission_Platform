@@ -30,7 +30,7 @@ const MissionSearch = ({ updateData }: MissionSearchProps) => {
         alert("검색어를 입력해주세요");
       }
     } catch (error) {
-      console.error("Search error:", error);
+      window.alert(`검색 에러: , ${error}`);
     }
   };
 

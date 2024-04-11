@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getData } from "../axios";
 import ConfirmPost from "./ConfirmPost";
 import { theme } from "../styles/theme";
@@ -7,7 +7,7 @@ import { NoLoginContent } from "../pages/mission/MissionConfirmPostPage";
 import { AxiosError } from "axios";
 import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PostEditModal from "./PostEditModal";
 const PostListLayout = styled.div`
   padding: 5px;

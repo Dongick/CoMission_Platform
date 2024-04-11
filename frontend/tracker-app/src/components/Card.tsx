@@ -21,7 +21,6 @@ const Card = ({
   minPar,
   par,
   duration,
-  status,
   photoUrl,
   frequency,
 }: CardProps) => {

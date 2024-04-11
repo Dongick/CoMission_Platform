@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ConfirmPostIndexType } from "../types";
 import { theme } from "../styles/theme";
 import deleteImg from "../assets/img/delete.png";

@@ -5,10 +5,8 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { userInfo } from "../recoil";
 import { postData } from "../axios";
-import { useNavigate } from "react-router";
 import useLogout from "../useLogout";
 const UserMenu = () => {
-  const navigate = useNavigate();
   const logout = useLogout();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
@@ -25,7 +23,7 @@ const UserMenu = () => {
       })
       .catch((error) => {
         if (typeof error === "string") {
-          alert("토큰 재발급 실패! 재로그인 해주세요");
+          alert("재로그인이 필요합니다!");
           logout();
         }
       });

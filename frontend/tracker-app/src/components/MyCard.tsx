@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { theme } from "../styles/theme";
 import { StyledCard, ContentDiv } from "./Card";
 import { useNavigate } from "react-router-dom";
 import noImg from "../assets/img/no-pictures.png";
