@@ -7,7 +7,7 @@ import axios, {
 
 // Axios instance 생성
 export const customAxios: AxiosInstance = axios.create({
-  baseURL: "http://localhost:8080", // BASE URL
+  baseURL: "http://3.35.87.46:8080", // AWS EC2 API서버의 BASE URL
   timeout: 5000,
   withCredentials: true,
 });
