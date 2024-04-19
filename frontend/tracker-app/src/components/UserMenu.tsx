@@ -35,6 +35,7 @@ const UserMenu = () => {
         border: "0.5px solid #363636",
         padding: "10px 15px",
         marginRight: "10px",
+        display: "none",
       }}
     >
       내 정보

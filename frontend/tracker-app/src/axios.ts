@@ -7,7 +7,7 @@ import axios, {
 
 // Axios instance 생성
 export const customAxios: AxiosInstance = axios.create({
-  baseURL: "https://api.comission-platform.store/", // AWS EC2 API서버의 BASE URL
+  baseURL: "https://api.comission-platform.store", // AWS EC2 API서버의 BASE URL
   timeout: 5000,
   withCredentials: true,
 });

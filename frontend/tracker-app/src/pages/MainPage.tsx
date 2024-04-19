@@ -205,7 +205,7 @@ const MainPage = () => {
           />
         ))}
       </MainSection>
-      {everClicked && !hasNextPage ? (
+      {(everClicked && !hasNextPage) || totalMissionData.length < 20 ? (
         <StyledButton
           disabled
           bgcolor={theme.mainGray}
