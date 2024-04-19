@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout";
 import styled from "styled-components";
 import Card from "../components/Card";
 import MyCard from "../components/MyCard";
+import Loaders from "../components/Loaders";
 import { userInfo } from "../recoil";
 import { useRecoilState } from "recoil";
 import { useNavigate, useLocation } from "react-router";
@@ -106,23 +107,25 @@ const MainPage = () => {
   };
   if (isLoading) {
     return (
-      <NoLoginContent>
-        <h1>데이터 로딩중...</h1>
-      </NoLoginContent>
+      <LoadingErrorWrapper>
+        <h1>페이지 로딩중...</h1>
+        <Loaders></Loaders>
+      </LoadingErrorWrapper>
     );
   }
   if (isError) {
     return (
-      <NoLoginContent>
-        <h1>데이터 로딩 에러</h1>
+      <LoadingErrorWrapper>
+        <h1>페이지 로딩 에러</h1>
         <StyledButton
           onClick={() => {
             window.location.reload();
           }}
+          style={{ width: "100px" }}
         >
           새로고침
         </StyledButton>
-      </NoLoginContent>
+      </LoadingErrorWrapper>
     );
   }
 
@@ -274,5 +277,18 @@ const MyMissionSection = styled.section`
     background-color: ${theme.subGray};
     border-radius: 10px;
     box-shadow: inset 0px 0px 2px white;
+  }
+`;
+
+const LoadingErrorWrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  h1 {
+    font-size: 1.5rem;
+    font-family: gmarket2;
+    margin-bottom: 30px;
   }
 `;

@@ -23,7 +23,6 @@ const UserMenu = () => {
       })
       .catch((error) => {
         if (typeof error === "string") {
-          alert("재로그인이 필요합니다!");
           logout();
         }
       });
