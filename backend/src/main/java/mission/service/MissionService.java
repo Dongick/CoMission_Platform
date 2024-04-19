@@ -30,6 +30,7 @@ public class MissionService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
     private final AWSS3Service awss3Service;
+    private final FileService fileService;
     private final TimeProvider timeProvider;
     private static final String MISSION_DIR = "missions/";
 
@@ -47,6 +48,7 @@ public class MissionService {
 
         // 미션에 이미지가 존재하면 AWS S3에 저장
         String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+//        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
@@ -77,10 +79,12 @@ public class MissionService {
             if(missionDocument.getPhotoUrl() != null) {
 
                 awss3Service.deleteFile(missionDocument.getPhotoUrl(), MISSION_DIR);
+//                fileService.deleteFile(missionDocument.getPhotoUrl());
             }
 
             // 미션에 이미지가 존재하면 AWS S3에 저장
             String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+//            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
 
             //LocalDateTime now = LocalDateTime.now();
             LocalDateTime now = timeProvider.getCurrentDateTime();
