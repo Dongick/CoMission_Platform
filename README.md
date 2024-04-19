@@ -1,2 +1,46 @@
-# progress-tracker
-목표 달성 웹 프로젝트
+# 📝 CoMission Platform - 공유미션 플랫폼 서비스
+> ### 배포 도메인 -> [Comission Platform](https://d2xutshawqtjv.cloudfront.net) 
+![image](https://github.com/chany0ng/progress-tracker/assets/91418544/372df2a6-61ac-47e7-8c3c-465d441c7d70)
+🔺 서비스 메인 페이지
+
+
+---
+
+
+![image](https://github.com/chany0ng/progress-tracker/assets/91418544/88a990c2-48be-4e29-9afe-75a30ff7e253)
+🔺 미션 상세 페이지
+
+
+
+## ✅ 프로젝트 소개
+- **Comission Platform**은 사용자가 로그인하고 미션을 생성하여 사람들과 공유할 수 있는 웹 애플리케이션입니다
+- 사용자는 특정 제목, 설명, 인증주기 및 참여 제한을 사용하여 미션을 만들 수 있습니다.
+- 미션이 생성되면 다른 사용자들과 함께 꾸준히 미션을 진행하며 목표 달성을 위해 노력할 수 있습니다.
+- 사용자들이 함께 목표를 공유하고 달성할 수 있도록 함으로써 경쟁의식과 동기를 부여합니다.
+
+
+## ✅ 프로젝트 사용법
+- 누구나 본인들만의 미션을 생성&공유를 통해, 참여자들을 모집해 각자의 미션을 진행할 수 있습니다.
+- 미션에 참가하는 참여자들은 미션에 기재된 인증주기에 따라 인증글을 작성하여야 한다
+> ### 배포 도메인 -> [Comission Platform](https://d2xutshawqtjv.cloudfront.net) 
+
+
+## ✅ 개발환경 및 기술스택
+
+### ⭕ Frontend
+- Typescript
+- React
+- Tanstack Query
+- Recoil
+- Styled-components
+- AWS S3 + Cloudfront
+
+### ⭕ Backend
+
+
+## ✅ 미션 관련 정보
+- 미션 주제
+- 미션에 대한 간단한 설명
+- 미션을 시작하기 위한 최소 필요 인원
+- 마감 날짜 최대1년
+- 미션 인증 주기 최소 1~7일(미션 별, 인증 게시판 필요)
