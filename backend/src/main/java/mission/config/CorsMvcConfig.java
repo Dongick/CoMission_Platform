@@ -13,6 +13,6 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders("Set-Cookie")
                 .allowCredentials(true)
 //                .allowedOrigins("http://localhost:3000");
-                .allowedOrigins("http://comission-hub-bucket.s3-website.ap-northeast-2.amazonaws.com/");
+                .allowedOrigins("https://d2xutshawqtjv.cloudfront.net");
     }
 }
