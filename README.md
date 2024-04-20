@@ -1,5 +1,5 @@
 # 📝 CoMission Platform - 공유미션 플랫폼 서비스
-> ### 배포 도메인 -> [Comission Platform](https://d2xutshawqtjv.cloudfront.net) 
+> ### 배포 도메인 -> [Comission Platform](https://comission-platform.shop) 
 ![image](https://github.com/chany0ng/progress-tracker/assets/91418544/372df2a6-61ac-47e7-8c3c-465d441c7d70)
 🔺 서비스 메인 페이지
 
@@ -22,21 +22,56 @@
 ## ✅ 프로젝트 사용법
 - 누구나 본인들만의 미션을 생성&공유를 통해, 참여자들을 모집해 각자의 미션을 진행할 수 있습니다.
 - 미션에 참가하는 참여자들은 미션에 기재된 인증주기에 따라 인증글을 작성하여야 한다
-> ### 배포 도메인 -> [Comission Platform](https://d2xutshawqtjv.cloudfront.net) 
-
 
 ## ✅ 개발환경 및 기술스택
 
 ### ⭕ Frontend
-- Typescript
-- React
-- Tanstack Query
-- Recoil
+#### 언어
+- Typescript (4.9.5)
+
+#### 라이브러리
+- React.js (18.2.0)
 - Styled-components
-- AWS S3 + Cloudfront
+
+#### 상태관리
+* 클라이언트 상태 관리
+  - Recoil (0.7.7)
+* 서버 상태 관리
+  - Tanstack Query (v5)
+
+#### 클라우드
+- AWS S3
+- AWS Cloudfront
+- AWS ACM
+- AWS Route53
+
+#### 기타
+- Axios (HTTP 비동기 통신)
+- JWT (JSON Web Tokens)
 
 ### ⭕ Backend
+#### 언어
+- Java 17
 
+#### 프레임워크
+- Spring Boot
+- Spring Data JPA
+
+#### 데이터베이스
+- MongoDB
+- MySQL
+
+#### 보안
+- JWT (JSON Web Tokens)
+- OAuth2 (네이버 및 구글 로그인 구현)
+- Spring Security
+
+#### 클라우드
+- AWS EC2 (배포)
+- AWS S3 (이미지 파일 저장)
+
+#### 기타
+- Swagger (API 문서화)
 
 ## ✅ 미션 관련 정보
 - 미션 주제
@@ -44,3 +79,9 @@
 - 미션을 시작하기 위한 최소 필요 인원
 - 마감 날짜 최대1년
 - 미션 인증 주기 최소 1~7일(미션 별, 인증 게시판 필요)
+
+## ✅ Git branch 전략
+- main
+  - develop
+      - frontend
+      - backend
