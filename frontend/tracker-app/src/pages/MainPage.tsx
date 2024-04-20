@@ -280,7 +280,7 @@ const MyMissionSection = styled.section`
   }
 `;
 
-const LoadingErrorWrapper = styled.div`
+export const LoadingErrorWrapper = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;

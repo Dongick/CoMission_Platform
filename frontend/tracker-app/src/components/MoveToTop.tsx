@@ -24,5 +24,6 @@ const MoveToTopBtn = styled.button`
   z-index: 99;
   border: 1px solid black;
   border-radius: 3px;
+  cursor: pointer;
   background-color: transparent;
 `;
