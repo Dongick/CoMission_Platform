@@ -55,8 +55,12 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         System.out.println(accessToken);
 
-        String redirectUrl = "http://localhost:3000/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
+//        String redirectUrl = "http://localhost:3000/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
+//                "&email=" + URLEncoder.encode(email, "UTF-8") + "&username=" + URLEncoder.encode(username, "UTF-8");
+
+        String redirectUrl = "https://d2xutshawqtjv.cloudfront.net/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
                 "&email=" + URLEncoder.encode(email, "UTF-8") + "&username=" + URLEncoder.encode(username, "UTF-8");
+
 
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", refreshToken));
 

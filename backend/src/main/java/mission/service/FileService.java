@@ -16,22 +16,13 @@ public class FileService {
     private String uploadAuthenticationDirectory;
     @Value("${file.upload.mission.directory}")
     private String uploadMissionDirectory;
+    private static final String MISSION_DIR = "missions/";
+    private static final String AUTHENTICATION_DIR = "authentications/";
 
-    // 인증글 작성 시 사진이 존재하면 해당 사진을 서버에 저장
-    public String uploadAuthenticationFile(MultipartFile photoData) throws IOException {
+    // 사진이 존재하면 해당 사진을 서버에 저장
+    public String uploadFile(MultipartFile photoData, String dirCheck) throws IOException {
         String fileName = UUID.randomUUID().toString() + ".jpg"; // 확장자는 이미지 형식에 맞게 변경
-        Path filePath = Paths.get(uploadAuthenticationDirectory, fileName);
-
-        byte[] bytes = photoData.getBytes();
-        Files.write(filePath, bytes);
-
-        return filePath.toString();
-    }
-
-    // 미션 생성시 사진을 서버에 저장
-    public String uploadMissionFile(MultipartFile photoData) throws IOException {
-        String fileName = UUID.randomUUID().toString() + ".jpg"; // 확장자는 이미지 형식에 맞게 변경
-        Path filePath = Paths.get(uploadMissionDirectory, fileName);
+        Path filePath = dirCheck == MISSION_DIR ? Paths.get(uploadMissionDirectory, fileName) : Paths.get(uploadAuthenticationDirectory, fileName);
 
         byte[] bytes = photoData.getBytes();
         Files.write(filePath, bytes);
