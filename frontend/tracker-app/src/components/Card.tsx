@@ -77,7 +77,7 @@ const Card = ({
                 textOverflow: "ellipsis",
               }}
             >
-              👨‍👧‍👧인원: {par}/{minPar} 명
+              👨‍👧‍👧참가 인원: {par}명
             </p>
           </div>
           <div

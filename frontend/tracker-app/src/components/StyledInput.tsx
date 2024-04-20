@@ -21,6 +21,9 @@ export default Input;
 
 const StyledInput = styled.input<InputProps>`
   width: ${(props) => props.size}vw;
+  @media screen and (max-width: 900px) {
+    width: 250px;
+  }
   border-radius: 10px;
   outline: none;
   padding: 5px;
