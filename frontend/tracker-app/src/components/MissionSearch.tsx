@@ -77,9 +77,6 @@ export const SearchSection = styled.section`
   padding: 10px;
   font-family: "gmarket2";
   font-size: 2rem;
-  @media screen and (max-width: 768px) {
-    font-size: 1.5rem;
-  }
   color: #333;
   display: flex;
   flex-direction: column;
