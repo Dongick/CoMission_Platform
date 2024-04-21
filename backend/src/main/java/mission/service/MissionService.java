@@ -47,8 +47,8 @@ public class MissionService {
         LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 미션에 이미지가 존재하면 AWS S3에 저장
-        String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
-//        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
+//        String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+        String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
@@ -78,13 +78,13 @@ public class MissionService {
             // 기존 미션에 이미지가 존재하면 삭제
             if(missionDocument.getPhotoUrl() != null) {
 
-                awss3Service.deleteFile(missionDocument.getPhotoUrl(), MISSION_DIR);
-//                fileService.deleteFile(missionDocument.getPhotoUrl());
+//                awss3Service.deleteFile(missionDocument.getPhotoUrl(), MISSION_DIR);
+                fileService.deleteFile(missionDocument.getPhotoUrl());
             }
 
             // 미션에 이미지가 존재하면 AWS S3에 저장
-            String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
-//            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
+//            String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
+            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
 
             //LocalDateTime now = LocalDateTime.now();
             LocalDateTime now = timeProvider.getCurrentDateTime();
