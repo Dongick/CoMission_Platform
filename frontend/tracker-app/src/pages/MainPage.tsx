@@ -164,7 +164,7 @@ const MainPage = () => {
               {myMissionData?.length || 0}
             </span>
           </h2>
-          {myMissionData?.length && (
+          {myMissionData?.length ? (
             <MyMissionSection>
               {myMissionData?.map((mission, index) => (
                 <MyCard
@@ -179,6 +179,8 @@ const MainPage = () => {
                 />
               ))}
             </MyMissionSection>
+          ) : (
+            ""
           )}
         </div>
       )}
@@ -230,7 +232,6 @@ const MainPage = () => {
     </Layout>
   );
 };
-
 export default MainPage;
 
 const MainSection = styled.section`

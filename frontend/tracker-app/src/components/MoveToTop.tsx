@@ -7,12 +7,12 @@ const MoveToTop = () => {
       behavior: "smooth",
     });
   };
-  return <MoveToTopBtn onClick={moveToTop} />;
+  return <MoveToTopBtn onClick={moveToTop}></MoveToTopBtn>;
 };
 
 export default MoveToTop;
 
-const MoveToTopBtn = styled.button`
+const MoveToTopBtn = styled.div`
   background-image: url(${upArrow});
   background-position: center;
   background-size: cover;

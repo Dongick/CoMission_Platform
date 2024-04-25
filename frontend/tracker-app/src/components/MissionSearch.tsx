@@ -1,5 +1,4 @@
-// import { SearchSection } from "../pages/MainPage";
-import sectionSVG from "../assets/img/wave-haikei.svg";
+import sectionSVG from "../assets/img/wave-haikei.webp";
 import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import Input from "./StyledInput";
