@@ -25,7 +25,6 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final JdbcTemplate jdbcTemplate;
     private final JWTUtil jwtUtil;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
@@ -39,8 +38,8 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        //configuration.setAllowedOrigins(Collections.singletonList("https://comission-platform.shop"));
+                        configuration.addAllowedOrigin("https://comission-platform.shop");
+                        configuration.addAllowedOrigin("http://localhost:3000");
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -74,7 +73,6 @@ public class SecurityConfig {
 
         //JWTFilter 추가
         http
-//                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
                 .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
 
 

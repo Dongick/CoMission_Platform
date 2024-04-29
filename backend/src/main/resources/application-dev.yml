@@ -1,0 +1,6 @@
+file:
+  upload:
+    authentication:
+      directory: ${AUTHENTICATION_FILE_UPLOAD}
+    mission:
+      directory: ${MISSION_FILE_UPLOAD}
