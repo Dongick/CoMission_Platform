@@ -27,6 +27,7 @@ const StyledInput = styled.input<InputProps>`
   border-radius: 10px;
   outline: none;
   padding: 5px;
+  white-space: pre-wrap;
   &:focus-visible {
     outline: 1px solid ${theme.subGreen};
     box-shadow: ${theme.boxShadowHover};

@@ -4,7 +4,6 @@ import { ThemeProvider } from "styled-components";
 import GlobalStyle from "./styles/GlobalStyle";
 import GlobalFont from "./styles/GlobalFont";
 import { theme } from "./styles/theme";
-import reportWebVitals from "./reportWebVitals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -40,5 +39,3 @@ root.render(
     </QueryClientProvider>
   </ThemeProvider>
 );
-
-reportWebVitals(console.log);
