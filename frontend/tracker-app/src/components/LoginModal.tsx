@@ -61,11 +61,13 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
             }}
           />
           <Span>소셜 로그인</Span>
-          <a href="https://api.comission-platform.store/oauth2/authorization/google">
+          {/* <a href="https://api.comission-platform.store/oauth2/authorization/google"> */}
+          <a href="http://localhost:8080/oauth2/authorization/google">
             <SocialLoginDiv />
           </a>
           <br />
-          <a href="https://api.comission-platform.store/oauth2/authorization/naver">
+          {/* <a href="https://api.comission-platform.store/oauth2/authorization/naver"> */}
+          <a href="http://localhost:8080/oauth2/authorization/naver">
             <SocialLoginDiv naver="true" />
           </a>
         </div>

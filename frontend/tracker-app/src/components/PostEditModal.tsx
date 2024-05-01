@@ -6,6 +6,7 @@ import StyledButton from "./StyledButton";
 import { postData, putData } from "../axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { ErrorResponseDataType } from "../types";
 interface NewPostModalProps {
   onClose: () => void;
   id: string;
@@ -69,9 +70,9 @@ const PostEditModal = ({ onClose, id, editPost }: NewPostModalProps) => {
         onClose();
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        alert(error?.response?.data?.errorCode);
-      }
+      const axiosError = error as AxiosError<ErrorResponseDataType>;
+      const errorMessage = axiosError.response?.data.errorMessage;
+      window.alert(errorMessage);
     }
   };
   return (
