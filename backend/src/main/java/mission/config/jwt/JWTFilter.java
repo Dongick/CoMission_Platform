@@ -44,9 +44,10 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (accessTokenHeader == null) {
 
-            if(requestUri.matches("^\\/api\\/main(?:\\/.*)?$") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
+            if(requestUri.matches("^\\/api\\/main") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
 
                 filterChain.doFilter(request, response);
+
             } else {
 
                 sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());

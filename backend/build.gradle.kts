@@ -42,6 +42,10 @@ dependencies {
 	testImplementation ("org.springframework.security:spring-security-test")
 }
 
+tasks.named<Jar>("jar") {
+	enabled = false
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }

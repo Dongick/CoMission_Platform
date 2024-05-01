@@ -12,7 +12,17 @@ import java.util.Optional;
 
 public interface MissionRepository extends MongoRepository<MissionDocument, ObjectId> {
     @Query(value= "{status: {$ne: 'COMPLETED'}}", sort = "{createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
-    List<MissionInfo> findAllByStatusNotOrderByCreatedAtDesc(Pageable pageable);
+    List<MissionInfo> findAllByStatusNotCompletedOrderByCreatedAtDesc(Pageable pageable);
+    @Query(value= "{status: {$ne: 'COMPLETED'}}", sort = "{participants: -1, createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
+    List<MissionInfo> findAllByStatusNotCompletedOrderByParticipantsDesc(Pageable pageable);
+    @Query(value= "{status: {$nin: ['COMPLETED', 'STARTED']}}", sort = "{createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
+    List<MissionInfo> findAllByStatusNotCompletedAndStartedOrderByCreatedAtDesc(Pageable pageable);
+    @Query(value= "{status: {$nin: ['COMPLETED', 'STARTED']}}", sort = "{participants: -1, createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
+    List<MissionInfo> findAllByStatusNotCompletedAndStartedOrderByParticipantsDesc(Pageable pageable);
+    @Query(value= "{status: {$nin: ['COMPLETED', 'CREATED']}}", sort = "{createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
+    List<MissionInfo> findAllByStatusNotCompletedAndCreatedOrderByCreatedAtDesc(Pageable pageable);
+    @Query(value= "{status: {$nin: ['COMPLETED', 'CREATED']}}", sort = "{participants: -1, createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
+    List<MissionInfo> findAllByStatusNotCompletedAndCreatedOrderByParticipantsDesc(Pageable pageable);
     @Query(value= "{_id: {$in: ?0}, status: {$ne: 'COMPLETED'}}", sort = "{createdAt: -1}", fields="{id:1, username:1, creatorEmail:1, title:1, photoUrl:1, minParticipants:1, participants:1, duration:1, status:1, frequency:1}")
     List<MissionInfo> findByMissionIdInAndStatusNotOrderByCreatedAtDesc(List<ObjectId> missionIdList);
 
