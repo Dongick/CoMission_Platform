@@ -46,7 +46,7 @@ spring:
 
           google:
             clientId: ${OAUTH2_GOOGLE_CLIENT_ID}
-            clientSecret: {OAUTH2_GOOGLE_CLIENT_SECRET}
+            clientSecret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             redirectUri: ${OAUTH2_GOOGLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
             scope: profile,email
