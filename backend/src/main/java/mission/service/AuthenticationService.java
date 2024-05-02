@@ -29,10 +29,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final ParticipantRepository participantRepository;
-    private final MissionRepository missionRepository;
     private final AWSS3Service awss3Service;
     private final FileService fileService;
     private final TimeProvider timeProvider;
+    private final MissionService missionService;
+    private final UserService userService;
     private static final String AUTHENTICATION_DIR = "authentications/";
 
     // 인증글 생성 매서드
@@ -43,19 +44,20 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        //LocalDateTime now = LocalDateTime.now();
         LocalDateTime now = timeProvider.getCurrentDateTime();
         int dayOfWeek = now.getDayOfWeek().getValue();
 
         LocalDate startDate = LocalDate.from(now.minusDays(dayOfWeek - 1));
 
-        MissionDocument missionDocument = getMissionDocument(id);
+        // 해당 미션이 존재하는지 확인
+        MissionDocument missionDocument = missionService.getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
         int authCount = getAuthenticationCount(missionDocument.getFrequency());
 
-        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
+        // 해당 미션에 해당 참가자가 존재하는지 확인
+        ParticipantDocument participantDocument = userService.getParticipantDocument(missionDocument, userEmail);
 
         List<Authentication> authenticationList = participantDocument.getAuthentication();
 
@@ -96,14 +98,15 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        //LocalDateTime now = LocalDateTime.now();
         LocalDateTime now = timeProvider.getCurrentDateTime();
 
-        MissionDocument missionDocument = getMissionDocument(id);
+        // 해당 미션이 존재하는지 확인
+        MissionDocument missionDocument = missionService.getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
-        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
+        // 해당 미션에 해당 참가자가 존재하는지 확인
+        ParticipantDocument participantDocument = userService.getParticipantDocument(missionDocument, userEmail);
 
         List<Authentication> authenticationList = participantDocument.getAuthentication();
 
@@ -145,14 +148,15 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        //LocalDateTime now = LocalDateTime.now();
         LocalDateTime now = timeProvider.getCurrentDateTime();
 
-        MissionDocument missionDocument = getMissionDocument(id);
+        // 해당 미션이 존재하는지 확인
+        MissionDocument missionDocument = missionService.getMissionDocument(id);
 
         judgeMissionStatus(missionDocument.getStatus());
 
-        ParticipantDocument participantDocument = getParticipantDocument(missionDocument, userEmail);
+        // 해당 미션에 해당 참가자가 존재하는지 확인
+        ParticipantDocument participantDocument = userService.getParticipantDocument(missionDocument, userEmail);
 
         List<Authentication> authenticationList = participantDocument.getAuthentication();
 
@@ -190,42 +194,26 @@ public class AuthenticationService {
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
-        MissionDocument missionDocument = getMissionDocument(id);
+        // 해당 미션이 존재하는지 확인
+        MissionDocument missionDocument = missionService.getMissionDocument(id);
 
         // 해당 미션의 상태 확인
         if(missionDocument.getStatus().equals(MissionStatus.CREATED.name())) {
             throw new BadRequestException(ErrorCode.MISSION_NOT_STARTED, ErrorCode.MISSION_NOT_STARTED.getMessage());
         }
 
-        getParticipantDocument(missionDocument, userEmail);
+        // 해당 미션에 해당 참가자가 존재하는지 확인
+        userService.getParticipantDocument(missionDocument, userEmail);
 
         List<ParticipantDocument> participantDocumentList = participantRepository.findByMissionId(missionDocument.getId());
 
-        List<Map<String, Object>> allAuthenticationList = groupAndSortAuthentications(participantDocumentList);
+        List<Map<String, Object>> allAuthenticationList = groupAndSortAuthentications(participantDocumentList, num);
 
-        List<Map<String, Object>> authenticationList = null;
-
-        // 인증글들을 lazy loading 으로 처리
-        if(allAuthenticationList.size() > 5 * num) {
-            if(allAuthenticationList.size() >= 5 * (num + 1)) {
-                authenticationList = allAuthenticationList.subList(5*num, 5*(num+1));
-            } else {
-                int endIndex = allAuthenticationList.size();
-
-                authenticationList = allAuthenticationList.subList(5*num, endIndex);
-            }
-
-            for(Map<String, Object> authentication : authenticationList) {
-
-                authentication.put("date", LocalDate.from((LocalDateTime) authentication.get("date")));
-            }
-        }
-
-        return new AuthenticationListResponse(authenticationList);
+        return new AuthenticationListResponse(allAuthenticationList);
     }
 
     // 인증글들을 형식에 맞춰 출력
-    private List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
+    private List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList, int num) {
 
         return participantDocumentList.stream()
                 .flatMap(participant -> participant.getAuthentication().stream()
@@ -240,6 +228,8 @@ public class AuthenticationService {
                         })
                 )
                 .sorted(Comparator.comparing(map -> (LocalDateTime) map.get("date"), Comparator.reverseOrder()))
+                .skip((long) num * 5)
+                .limit(5)
                 .collect(Collectors.toList()
                 );
     }
@@ -252,18 +242,6 @@ public class AuthenticationService {
                 .photoData(photoData)
                 .textData(textData)
                 .build();
-    }
-
-    // 해당 미션이 존재하는지 확인
-    private MissionDocument getMissionDocument(String id) {
-        return missionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
-    }
-
-    // 해당 미션에 해당 참가자가 존재하는지 확인
-    private ParticipantDocument getParticipantDocument(MissionDocument missionDocument, String userEmail) {
-        return participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.PARTICIPANT_NOT_FOUND, ErrorCode.PARTICIPANT_NOT_FOUND.getMessage()));
     }
 
     // 해당 미션의 상태 확인
