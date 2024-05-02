@@ -1,6 +1,7 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
+import mission.document.ParticipantDocument;
 import mission.dto.main.MainResponse;
 import mission.dto.mission.MissionInfo;
 import mission.dto.oauth2.CustomOAuth2User;
@@ -37,10 +38,10 @@ public class MainService {
                 CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
                 String userEmail = customOAuth2User.getEmail();
 
-                List<ParticipantMissionId> participantMissionIdList = participantRepository.findByUserEmail(userEmail);
+                List<ParticipantDocument> participantDocumentList = participantRepository.findByUserEmail(userEmail);
 
-                List<ObjectId> missionIdList = participantMissionIdList.stream()
-                        .map(ParticipantMissionId::getMissionId)
+                List<ObjectId> missionIdList = participantDocumentList.stream()
+                        .map(ParticipantDocument::getMissionId)
                         .collect(Collectors.toList());
 
                 // 로그인을 진행한 사용자이면 현재 참가한 미션 목록

@@ -26,7 +26,7 @@ public enum ErrorCode {
 
 
     //USER
-
+    DIFFERENT_LOGGED_USER("로그인한 사용자와 다른 사용자 입니다."),
 
     // HTTP STATUS CODE - 400
     ACCESS_TOKEN_INVALID("access token이 잘못되었습니다."),

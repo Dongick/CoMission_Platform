@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends MongoRepository<ParticipantDocument, ObjectId> {
 
-    List<ParticipantMissionId> findByUserEmail(String email);
+    List<ParticipantDocument> findByUserEmail(String email);
 
     List<ParticipantDocument> findByMissionId(ObjectId missionId);
 

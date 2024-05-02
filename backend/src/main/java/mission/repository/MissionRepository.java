@@ -40,5 +40,6 @@ public interface MissionRepository extends MongoRepository<MissionDocument, Obje
     @Query(value = "{title: {$regex: ?0, $options: 'i'}, status: {$ne: 'COMPLETED'}}", sort = "{createdAt: -1}")
     List<MissionInfo> findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(String regex);
 
-    List<SimpleMissionInfo> findById(List<ObjectId> missionIdList);
+    @Query(value= "{_id: {$in: ?0}}", sort = "{createdAt: -1}")
+    List<SimpleMissionInfo> findByIdInOrderByCreatedAtDesc(List<ObjectId> missionIdList);
 }
