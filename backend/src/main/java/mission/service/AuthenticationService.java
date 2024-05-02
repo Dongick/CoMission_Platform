@@ -201,31 +201,31 @@ public class AuthenticationService {
 
         List<ParticipantDocument> participantDocumentList = participantRepository.findByMissionId(missionDocument.getId());
 
-        List<Map<String, Object>> allAuthenticationList = groupAndSortAuthentications(participantDocumentList);
+        List<Map<String, Object>> allAuthenticationList = groupAndSortAuthentications(participantDocumentList, num);
 
         List<Map<String, Object>> authenticationList = null;
 
         // 인증글들을 lazy loading 으로 처리
-        if(allAuthenticationList.size() > 5 * num) {
-            if(allAuthenticationList.size() >= 5 * (num + 1)) {
-                authenticationList = allAuthenticationList.subList(5*num, 5*(num+1));
-            } else {
-                int endIndex = allAuthenticationList.size();
+//        if(allAuthenticationList.size() > 5 * num) {
+//            if(allAuthenticationList.size() >= 5 * (num + 1)) {
+//                authenticationList = allAuthenticationList.subList(5*num, 5*(num+1));
+//            } else {
+//                int endIndex = allAuthenticationList.size();
+//
+//                authenticationList = allAuthenticationList.subList(5*num, endIndex);
+//            }
+//
+//            for(Map<String, Object> authentication : authenticationList) {
+//
+//                authentication.put("date", LocalDate.from((LocalDateTime) authentication.get("date")));
+//            }
+//        }
 
-                authenticationList = allAuthenticationList.subList(5*num, endIndex);
-            }
-
-            for(Map<String, Object> authentication : authenticationList) {
-
-                authentication.put("date", LocalDate.from((LocalDateTime) authentication.get("date")));
-            }
-        }
-
-        return new AuthenticationListResponse(authenticationList);
+        return new AuthenticationListResponse(allAuthenticationList);
     }
 
     // 인증글들을 형식에 맞춰 출력
-    private List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList) {
+    private List<Map<String, Object>> groupAndSortAuthentications(List<ParticipantDocument> participantDocumentList, int num) {
 
         return participantDocumentList.stream()
                 .flatMap(participant -> participant.getAuthentication().stream()
@@ -240,6 +240,8 @@ public class AuthenticationService {
                         })
                 )
                 .sorted(Comparator.comparing(map -> (LocalDateTime) map.get("date"), Comparator.reverseOrder()))
+                .skip((long) num * 5)
+                .limit(5)
                 .collect(Collectors.toList()
                 );
     }

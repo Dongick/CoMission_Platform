@@ -145,6 +145,7 @@ public class MissionService {
                 .build();
     }
 
+    // 미션 검색 매서드
     public MissionSearchResponse missionSearch(MissionSearchRequest missionSearchRequest) {
         List<MissionInfo> missionInfoList = missionRepository.findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(missionSearchRequest.getTitle());
 

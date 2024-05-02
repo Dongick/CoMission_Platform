@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import mission.dto.user.UserPostResponse;
 import mission.exception.ErrorResponse;
 import mission.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,24 @@ public class UserController {
         userService.logout(request, response);
 
         return ResponseEntity.ok("good");
+    }
+
+    @GetMapping("/post")
+    @Operation(
+            summary = "사용자가 참여한 미션",
+            description = "사용자가 참여한 모든 미션 제공"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 로그아웃 성공"),
+            @ApiResponse(responseCode = "400", description = "1. ACCESS_TOKEN_INVALID : access token 값 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401",
+                    description = "1. ACCESS_TOKEN_EXPIRED : access token 만료 \t\n 2. UNAUTHORIZED : 토큰 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<UserPostResponse> getUserPost() {
+        UserPostResponse userPostResponse = userService.userPost();
+        return ResponseEntity.ok(userPostResponse);
     }
 
 }
