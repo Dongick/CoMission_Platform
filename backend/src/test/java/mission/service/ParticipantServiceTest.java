@@ -2,15 +2,16 @@ package mission.service;
 
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
-import mission.dto.User;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.dto.participant.ParticipantRequest;
+import mission.dto.user.User;
 import mission.enums.MissionStatus;
 import mission.exception.BadRequestException;
 import mission.exception.ConflictException;
 import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +37,8 @@ class ParticipantServiceTest {
     private ParticipantRepository participantRepository;
     @Mock
     private MissionRepository missionRepository;
+    @Mock
+    private TimeProvider timeProvider;
     @InjectMocks
     private ParticipantService participantService;
 
@@ -71,6 +75,7 @@ class ParticipantServiceTest {
                 .participants(2)
                 .build();
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(participantRequest.getId())).thenReturn(Optional.of(missionDocument));
         when(participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(), userEmail)).thenReturn(Optional.empty());
 

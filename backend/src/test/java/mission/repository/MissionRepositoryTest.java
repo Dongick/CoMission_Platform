@@ -2,6 +2,7 @@ package mission.repository;
 
 import mission.document.MissionDocument;
 import mission.dto.mission.MissionInfo;
+import mission.dto.mission.SimpleMissionInfo;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,46 +28,166 @@ class MissionRepositoryTest {
     void setUp() {
         missionRepository.deleteAll();
 
-        ObjectId[] ids = {new ObjectId("65ea0c8007b2c737d6227bf0"), new ObjectId("65ea0c8007b2c737d6227bf2"), new ObjectId("65ea0c8007b2c737d6227bf4")};
-        String[] title = {"Mission 1", "Mission 2", "Mission 3"};
-        String[] status = {"CREATED", "STATED", "COMPLETED"};
+        ObjectId[] ids = {new ObjectId("65ea0c8007b2c737d6227bf0"), new ObjectId("65ea0c8007b2c737d6227bf2"), new ObjectId("65ea0c8007b2c737d6227bf4"),
+                new ObjectId("65ea0c8007b2c737d6227bf6"), new ObjectId("65ea0c8007b2c737d6227bf8"), new ObjectId("65ea0c8007b2c737d6227bfa")};
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+        String[] status = {"CREATED", "STARTED", "COMPLETED", "CREATED", "STARTED", "COMPLETED"};
+        int[] participants = {7, 3, 5, 3, 1, 9};
 
         for (int i = 0; i < ids.length; i++) {
             MissionDocument missionDocument = MissionDocument.builder()
                     .id(ids[i])
                     .createdAt(LocalDateTime.now())
                     .title(title[i])
-                    .minParticipants(3)
-                    .participants(1)
-                    .duration(10)
+                    .participants(participants[i])
                     .status(status[i])
-                    .frequency("매일")
                     .build();
             missionRepository.save(missionDocument);
         }
     }
 
     @Test
-    @DisplayName("MissionRepository의 findAllAndStatusNotByOrderByCreatedAtDesc 매서드 테스트")
-    void findAllByStatusNotOrderByCreatedAtDesc() {
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedOrderByCreatedAtDesc 매서드 테스트")
+    void findAllByStatusNotCompletedOrderByCreatedAtDesc() {
         //given
-        String[] title = {"Mission 1", "Mission 2", "Mission 3"};
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
 
         Pageable pageable1 = PageRequest.of(0, 100);
-        Pageable pageable2 = PageRequest.of(0, 1);
+        Pageable pageable2 = PageRequest.of(0, 2);
 
         //when
-        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotOrderByCreatedAtDesc(pageable1);
-        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotOrderByCreatedAtDesc(pageable2);
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedOrderByCreatedAtDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedOrderByCreatedAtDesc(pageable2);
+
+        //then
+        Assertions.assertThat(missions1.size()).isEqualTo(4);
+        Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missions1.get(2).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missions1.get(3).getTitle()).isEqualTo(title[0]);
+
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
+        Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[3]);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedOrderByParticipantsDesc 매서드 테스트")
+    void findAllByStatusNotCompletedOrderByParticipantsDesc() {
+        //given
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+
+        Pageable pageable1 = PageRequest.of(0, 100);
+        Pageable pageable2 = PageRequest.of(0, 2);
+
+        //when
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedOrderByParticipantsDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedOrderByParticipantsDesc(pageable2);
+
+        //then
+        Assertions.assertThat(missions1.size()).isEqualTo(4);
+        Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missions1.get(2).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missions1.get(3).getTitle()).isEqualTo(title[4]);
+
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
+        Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[3]);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedAndStartedOrderByCreatedAtDesc 매서드 테스트")
+    void findAllByStatusNotCompletedAndStartedOrderByCreatedAtDesc() {
+        //given
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+
+        Pageable pageable1 = PageRequest.of(0, 100);
+        Pageable pageable2 = PageRequest.of(0, 2);
+
+        //when
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedAndStartedOrderByCreatedAtDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedAndStartedOrderByCreatedAtDesc(pageable2);
+
+        //then
+        Assertions.assertThat(missions1.size()).isEqualTo(2);
+        Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[0]);
+
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
+        Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[0]);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedAndStartedOrderByParticipantsDesc 매서드 테스트")
+    void findAllByStatusNotCompletedAndStartedOrderByParticipantsDesc() {
+        //given
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+
+        Pageable pageable1 = PageRequest.of(0, 100);
+        Pageable pageable2 = PageRequest.of(0, 2);
+
+        //when
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedAndStartedOrderByParticipantsDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedAndStartedOrderByParticipantsDesc(pageable2);
+
+        //then
+        Assertions.assertThat(missions1.size()).isEqualTo(2);
+        Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[3]);
+
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
+        Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[3]);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedAndCreatedOrderByCreatedAtDesc 매서드 테스트")
+    void findAllByStatusNotCompletedAndCreatedOrderByCreatedAtDesc() {
+        //given
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+
+        Pageable pageable1 = PageRequest.of(0, 100);
+        Pageable pageable2 = PageRequest.of(0, 2);
+
+        //when
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedAndCreatedOrderByCreatedAtDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedAndCreatedOrderByCreatedAtDesc(pageable2);
+
+        //then
+        Assertions.assertThat(missions1.size()).isEqualTo(2);
+        Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[1]);
+
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
+        Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[1]);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findAllByStatusNotCompletedAndCreatedOrderByParticipantsDesc 매서드 테스트")
+    void findAllByStatusNotCompletedAndCreatedOrderByParticipantsDesc() {
+        //given
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
+
+        Pageable pageable1 = PageRequest.of(0, 100);
+        Pageable pageable2 = PageRequest.of(0, 2);
+
+        //when
+        List<MissionInfo> missions1 = missionRepository.findAllByStatusNotCompletedAndCreatedOrderByParticipantsDesc(pageable1);
+        List<MissionInfo> missions2 = missionRepository.findAllByStatusNotCompletedAndCreatedOrderByParticipantsDesc(pageable2);
 
         //then
         Assertions.assertThat(missions1.size()).isEqualTo(2);
         Assertions.assertThat(missions1.get(0).getTitle()).isEqualTo(title[1]);
-        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missions1.get(1).getTitle()).isEqualTo(title[4]);
 
-        Assertions.assertThat(missions2.size()).isEqualTo(1);
+        Assertions.assertThat(missions2.size()).isEqualTo(2);
         Assertions.assertThat(missions2.get(0).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missions2.get(1).getTitle()).isEqualTo(title[4]);
     }
+
 
     @Test
     @DisplayName("MissionRepository의 findByMissionIdInAndStatusNotOrderByCreatedAtDesc 매서드 테스트")
@@ -118,15 +239,7 @@ class MissionRepositoryTest {
     void findByStatus() {
         //given
         String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
-        String[] status = {"CREATED", "STATED", "COMPLETED"};
-
-        for(int i = 0; i < 3; i++) {
-            MissionDocument missionDocument = MissionDocument.builder()
-                    .title(title[i + 3])
-                    .status(status[i])
-                    .build();
-            missionRepository.save(missionDocument);
-        }
+        String[] status = {"CREATED", "STARTED", "COMPLETED"};
 
         //when
         List<MissionDocument> missionDocumentList1 = missionRepository.findByStatus(status[0]);
@@ -136,28 +249,28 @@ class MissionRepositoryTest {
         //then
         Assertions.assertThat(missionDocumentList1.size()).isEqualTo(2);
         Assertions.assertThat(missionDocumentList1.get(0).getStatus()).isEqualTo(status[0]);
-        Assertions.assertThat(missionDocumentList1.get(0).getTitle()).isEqualTo("Mission 1");
+        Assertions.assertThat(missionDocumentList1.get(0).getTitle()).isEqualTo(title[0]);
         Assertions.assertThat(missionDocumentList1.get(1).getStatus()).isEqualTo(status[0]);
-        Assertions.assertThat(missionDocumentList1.get(1).getTitle()).isEqualTo("Mission 4");
+        Assertions.assertThat(missionDocumentList1.get(1).getTitle()).isEqualTo(title[3]);
 
         Assertions.assertThat(missionDocumentList2.size()).isEqualTo(2);
         Assertions.assertThat(missionDocumentList2.get(0).getStatus()).isEqualTo(status[1]);
-        Assertions.assertThat(missionDocumentList2.get(0).getTitle()).isEqualTo("Mission 2");
+        Assertions.assertThat(missionDocumentList2.get(0).getTitle()).isEqualTo(title[1]);
         Assertions.assertThat(missionDocumentList2.get(1).getStatus()).isEqualTo(status[1]);
-        Assertions.assertThat(missionDocumentList2.get(1).getTitle()).isEqualTo("Mission 5");
+        Assertions.assertThat(missionDocumentList2.get(1).getTitle()).isEqualTo(title[4]);
 
         Assertions.assertThat(missionDocumentList3.size()).isEqualTo(2);
         Assertions.assertThat(missionDocumentList3.get(0).getStatus()).isEqualTo(status[2]);
-        Assertions.assertThat(missionDocumentList3.get(0).getTitle()).isEqualTo("Mission 3");
+        Assertions.assertThat(missionDocumentList3.get(0).getTitle()).isEqualTo(title[2]);
         Assertions.assertThat(missionDocumentList3.get(1).getStatus()).isEqualTo(status[2]);
-        Assertions.assertThat(missionDocumentList3.get(1).getTitle()).isEqualTo("Mission 6");
+        Assertions.assertThat(missionDocumentList3.get(1).getTitle()).isEqualTo(title[5]);
     }
 
     @Test
     @DisplayName("MissionRepository의 findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc 매서드 테스트")
     void findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc() {
         //given
-        String[] title = {"Mission 1", "Mission 2", "Mission 3"};
+        String[] title = {"Mission 1", "Mission 2", "Mission 3", "Mission 4", "Mission 5", "Mission 6"};
         String[] regexTitle = {"mi", "MIS", "misq", "mission 2", "mission 3"};
 
         //when
@@ -168,13 +281,17 @@ class MissionRepositoryTest {
         List<MissionInfo> missionInfoList5 = missionRepository.findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(regexTitle[4]);
 
         //then
-        Assertions.assertThat(missionInfoList1.size()).isEqualTo(2);
-        Assertions.assertThat(missionInfoList1.get(0).getTitle()).isEqualTo(title[1]);
-        Assertions.assertThat(missionInfoList1.get(1).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missionInfoList1.size()).isEqualTo(4);
+        Assertions.assertThat(missionInfoList1.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missionInfoList1.get(1).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missionInfoList1.get(2).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missionInfoList1.get(3).getTitle()).isEqualTo(title[0]);
 
-        Assertions.assertThat(missionInfoList2.size()).isEqualTo(2);
-        Assertions.assertThat(missionInfoList2.get(0).getTitle()).isEqualTo(title[1]);
-        Assertions.assertThat(missionInfoList2.get(1).getTitle()).isEqualTo(title[0]);
+        Assertions.assertThat(missionInfoList2.size()).isEqualTo(4);
+        Assertions.assertThat(missionInfoList2.get(0).getTitle()).isEqualTo(title[4]);
+        Assertions.assertThat(missionInfoList2.get(1).getTitle()).isEqualTo(title[3]);
+        Assertions.assertThat(missionInfoList2.get(2).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missionInfoList2.get(3).getTitle()).isEqualTo(title[0]);
 
         Assertions.assertThat(missionInfoList3.size()).isEqualTo(0);
 
@@ -182,5 +299,28 @@ class MissionRepositoryTest {
         Assertions.assertThat(missionInfoList4.get(0).getTitle()).isEqualTo(title[1]);
 
         Assertions.assertThat(missionInfoList5.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("MissionRepository의 findByIdInOrderByCreatedAtDesc 매서드 테스트")
+    void findByIdInOrderByCreatedAtDesc() {
+        //given
+        ObjectId[] ids = {new ObjectId("65ea0c8007b2c737d6227bf0"), new ObjectId("65ea0c8007b2c737d6227bf2"), new ObjectId("65ea0c8007b2c737d6227bf4")};
+        String[] title = {"Mission 1", "Mission 2", "Mission 3"};
+
+        List<ObjectId> objectIdList = new ArrayList<>();
+        for(int i = 0; i < ids.length; i++) {
+            objectIdList.add(ids[i]);
+        }
+
+        //when
+        List<SimpleMissionInfo> missionInfoList = missionRepository.findByIdInOrderByCreatedAtDesc(objectIdList);
+
+        //then
+        Assertions.assertThat(missionInfoList.size()).isEqualTo(3);
+        Assertions.assertThat(missionInfoList.get(0).getTitle()).isEqualTo(title[2]);
+        Assertions.assertThat(missionInfoList.get(1).getTitle()).isEqualTo(title[1]);
+        Assertions.assertThat(missionInfoList.get(2).getTitle()).isEqualTo(title[0]);
+
     }
 }

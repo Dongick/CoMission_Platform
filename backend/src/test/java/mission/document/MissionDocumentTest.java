@@ -28,6 +28,8 @@ class MissionDocumentTest {
         String status = "CREATED";
         String frequency = "주2회";
         String creatorEmail = "test@example.com";
+        String photoUrl = "http://test.com";
+        String username = "test";
 
         // When
         MissionDocument missionDocument = MissionDocument.builder()
@@ -43,6 +45,8 @@ class MissionDocumentTest {
                 .status(status)
                 .frequency(frequency)
                 .creatorEmail(creatorEmail)
+                .photoUrl(photoUrl)
+                .username(username)
                 .build();
 
         // Then
@@ -58,5 +62,7 @@ class MissionDocumentTest {
         Assertions.assertThat(missionDocument.getTitle()).isEqualTo(title);
         Assertions.assertThat(missionDocument.getStartDate()).isEqualTo(startDate);
         Assertions.assertThat(missionDocument.getMinParticipants()).isEqualTo(minParticipants);
+        Assertions.assertThat(missionDocument.getPhotoUrl()).isEqualTo(photoUrl);
+        Assertions.assertThat(missionDocument.getUsername()).isEqualTo(username);
     }
 }
