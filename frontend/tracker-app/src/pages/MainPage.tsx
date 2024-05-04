@@ -16,10 +16,12 @@ import {
   LazyMissionInfoListType,
 } from "../types";
 import { getData } from "../axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
 import MissionSearch from "../components/MissionSearch";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
+
+const LazyMissionSearch = lazy(() => import("../components/MissionSearch"));
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -131,7 +133,10 @@ const MainPage = () => {
 
   return (
     <Layout>
-      <MissionSearch updateData={updateData} />
+      {/* <MissionSearch updateData={updateData} /> */}
+      <Suspense fallback={<Loaders />}>
+        <LazyMissionSearch updateData={updateData} />
+      </Suspense>
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
