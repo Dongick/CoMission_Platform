@@ -2,12 +2,14 @@ import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { userInfo } from "../recoil";
 import { postData } from "../axios";
 import useLogout from "../useLogout";
 const UserMenu = () => {
   const logout = useLogout();
+  const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleLoginClick = () => {
@@ -37,6 +39,7 @@ const UserMenu = () => {
         marginRight: "10px",
         display: "none",
       }}
+      onClick={() => navigate("/my-page")}
     >
       내 정보
     </StyledButton>
