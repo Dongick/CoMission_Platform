@@ -18,9 +18,10 @@ import {
 import { getData } from "../axios";
 import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
-import MissionSearch from "../components/MissionSearch";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
 
+const LazyCard = lazy(() => import("../components/Card"));
+const LazyMyCard = lazy(() => import("../components/MyCard"));
 const LazyMissionSearch = lazy(() => import("../components/MissionSearch"));
 
 const MainPage = () => {
@@ -37,6 +38,8 @@ const MainPage = () => {
   const [noDataMessage, setNoDataMessage] =
     useState<string>("생성된 미션이 없습니다!");
   const [everClicked, setEverClicked] = useState<boolean>(false);
+
+  // 소셜로그인 토큰처리
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
@@ -133,8 +136,7 @@ const MainPage = () => {
 
   return (
     <Layout>
-      {/* <MissionSearch updateData={updateData} /> */}
-      <Suspense fallback={<Loaders />}>
+      <Suspense>
         <LazyMissionSearch updateData={updateData} />
       </Suspense>
       <StyledButton
