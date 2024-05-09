@@ -1,16 +1,29 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 // 정렬: 최신순, 참가자 순
 // 필터: 시작된 미션, 시작안된 미션
 
 const Filter = () => {
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
+
+  // 이미 URL에 query존재 시 기존 값으로 설정
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sort = searchParams.get("sort") || "";
+  const filter = searchParams.get("filter") || "";
+
+  // 상태를 URLSearchParams 객체로 업데이트
+  useEffect(() => {
+    const newSearchParams = new URLSearchParams(location.search);
+    if (sort) newSearchParams.set("sort", sort);
+    if (filter) newSearchParams.set("filter", filter);
+    setSearchParams(newSearchParams, { replace: true });
+  }, [sort, filter]);
 
   return (
-    <div>
+    <aside>
       <h1>정렬 방식</h1>
       <div>
         <label>
@@ -43,7 +56,7 @@ const Filter = () => {
           Not Started Missions
         </label>
       </div>
-    </div>
+    </aside>
   );
 };
 
