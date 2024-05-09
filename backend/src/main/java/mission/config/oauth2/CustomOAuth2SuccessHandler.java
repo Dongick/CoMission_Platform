@@ -8,6 +8,7 @@ import mission.dto.oauth2.CustomOAuth2User;
 import mission.entity.RefreshTokenEntity;
 import mission.config.jwt.JWTUtil;
 import mission.repository.RefreshTokenRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -26,6 +27,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    @Value("${app.cors.allowed-origins}")
+    private final String[] allowedOrigin;
 
     @Override
     @Transactional
@@ -55,12 +58,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         System.out.println(accessToken);
 
-        String redirectUrl = "http://localhost:3000/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
+        String redirectUrl = allowedOrigin[0] + "/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
                 "&email=" + URLEncoder.encode(email, "UTF-8") + "&username=" + URLEncoder.encode(username, "UTF-8");
-
-//        String redirectUrl = "https://comission-platform.shop/?AccessToken=" + URLEncoder.encode(accessToken, "UTF-8") +
-//                "&email=" + URLEncoder.encode(email, "UTF-8") + "&username=" + URLEncoder.encode(username, "UTF-8");
-
 
         response.addCookie(jwtUtil.createJwtCookie("RefreshToken", refreshToken));
 
