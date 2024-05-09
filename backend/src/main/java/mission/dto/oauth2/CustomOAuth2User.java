@@ -1,7 +1,7 @@
 package mission.dto.oauth2;
 
 import lombok.AllArgsConstructor;
-import mission.dto.user.User;
+import mission.dto.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 

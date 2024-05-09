@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import mission.dto.oauth2.CustomOAuth2User;
-import mission.dto.user.User;
+import mission.dto.User;
 import mission.exception.ErrorCode;
 import mission.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -44,10 +44,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (accessTokenHeader == null) {
 
-            if(requestUri.matches("^\\/api\\/main") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
+            if(requestUri.matches("^\\/api\\/main(?:\\/.*)?$") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
 
                 filterChain.doFilter(request, response);
-
             } else {
 
                 sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());

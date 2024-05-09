@@ -61,6 +61,7 @@ public class ParticipantService {
             int participants = missionDocument.getParticipants() + 1;
             missionDocument.setParticipants(participants);
 
+            //LocalDateTime now = LocalDateTime.now();
             LocalDateTime now = timeProvider.getCurrentDateTime();
 
             // 해당 미션의 최소 참여자 수를 충족하면 미션을 시작 상태로 바꿈
@@ -80,7 +81,7 @@ public class ParticipantService {
     }
 
     // 미션 참여자 저장
-    public void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
+    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
         participantRepository.save(ParticipantDocument.builder()
                 .missionId(missionId)
                 .joinedAt(now)

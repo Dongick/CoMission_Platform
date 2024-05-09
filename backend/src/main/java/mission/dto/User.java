@@ -1,4 +1,4 @@
-package mission.dto.user;
+package mission.dto;
 
 import lombok.Builder;
 import lombok.Getter;

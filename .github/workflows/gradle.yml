@@ -1,3 +1,10 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
 name: Java CI && CD with Gradle
 
 on:
@@ -17,19 +24,11 @@ jobs:
       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
       MONGODB_HOST: ${{secrets.MONGODB_HOST}}
       MONGODB_DATABASE: ${{secrets.MONGODB_DATABASE}}
-      MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
-      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-      MYSQL_HOST: ${{secrets.MYSQL_HOST}}
-      MYSQL_DATABASE: ${{secrets.MYSQL_DATABASE}}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       OAUTH2_NAVER_CLIENT_ID: ${{ secrets.OAUTH2_NAVER_CLIENT_ID }}
       OAUTH2_NAVER_CLIENT_SECRET: ${{ secrets.OAUTH2_NAVER_CLIENT_SECRET }}
-      OAUTH2_NAVER_REDIRECT_URI: ${{secrets.OAUTH2_NAVER_REDIRECT_URI}}
-      OAUTH2_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}
-      OAUTH2_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}
-      OAUTH2_GOOGLE_REDIRECT_URI: ${{secrets.OAUTH2_GOOGLE_REDIRECT_URI}}
-      APP_CORS_ALLOWED_ORIGINS: ${{secrets.APP_CORS_ALLOWED_ORIGINS}}
       S3_BUCKET: ${{secrets.S3_BUCKET}}
+      OAUTH2_NAVER_REDIRECT_URI: ${{secrets.OAUTH2_NAVER_REDIRECT_URI}}
       SPRING_PROFILES_ACTIVE: ${{secrets.SPRING_PROFILES_ACTIVE}}
 
     steps:
@@ -45,7 +44,7 @@ jobs:
 
     - name: Grant execute permission for gradle && Build with Gradle without Test
       run: |
-        cd ./backend
+        cd ./demo
         chmod +x gradlew
         ./gradlew clean build -x test --stacktrace
       
@@ -56,42 +55,34 @@ jobs:
 
     - name: Docker image build
       run: |
-        cd ./backend
-        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/comission-platform .
+        cd ./demo
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/gitaction-test .
 
     - name: Docker Hub push
-      run: docker push ${{secrets.DOCKERHUB_USERNAME}}/comission-platform
+      run: docker push ${{secrets.DOCKERHUB_USERNAME}}/gitaction-test
 
     - name: Deploy
       uses: appleboy/ssh-action@master
       with:
-        host: ${{secrets.EC2_HOST}}
+        host: ${{secrets.AWS_HOST}}
         username: ubuntu
-        key: ${{secrets.EC2_KEY}}
+        key: ${{secrets.AWS_KEY}}
         script: |
           sudo docker login -u ${{secrets.DOCKERHUB_USERNAME}} -p ${{secrets.DOCKERHUB_PASSWORD}}
           sudo docker rm -f $(sudo docker ps -qa) 2>/dev/null || true
-          sudo docker pull ${{secrets.DOCKERHUB_USERNAME}}/comission-platform
-          sudo docker run --name comission-platform --rm -dit -p 8080:8080 \
+          sudo docker pull ${{secrets.DOCKERHUB_USERNAME}}/gitaction-test
+          sudo docker run --name gitaction-test --rm -dit -p 8080:8080 \
             -e AWS_ACCESS_KEY="${{ secrets.AWS_ACCESS_KEY }}" \
             -e AWS_SECRET_KEY="${{ secrets.AWS_SECRET_KEY }}" \
             -e MONGODB_USERNAME="${{ secrets.MONGODB_USERNAME }}" \
             -e MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}" \
             -e MONGODB_HOST="${{ secrets.MONGODB_HOST }}" \
             -e MONGODB_DATABASE="${{ secrets.MONGODB_DATABASE }}" \
-            -e MYSQL_USERNAME="${{ secrets.MYSQL_USERNAME }}" \
-            -e MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}" \
-            -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
-            -e MYSQL_DATABASE="${{ secrets.MYSQL_DATABASE }}" \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e OAUTH2_NAVER_CLIENT_ID="${{ secrets.OAUTH2_NAVER_CLIENT_ID }}" \
             -e OAUTH2_NAVER_CLIENT_SECRET="${{ secrets.OAUTH2_NAVER_CLIENT_SECRET }}" \
-            -e OAUTH2_NAVER_REDIRECT_URI="${{ secrets.OAUTH2_NAVER_REDIRECT_URI }}" \
-            -e OAUTH2_GOOGLE_CLIENT_ID="${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}" \
-            -e OAUTH2_GOOGLE_CLIENT_SECRET="${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" \
-            -e OAUTH2_GOOGLE_REDIRECT_URI="${{ secrets.OAUTH2_GOOGLE_REDIRECT_URI }}" \
-            -e APP_CORS_ALLOWED_ORIGINS="${{ secrets.APP_CORS_ALLOWED_ORIGINS }}" \
             -e S3_BUCKET="${{ secrets.S3_BUCKET }}" \
+            -e OAUTH2_NAVER_REDIRECT_URI="${{ secrets.OAUTH2_NAVER_REDIRECT_URI }}" \
             -e SPRING_PROFILES_ACTIVE="${{ secrets.SPRING_PROFILES_ACTIVE }}" \
-            ${{secrets.DOCKERHUB_USERNAME}}/comission-platform &
+            ${{secrets.DOCKERHUB_USERNAME}}/gitaction-test &
           sudo docker image prune -f

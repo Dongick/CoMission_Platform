@@ -1,11 +1,11 @@
 package mission.service;
 
 import lombok.RequiredArgsConstructor;
+import mission.dto.*;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.dto.oauth2.GoogleResponse;
 import mission.dto.oauth2.NaverResponse;
 import mission.dto.oauth2.OAuth2Response;
-import mission.dto.user.User;
 import mission.entity.UserEntity;
 import mission.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import java.util.Optional;
 
