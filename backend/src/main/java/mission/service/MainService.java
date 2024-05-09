@@ -5,7 +5,6 @@ import mission.document.ParticipantDocument;
 import mission.dto.main.MainResponse;
 import mission.dto.mission.MissionInfo;
 import mission.dto.oauth2.CustomOAuth2User;
-import mission.dto.participant.ParticipantMissionId;
 import mission.exception.BadRequestException;
 import mission.exception.ErrorCode;
 import mission.repository.MissionRepository;

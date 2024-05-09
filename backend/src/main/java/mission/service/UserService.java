@@ -10,7 +10,6 @@ import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.mission.SimpleMissionInfo;
 import mission.dto.oauth2.CustomOAuth2User;
-import mission.dto.participant.ParticipantMissionId;
 import mission.dto.user.UserMissionPost;
 import mission.dto.user.UserMissionPostResponse;
 import mission.dto.user.UserPostResponse;

@@ -2,15 +2,15 @@ package mission.service;
 
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
-import mission.dto.User;
 import mission.dto.authentication.AuthenticationCreateRequest;
 import mission.dto.authentication.AuthenticationListResponse;
 import mission.dto.authentication.AuthenticationUpdateRequest;
 import mission.dto.oauth2.CustomOAuth2User;
+import mission.dto.user.User;
 import mission.exception.BadRequestException;
+import mission.exception.ErrorCode;
 import mission.exception.ForbiddenException;
 import mission.exception.NotFoundException;
-import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import mission.util.TimeProvider;
 import org.assertj.core.api.Assertions;
@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,11 +44,15 @@ class AuthenticationServiceTest {
     @Mock
     private ParticipantRepository participantRepository;
     @Mock
-    private MissionRepository missionRepository;
-    @Mock
     private AWSS3Service awss3Service;
     @Mock
+    private FileService fileService;
+    @Mock
     private TimeProvider timeProvider;
+    @Mock
+    private MissionService missionService;
+    @Mock
+    private UserService userService;
     private static String AUTHENTICATION_DIR = "authentications/";
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -74,17 +77,17 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareParticipantDocument(missionId, "test", "test@example.com");
 
         when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
-        when(awss3Service.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
+        when(fileService.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
 
         // when
         authenticationService.createAuthentication(authenticationCreateRequest, photoData, missionId);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service).uploadFile(photoData, AUTHENTICATION_DIR);
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService).uploadFile(photoData, AUTHENTICATION_DIR);
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -115,15 +118,15 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now.minusDays(7), null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.createAuthentication(authenticationCreateRequest, null, missionId);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
         verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
@@ -159,15 +162,15 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.createAuthentication(authenticationCreateRequest, null, missionId);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
         verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
@@ -194,7 +197,7 @@ class AuthenticationServiceTest {
         authenticationCreateRequest.setTextData(textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
-        when(missionRepository.findById(missionId)).thenReturn(Optional.empty());
+        when(missionService.getMissionDocument(anyString())).thenThrow(new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
 
         // when, then
         assertThrows(NotFoundException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -217,7 +220,7 @@ class AuthenticationServiceTest {
         MissionDocument missionDocument = prepareMissionDocument(missionId, frequency, status);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
 
         // when, then
         assertThrows(BadRequestException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -240,7 +243,7 @@ class AuthenticationServiceTest {
         MissionDocument missionDocument = prepareMissionDocument(missionId, frequency, status);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
 
         // when, then
         assertThrows(BadRequestException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -263,8 +266,8 @@ class AuthenticationServiceTest {
         MissionDocument missionDocument = prepareMissionDocument(missionId, frequency, status);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.empty());
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenThrow(new NotFoundException(ErrorCode.PARTICIPANT_NOT_FOUND, ErrorCode.PARTICIPANT_NOT_FOUND.getMessage()));
 
         // when, then
         assertThrows(NotFoundException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -290,8 +293,8 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when, then
         assertThrows(ForbiddenException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -325,8 +328,8 @@ class AuthenticationServiceTest {
         participantDocument.setAuthentication(authenticationList);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when, then
         assertThrows(BadRequestException.class, () -> authenticationService.createAuthentication(authenticationCreateRequest, null, missionId));
@@ -355,19 +358,19 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, photoUrl, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
-        when(awss3Service.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
+        when(fileService.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
 
         // when
         authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service).deleteFile(anyString(), anyString());
-        verify(awss3Service).uploadFile(any(MultipartFile.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService).deleteFile(anyString());
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -399,18 +402,18 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, photoUrl, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service).deleteFile(anyString(), anyString());
-        verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService).deleteFile(anyString());
+        verify(fileService, never()).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -442,19 +445,19 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
-        when(awss3Service.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
+        when(fileService.uploadFile(photoData, AUTHENTICATION_DIR)).thenReturn(fileLocation);
 
         // when
         authenticationService.updateAuthentication(authenticationUpdateRequest, photoData, missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service, never()).deleteFile(anyString(), anyString());
-        verify(awss3Service).uploadFile(any(MultipartFile.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService, never()).deleteFile(anyString());
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -484,18 +487,18 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.updateAuthentication(authenticationUpdateRequest, null, missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service, never()).deleteFile(anyString(), anyString());
-        verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService, never()).deleteFile(anyString());
+        verify(fileService, never()).uploadFile(any(MultipartFile.class), anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -525,8 +528,8 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareParticipantDocument(missionId, "test", "test@example.com");
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when, then
         assertThrows(NotFoundException.class, () -> authenticationService.updateAuthentication(authenticationUpdateRequest, null, missionId));
@@ -552,8 +555,8 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now.minusDays(1), null, textData);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when, then
         assertThrows(NotFoundException.class, () -> authenticationService.updateAuthentication(authenticationUpdateRequest, null, missionId));
@@ -577,17 +580,17 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, photoUrl, null);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.deleteAuthentication(missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service).deleteFile(anyString(), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService).deleteFile(anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -611,17 +614,17 @@ class AuthenticationServiceTest {
         ParticipantDocument participantDocument = prepareOneAuthentication(prepareTwoAuthentication(prepareParticipantDocument(missionId, "test", "test@example.com"), now, null, null), now, null, null);
 
         when(timeProvider.getCurrentDateTime()).thenReturn(now);
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument);
 
         // when
         authenticationService.deleteAuthentication(missionId);
 
         // then
         verify(timeProvider).getCurrentDateTime();
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
-        verify(awss3Service, never()).deleteFile(anyString(), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
+        verify(fileService, never()).deleteFile(anyString());
         verify(participantRepository).save(any(ParticipantDocument.class));
 
         List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
@@ -652,16 +655,16 @@ class AuthenticationServiceTest {
         participantDocumentList.add(participantDocument2);
 
 
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument1));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument1);
         when(participantRepository.findByMissionId(any(ObjectId.class))).thenReturn(participantDocumentList);
 
         // when
         AuthenticationListResponse response = authenticationService.authenticationList(missionId, 0);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
         verify(participantRepository).findByMissionId(any(ObjectId.class));
 
         Assertions.assertThat(response).isNotNull();
@@ -669,9 +672,9 @@ class AuthenticationServiceTest {
         Assertions.assertThat(authenticationList.size()).isEqualTo(4);
 
         Assertions.assertThat(authenticationList.get(0).get("username")).isEqualTo("test");
-        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(LocalDate.of(2024, 4, 11));
+        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(now.minusDays(1));
         Assertions.assertThat(authenticationList.get(2).get("username")).isEqualTo("test2");
-        Assertions.assertThat(authenticationList.get(2).get("date")).isEqualTo(LocalDate.of(2024, 4, 8));
+        Assertions.assertThat(authenticationList.get(2).get("date")).isEqualTo(now.minusDays(4));
     }
 
     @Test
@@ -699,16 +702,16 @@ class AuthenticationServiceTest {
         participantDocumentList.add(participantDocument2);
 
 
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument1));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument1);
         when(participantRepository.findByMissionId(any(ObjectId.class))).thenReturn(participantDocumentList);
 
         // when
         AuthenticationListResponse response = authenticationService.authenticationList(missionId, 0);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
         verify(participantRepository).findByMissionId(any(ObjectId.class));
 
         Assertions.assertThat(response).isNotNull();
@@ -716,11 +719,11 @@ class AuthenticationServiceTest {
         Assertions.assertThat(authenticationList.size()).isEqualTo(5);
 
         Assertions.assertThat(authenticationList.get(0).get("username")).isEqualTo("test");
-        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(LocalDate.of(2024, 4, 11));
+        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(now.minusDays(1));
         Assertions.assertThat(authenticationList.get(2).get("username")).isEqualTo("test2");
-        Assertions.assertThat(authenticationList.get(2).get("date")).isEqualTo(LocalDate.of(2024, 4, 8));
+        Assertions.assertThat(authenticationList.get(2).get("date")).isEqualTo(now.minusDays(4));
         Assertions.assertThat(authenticationList.get(4).get("username")).isEqualTo("test2");
-        Assertions.assertThat(authenticationList.get(4).get("date")).isEqualTo(LocalDate.of(2024, 4, 6));
+        Assertions.assertThat(authenticationList.get(4).get("date")).isEqualTo(now.minusDays(6));
     }
 
     @Test
@@ -748,16 +751,16 @@ class AuthenticationServiceTest {
         participantDocumentList.add(participantDocument2);
 
 
-        when(missionRepository.findById(anyString())).thenReturn(Optional.of(missionDocument));
-        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument1));
+        when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+        when(userService.getParticipantDocument(any(MissionDocument.class), anyString())).thenReturn(participantDocument1);
         when(participantRepository.findByMissionId(any(ObjectId.class))).thenReturn(participantDocumentList);
 
         // when
         AuthenticationListResponse response = authenticationService.authenticationList(missionId, 1);
 
         // then
-        verify(missionRepository).findById(anyString());
-        verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
+        verify(missionService).getMissionDocument(anyString());
+        verify(userService).getParticipantDocument(any(MissionDocument.class), anyString());
         verify(participantRepository).findByMissionId(any(ObjectId.class));
 
         Assertions.assertThat(response).isNotNull();
@@ -765,7 +768,7 @@ class AuthenticationServiceTest {
         Assertions.assertThat(authenticationList.size()).isEqualTo(1);
 
         Assertions.assertThat(authenticationList.get(0).get("username")).isEqualTo("test2");
-        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(LocalDate.of(2024, 4, 5));
+        Assertions.assertThat(authenticationList.get(0).get("date")).isEqualTo(now.minusDays(7));
     }
 
     // Mock SecurityContextHolder 설정
