@@ -26,12 +26,13 @@ public enum ErrorCode {
 
 
     //USER
-
+    DIFFERENT_LOGGED_USER("로그인한 사용자와 다른 사용자 입니다."),
 
     // HTTP STATUS CODE - 400
     ACCESS_TOKEN_INVALID("access token이 잘못되었습니다."),
     REFRESH_TOKEN_INVALID("refresh token이 잘못되었습니다."),
-    VALIDATION_FAILED("유효성 검사 실패"),
+    VALIDATION_FAILED("유효성 검사에 실패했습니다."),
+    TYPE_MISMATCH_FAILED("파라미터의 타입이 잘못되었습니다."),
 
 
     // HTTP STATUS CODE - 401
