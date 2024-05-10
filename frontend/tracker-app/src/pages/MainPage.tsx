@@ -20,7 +20,6 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
 import Filter from "../components/Filter";
-
 const LazyCard = lazy(() => import("../components/Card"));
 const LazyMyCard = lazy(() => import("../components/MyCard"));
 const LazyMissionSearch = lazy(() => import("../components/MissionSearch"));
@@ -39,6 +38,8 @@ const MainPage = () => {
   const [noDataMessage, setNoDataMessage] =
     useState<string>("생성된 미션이 없습니다!");
   const [everClicked, setEverClicked] = useState<boolean>(false);
+  const [sort, setSort] = useState<string>("");
+  const [filter, setFilter] = useState<string>("");
 
   // 소셜로그인 토큰처리
   useEffect(() => {
@@ -48,11 +49,12 @@ const MainPage = () => {
     const name = urlSearchParams.get("username");
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
-      setUserInfoState({
+      setUserInfoState((prev) => ({
+        ...prev,
         isLoggedIn: true,
         user_id: `${name}`,
         user_email: `${email}`,
-      });
+      }));
       navigate("/");
     }
   }, [location.search, setUserInfoState, navigate]);
@@ -200,7 +202,12 @@ const MainPage = () => {
         </NoLoginContent>
       )}
       <ContentBody>
-        <Filter />
+        <Filter
+          sort={sort}
+          setSort={setSort}
+          filter={filter}
+          filter={setFilter}
+        />
         <MainSection>
           {totalMissionData?.map((mission, index) => (
             <Card

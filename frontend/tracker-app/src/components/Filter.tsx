@@ -3,31 +3,36 @@ import { theme } from "../styles/theme";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 
-// 정렬: 최신순, 참가자 순
-// 필터: 시작된 미션, 시작안된 미션
+interface FilterProps {
+  sort: string;
+  setSort: React.Dispatch<React.SetStateAction<string>>;
+  filter: string;
+  setFilter: React.Dispatch<React.SetStateAction<string>>;
+}
 
-const Filter = () => {
+const Filter = ({ sort, filter, setSort, setFilter }: FilterProps) => {
   const location = useLocation();
-
   // 이미 URL에 query존재 시 기존 값으로 설정
   const [searchParams, setSearchParams] = useSearchParams();
-  const sort = searchParams.get("sort") || "";
-  const filter = searchParams.get("filter") || "";
+  sort = searchParams.get("sort") || "";
+  filter = searchParams.get("filter") || "";
 
-  // 상태를 URLSearchParams 객체로 업데이트
-  useEffect(() => {
+  const sortChangeHandler = (e) => {
+    console.log(e.target.value);
+  };
+  // 조건이 바뀌면, 쿼리 값 업데이트
+  const handleApplyButtonClick = () => {
     const newSearchParams = new URLSearchParams(location.search);
     if (sort) newSearchParams.set("sort", sort);
     if (filter) newSearchParams.set("filter", filter);
     setSearchParams(newSearchParams, { replace: true });
-  }, [sort, filter]);
+  };
 
   return (
     <Asidebar>
       <div>
         <label>
-          <StyledSelect>
-            {/* value={sortBy} onChange={handleSortChange} */}
+          <StyledSelect value={sort} onChange={sortChangeHandler}>
             <option value="recent">최신순</option>
             <option value="participants">참여자순</option>
           </StyledSelect>
@@ -56,6 +61,7 @@ const Filter = () => {
           </label>
         </div>
       </FilterDiv>
+      <button onClick={handleApplyButtonClick}>Apply</button>
     </Asidebar>
   );
 };
