@@ -1,27 +1,35 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
-
+import { ChangeEvent, useEffect } from "react";
+import { FilterType } from "../types";
 interface FilterProps {
   sort: string;
   setSort: React.Dispatch<React.SetStateAction<string>>;
-  filter: string;
-  setFilter: React.Dispatch<React.SetStateAction<string>>;
+  filter: FilterType;
+  setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
 }
 
 const Filter = ({ sort, filter, setSort, setFilter }: FilterProps) => {
   const location = useLocation();
+
   // 이미 URL에 query존재 시 기존 값으로 설정
   const [searchParams, setSearchParams] = useSearchParams();
   sort = searchParams.get("sort") || "";
-  filter = searchParams.get("filter") || "";
+  searchParams.getAll("filter").forEach((value) => {
+    if (value === "start" || value === "notStart") {
+      filter[value] = true;
+    }
+  });
 
-  const sortChangeHandler = (e) => {
-    console.log(e.target.value);
+  const sortChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSort(e.target.value);
   };
+
   // 조건이 바뀌면, 쿼리 값 업데이트
   const handleApplyButtonClick = () => {
+    // 먼저 바뀐 조건으로 api요청을 해야한다.
+    // api요청을 하는 함수는 메인에서 넘어와서 실행시킨다
     const newSearchParams = new URLSearchParams(location.search);
     if (sort) newSearchParams.set("sort", sort);
     if (filter) newSearchParams.set("filter", filter);
@@ -44,18 +52,18 @@ const Filter = ({ sort, filter, setSort, setFilter }: FilterProps) => {
           <label>
             <StyledCheckbox
               type="checkbox"
-              name="started"
-              // checked={filters.started}
-              // onChange={handleFilterChange}
+              name="시작된 미션"
+              checked={filters.started}
+              onChange={handleFilterChange}
             />
             Started Missions
           </label>
           <label>
             <StyledCheckbox
               type="checkbox"
-              name="notStarted"
-              // checked={filters.notStarted}
-              // onChange={handleFilterChange}
+              name="시작되지 않은 미션"
+              checked={filters.notStarted}
+              onChange={handleFilterChange}
             />
             Not Started Missions
           </label>

@@ -14,12 +14,14 @@ import {
   SearchedMissionInfoType,
   SimpleMissionInfoType,
   LazyMissionInfoListType,
+  FilterType,
 } from "../types";
 import { getData } from "../axios";
 import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
 import Filter from "../components/Filter";
+
 const LazyCard = lazy(() => import("../components/Card"));
 const LazyMyCard = lazy(() => import("../components/MyCard"));
 const LazyMissionSearch = lazy(() => import("../components/MissionSearch"));
@@ -39,7 +41,10 @@ const MainPage = () => {
     useState<string>("생성된 미션이 없습니다!");
   const [everClicked, setEverClicked] = useState<boolean>(false);
   const [sort, setSort] = useState<string>("");
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<FilterType>({
+    start: false,
+    notStart: false,
+  });
 
   // 소셜로그인 토큰처리
   useEffect(() => {
@@ -206,7 +211,7 @@ const MainPage = () => {
           sort={sort}
           setSort={setSort}
           filter={filter}
-          filter={setFilter}
+          setFilter={setFilter}
         />
         <MainSection>
           {totalMissionData?.map((mission, index) => (

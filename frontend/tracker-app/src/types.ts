@@ -61,7 +61,12 @@ export type UserInfoType = {
   user_email: string;
   isLoggedIn: boolean;
   sort: string;
-  filter: string;
+  filter: FilterType;
+};
+
+export type FilterType = {
+  start: boolean;
+  notStart: boolean;
 };
 
 export type ErrorResponseDataType = {

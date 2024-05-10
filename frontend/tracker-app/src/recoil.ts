@@ -14,7 +14,10 @@ export const userInfo = atom<UserInfoType>({
     user_id: "",
     user_email: "",
     sort: "",
-    filter: "",
+    filter: {
+      start: false,
+      notStart: false,
+    },
   },
   effects_UNSTABLE: [persistAtom],
 });
