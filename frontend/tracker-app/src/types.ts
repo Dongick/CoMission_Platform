@@ -60,6 +60,8 @@ export type UserInfoType = {
   user_id: string;
   user_email: string;
   isLoggedIn: boolean;
+  sort: string;
+  filter: string;
 };
 
 export type ErrorResponseDataType = {

@@ -13,6 +13,8 @@ export const userInfo = atom<UserInfoType>({
     isLoggedIn: false,
     user_id: "",
     user_email: "",
+    sort: "",
+    filter: "",
   },
   effects_UNSTABLE: [persistAtom],
 });
