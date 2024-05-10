@@ -19,6 +19,7 @@ import { getData } from "../axios";
 import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
+import Filter from "../components/Filter";
 
 const LazyCard = lazy(() => import("../components/Card"));
 const LazyMyCard = lazy(() => import("../components/MyCard"));
@@ -198,22 +199,25 @@ const MainPage = () => {
           <p>미션을 생성해보세요!</p>
         </NoLoginContent>
       )}
-      <MainSection>
-        {totalMissionData?.map((mission, index) => (
-          <Card
-            key={index}
-            id={mission.id}
-            title={mission.title}
-            username={mission.username}
-            minPar={mission.minParticipants}
-            par={mission.participants}
-            duration={mission.duration}
-            status={mission.status}
-            frequency={mission.frequency}
-            photoUrl={mission.photoUrl}
-          />
-        ))}
-      </MainSection>
+      <ContentBody>
+        <Filter />
+        <MainSection>
+          {totalMissionData?.map((mission, index) => (
+            <Card
+              key={index}
+              id={mission.id}
+              title={mission.title}
+              username={mission.username}
+              minPar={mission.minParticipants}
+              par={mission.participants}
+              duration={mission.duration}
+              status={mission.status}
+              frequency={mission.frequency}
+              photoUrl={mission.photoUrl}
+            />
+          ))}
+        </MainSection>
+      </ContentBody>
       {(everClicked && !hasNextPage) || totalMissionData.length < 20 ? (
         <StyledButton
           disabled
@@ -244,7 +248,7 @@ export default MainPage;
 const MainSection = styled.section`
   min-height: 100vh;
   padding: 3vh;
-  width: 70%;
+  width: 80%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
@@ -255,6 +259,12 @@ const MainSection = styled.section`
     grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
   }
   gap: 20px; /* Adjust the gap between cards */
+`;
+
+const ContentBody = styled.div`
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
 `;
 
 const MyMissionSection = styled.section`

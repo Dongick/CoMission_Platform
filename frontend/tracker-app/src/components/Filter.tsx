@@ -23,44 +23,81 @@ const Filter = () => {
   }, [sort, filter]);
 
   return (
-    <aside>
-      <h1>정렬 방식</h1>
+    <Asidebar>
       <div>
         <label>
-          Sort By:
-          <StyledSelect value={sortBy} onChange={handleSortChange}>
-            <option value="recent">Most Recent</option>
-            <option value="participants">Participants</option>
-            {/* Add more sorting options here */}
+          <StyledSelect>
+            {/* value={sortBy} onChange={handleSortChange} */}
+            <option value="recent">최신순</option>
+            <option value="participants">참여자순</option>
           </StyledSelect>
         </label>
       </div>
-      <h1>미션 필터</h1>
-      <div>
-        <label>
-          <StyledCheckbox
-            type="checkbox"
-            name="started"
-            checked={filters.started}
-            onChange={handleFilterChange}
-          />
-          Started Missions
-        </label>
-        <label>
-          <StyledCheckbox
-            type="checkbox"
-            name="notStarted"
-            checked={filters.notStarted}
-            onChange={handleFilterChange}
-          />
-          Not Started Missions
-        </label>
-      </div>
-    </aside>
+      <FilterDiv>
+        <div>미션 필터</div>
+        <div>
+          <label>
+            <StyledCheckbox
+              type="checkbox"
+              name="started"
+              // checked={filters.started}
+              // onChange={handleFilterChange}
+            />
+            Started Missions
+          </label>
+          <label>
+            <StyledCheckbox
+              type="checkbox"
+              name="notStarted"
+              // checked={filters.notStarted}
+              // onChange={handleFilterChange}
+            />
+            Not Started Missions
+          </label>
+        </div>
+      </FilterDiv>
+    </Asidebar>
   );
 };
 
-const StyledSelect = styled.select``;
+const Asidebar = styled.aside`
+  min-width: 200px;
+  height: max-content;
+  padding: 10px;
+  background-color: ${theme.mainGray};
+  @media screen and (max-width: 1000px) {
+    min-width: 100px;
+  }
+  @media screen and (max-width: 700px) {
+    min-width: 50px;
+  }
+`;
+const StyledSelect = styled.select`
+  width: 80%;
+  height: 35px;
+  margin: 30px 10px 30px 10px;
+  border: 1px solid ${theme.subGray};
+  border-radius: 3px;
+  font-size: 1rem;
+  font-family: noto;
+  cursor: pointer;
+`;
 
+const FilterDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+  font-size: 1rem;
+  font-family: noto;
+  cursor: pointer;
+
+  & > div:first-child {
+    height: 30px;
+    background-color: white;
+    color: #595959;
+    font-weight: 700;
+  }
+`;
 const StyledCheckbox = styled.input``;
 export default Filter;
