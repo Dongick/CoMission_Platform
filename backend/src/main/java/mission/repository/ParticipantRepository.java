@@ -1,7 +1,6 @@
 package mission.repository;
 
 import mission.document.ParticipantDocument;
-import mission.dto.participant.ParticipantMissionId;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

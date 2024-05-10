@@ -1,7 +1,6 @@
 package mission.repository;
 
 import mission.document.ParticipantDocument;
-import mission.dto.participant.ParticipantMissionId;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +49,6 @@ class ParticipantRepositoryTest {
         ObjectId[] missionId = {new ObjectId("65ea0c8007b2c737d6227ba0"), new ObjectId("65ea0c8007b2c737d6227ba2"), new ObjectId("65ea0c8007b2c737d6227ba4"), new ObjectId("65ea0c8007b2c737d6227ba6")};
         String[] userEmail = {"test1@example.com", "test2@example.com", "test3@example.com", "test4@example.com"};
 
-
         ParticipantDocument participantDocument = ParticipantDocument.builder()
                 .id(new ObjectId("65ea0c8007b2c737d6227bf6"))
                 .username("test1")
@@ -62,23 +60,23 @@ class ParticipantRepositoryTest {
         participantRepository.save(participantDocument);
 
         //when
-        List<ParticipantMissionId> participantMissionIdList1 = participantRepository.findByUserEmail(userEmail[0]);
-        List<ParticipantMissionId> participantMissionIdList2 = participantRepository.findByUserEmail(userEmail[1]);
-        List<ParticipantMissionId> participantMissionIdList3 = participantRepository.findByUserEmail(userEmail[2]);
-        List<ParticipantMissionId> participantMissionIdList4 = participantRepository.findByUserEmail(userEmail[3]);
+        List<ParticipantDocument> participantDocumentList1 = participantRepository.findByUserEmail(userEmail[0]);
+        List<ParticipantDocument> participantDocumentList2 = participantRepository.findByUserEmail(userEmail[1]);
+        List<ParticipantDocument> participantDocumentList3 = participantRepository.findByUserEmail(userEmail[2]);
+        List<ParticipantDocument> participantDocumentList4 = participantRepository.findByUserEmail(userEmail[3]);
 
         //then
-        Assertions.assertThat(participantMissionIdList1.size()).isEqualTo(2);
-        Assertions.assertThat(participantMissionIdList1.get(0).getMissionId()).isEqualTo(missionId[0]);
-        Assertions.assertThat(participantMissionIdList1.get(1).getMissionId()).isEqualTo(missionId[3]);
+        Assertions.assertThat(participantDocumentList1.size()).isEqualTo(2);
+        Assertions.assertThat(participantDocumentList1.get(0).getMissionId()).isEqualTo(missionId[0]);
+        Assertions.assertThat(participantDocumentList1.get(1).getMissionId()).isEqualTo(missionId[3]);
 
-        Assertions.assertThat(participantMissionIdList2.size()).isEqualTo(1);
-        Assertions.assertThat(participantMissionIdList2.get(0).getMissionId()).isEqualTo(missionId[1]);
+        Assertions.assertThat(participantDocumentList2.size()).isEqualTo(1);
+        Assertions.assertThat(participantDocumentList2.get(0).getMissionId()).isEqualTo(missionId[1]);
 
-        Assertions.assertThat(participantMissionIdList3.size()).isEqualTo(1);
-        Assertions.assertThat(participantMissionIdList3.get(0).getMissionId()).isEqualTo(missionId[2]);
+        Assertions.assertThat(participantDocumentList3.size()).isEqualTo(1);
+        Assertions.assertThat(participantDocumentList3.get(0).getMissionId()).isEqualTo(missionId[2]);
 
-        Assertions.assertThat(participantMissionIdList4.size()).isEqualTo(0);
+        Assertions.assertThat(participantDocumentList4.size()).isEqualTo(0);
     }
 
     @Test
