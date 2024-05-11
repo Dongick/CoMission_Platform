@@ -7,11 +7,11 @@ const useLogout = () => {
   const setUserInfo = useSetRecoilState(userInfo);
   const logout = (): void => {
     localStorage.removeItem("accessToken");
-    setUserInfo({
+    setUserInfo(prev => ({...prev,
       isLoggedIn: false,
       user_id: "",
       user_email: "",
-    });
+    }));
     navigate("/");
   };
 

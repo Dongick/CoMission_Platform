@@ -65,8 +65,8 @@ export type UserInfoType = {
 };
 
 export type FilterType = {
-  start: boolean;
-  notStart: boolean;
+  started: boolean;
+  created: boolean;
 };
 
 export type ErrorResponseDataType = {

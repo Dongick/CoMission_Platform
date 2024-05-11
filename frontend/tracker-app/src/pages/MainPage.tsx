@@ -40,10 +40,10 @@ const MainPage = () => {
   const [noDataMessage, setNoDataMessage] =
     useState<string>("생성된 미션이 없습니다!");
   const [everClicked, setEverClicked] = useState<boolean>(false);
-  const [sort, setSort] = useState<string>("");
+  const [sort, setSort] = useState<string>("latest");
   const [filter, setFilter] = useState<FilterType>({
-    start: false,
-    notStart: false,
+    started: false,
+    created: false,
   });
 
   // 소셜로그인 토큰처리
