@@ -35,7 +35,6 @@ public class ReissueController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-
         reissueService.reissue(request, response);
 
         return ResponseEntity.ok("good");

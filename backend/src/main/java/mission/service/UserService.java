@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mission.config.jwt.JWTUtil;
 import mission.document.Authentication;
 import mission.document.MissionDocument;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -55,6 +57,7 @@ public class UserService {
                 }
             }
         } else {
+            log.error("RefreshToken이 존재하지 않음");
             throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
         }
 
@@ -87,6 +90,7 @@ public class UserService {
                 .map(ParticipantDocument::getMissionId)
                 .collect(Collectors.toList());
 
+        // 참가한 미션이 존재하면 참가한 모든 미션 목록
         if(!missionIdList.isEmpty()) {
             participantSimpleMissionInfoList = missionRepository.findByIdInOrderByCreatedAtDesc(missionIdList);
         }
@@ -98,14 +102,17 @@ public class UserService {
 
     // 사용자가 참가한 미션 중 하나의 미션의 사용자 인증글 목록 매서드
     @Transactional
-    public UserMissionPostResponse userMissionPost(String email, String id, int num) {
+    public UserMissionPostResponse userMissionAuthenticationPost(String email, String id, int num) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) principal;
         String userEmail = customOAuth2User.getEmail();
 
+        // 로그인한 사용자와 pathValue로 넘어온 email 값 비교
         if(userEmail.equals(email)) {
+
+            // num 값이 0보다 작으면 유효성 검사 실패
             if(num < 0) {
                 throw new BadRequestException(ErrorCode.VALIDATION_FAILED, ErrorCode.VALIDATION_FAILED.getMessage());
             }

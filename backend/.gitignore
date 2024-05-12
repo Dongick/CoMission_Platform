@@ -26,6 +26,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 *.jpg
+log
 
 ### NetBeans ###
 /nbproject/private/
