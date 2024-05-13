@@ -37,7 +37,6 @@ const UserMenu = () => {
         border: "0.5px solid #363636",
         padding: "10px 15px",
         marginRight: "10px",
-        display: "none",
       }}
       onClick={() => navigate("/my-page")}
     >
@@ -46,7 +45,6 @@ const UserMenu = () => {
   );
   return (
     <Wrapper>
-      {userInfoState.isLoggedIn}
       {userInfoState.isLoggedIn ? (
         <div>
           {myInfoButton}
@@ -79,7 +77,7 @@ export default UserMenu;
 const Wrapper = styled.div`
   position: absolute;
   top: 30%;
-  right: 15%;
+  right: 10%;
   @media screen and (max-width: 1024px) {
     display: none;
   }

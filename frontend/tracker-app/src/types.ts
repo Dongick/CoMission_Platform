@@ -9,6 +9,15 @@ export type SimpleMissionInfoType = {
   frequency: string;
   photoUrl: string;
 };
+
+export type ParticipatedMissionType = {
+  simpleMissionInfoList: {
+    id: string;
+    title: string;
+    photoUrl: string;
+  }[];
+};
+
 export type LazyMissionInfoListType = {
   missionInfoList: SimpleMissionInfoType[];
 };
@@ -54,6 +63,14 @@ export type ConfirmPostIndexType = {
 
 export type ConfirmPostListType = {
   authenticationData: ConfirmPostDataType[];
+};
+
+export type UserMissionPostListType = {
+  userMissionPostList: {
+    date: string;
+    photoData: string;
+    textData: string;
+  }[];
 };
 
 export type UserInfoType = {
