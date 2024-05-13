@@ -45,6 +45,18 @@ const MainPage = () => {
     started: false,
     created: false,
   });
+  const [filterQuery, setFilterQuery] = useState<string>("all");
+  useEffect(() => {
+    if (filter.started && filter.created) {
+      setFilterQuery("all");
+    } else if (filter.started) {
+      setFilterQuery("started");
+    } else if (filter.created) {
+      setFilterQuery("created");
+    } else {
+      setFilterQuery("all");
+    }
+  }, [filter]);
 
   // 소셜로그인 토큰처리
   useEffect(() => {
@@ -65,7 +77,9 @@ const MainPage = () => {
   }, [location.search, setUserInfoState, navigate]);
 
   const fetchLazyData = async ({ pageParam = 1 }) =>
-    await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
+    await getData<LazyMissionInfoListType>(
+      `/api/main/?sort=${sort}&num=${pageParam}&filter=${filterQuery}`
+    );
   const {
     data: lazyData,
     fetchNextPage,
@@ -87,18 +101,21 @@ const MainPage = () => {
   });
 
   const fetchData = async () =>
-    await getData<MainServerResponseType>("/api/main");
-  const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["totalMissionData"],
+    await getData<MainServerResponseType>(
+      `/api/main?sort=${sort}&num=0&filter=${filterQuery}`
+    );
+  const { data, refetch, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ["totalMissionData", filterQuery],
     queryFn: fetchData,
   });
 
   useEffect(() => {
     if (data) {
+      console.log("데이터 페칭!");
       setTotalMissionData(data.missionInfoList);
       setMyMissionData(data.participantMissionInfoList);
     }
-  }, [isSuccess, data]);
+  }, [isSuccess, data, refetch]);
 
   useEffect(() => {
     const newLazyData =
@@ -212,6 +229,7 @@ const MainPage = () => {
           setSort={setSort}
           filter={filter}
           setFilter={setFilter}
+          refetch={refetch}
         />
         <MainSection>
           {totalMissionData?.map((mission, index) => (

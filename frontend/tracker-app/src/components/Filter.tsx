@@ -1,45 +1,53 @@
 import styled from "styled-components";
 import { theme } from "../styles/theme";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { ChangeEvent } from "react";
-import { FilterType } from "../types";
+import { ChangeEvent, useCallback } from "react";
+import { FilterType, MainServerResponseType } from "../types";
 import { useSetRecoilState } from "recoil";
 import { userInfo } from "../recoil";
+import { QueryObserverResult } from "@tanstack/react-query";
 interface FilterProps {
   sort: string;
   setSort: React.Dispatch<React.SetStateAction<string>>;
   filter: FilterType;
   setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
+  refetch: () => Promise<QueryObserverResult<MainServerResponseType, Error>>;
 }
 
-const Filter = ({ sort, filter, setSort, setFilter }: FilterProps) => {
+const Filter = ({ sort, filter, setSort, setFilter, refetch }: FilterProps) => {
   const location = useLocation();
   const setUserInfo = useSetRecoilState(userInfo);
   // 이미 URL에 query존재 시 기존 값으로 설정
   const [searchParams, setSearchParams] = useSearchParams();
-  sort = searchParams.get("sort") || "participants";
-  searchParams.getAll("filter").forEach((value) => {
-    if (value === "started" || value === "created") {
-      filter[value] = true;
-    }
-  });
+  // sort = searchParams.get("sort") || "sibal";
+  // console.log(sort);
+  // searchParams.getAll("filter").forEach((value) => {
+  //   if (value === "started" || value === "created") {
+  //     filter[value] = true;
+  //   }
+  // });
 
-  const sortChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target.value);
+  const sortChangeHandler = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     setSort(e.target.value);
-  };
-  const filterChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFilter((prevFilter) => ({
-      ...prevFilter,
-      [name]: checked,
-    }));
-  };
+  }, []);
+
+  const filterChangeHandler = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const { name, checked } = e.target;
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        [name]: checked,
+      }));
+    },
+    []
+  );
 
   // 조건이 바뀌면, 쿼리 값 업데이트
   const handleApplyButtonClick = () => {
     // 먼저 바뀐 조건으로 api요청을 해야한다.
     // api요청을 하는 함수는 메인에서 넘어와서 실행시킨다
+    console.log(sort, filter);
+    refetch();
     updateQueryURLHandler();
   };
 
