@@ -44,9 +44,6 @@ const Filter = ({ sort, filter, setSort, setFilter, refetch }: FilterProps) => {
 
   // 조건이 바뀌면, 쿼리 값 업데이트
   const handleApplyButtonClick = () => {
-    // 먼저 바뀐 조건으로 api요청을 해야한다.
-    // api요청을 하는 함수는 메인에서 넘어와서 실행시킨다
-    console.log(sort, filter);
     refetch();
     updateQueryURLHandler();
   };

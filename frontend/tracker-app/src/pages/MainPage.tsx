@@ -105,17 +105,16 @@ const MainPage = () => {
       `/api/main?sort=${sort}&num=0&filter=${filterQuery}`
     );
   const { data, refetch, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["totalMissionData", filterQuery],
+    queryKey: ["totalMissionData"],
     queryFn: fetchData,
   });
 
   useEffect(() => {
     if (data) {
-      console.log("데이터 페칭!");
       setTotalMissionData(data.missionInfoList);
       setMyMissionData(data.participantMissionInfoList);
     }
-  }, [isSuccess, data, refetch]);
+  }, [isSuccess, data]);
 
   useEffect(() => {
     const newLazyData =
@@ -216,13 +215,6 @@ const MainPage = () => {
           )}
         </div>
       )}
-      {totalMissionData.length === 0 && !isLoading && (
-        <NoLoginContent style={{ padding: "10%" }}>
-          <span>❌</span>
-          <h1>{noDataMessage}</h1>
-          <p>미션을 생성해보세요!</p>
-        </NoLoginContent>
-      )}
       <ContentBody>
         <Filter
           sort={sort}
@@ -231,22 +223,30 @@ const MainPage = () => {
           setFilter={setFilter}
           refetch={refetch}
         />
-        <MainSection>
-          {totalMissionData?.map((mission, index) => (
-            <Card
-              key={index}
-              id={mission.id}
-              title={mission.title}
-              username={mission.username}
-              minPar={mission.minParticipants}
-              par={mission.participants}
-              duration={mission.duration}
-              status={mission.status}
-              frequency={mission.frequency}
-              photoUrl={mission.photoUrl}
-            />
-          ))}
-        </MainSection>
+        {totalMissionData.length === 0 && !isLoading ? (
+          <NoLoginContent style={{ padding: "10%" }}>
+            <span>❌</span>
+            <h1>{noDataMessage}</h1>
+            <p>미션을 생성해보세요!</p>
+          </NoLoginContent>
+        ) : (
+          <MainSection>
+            {totalMissionData?.map((mission, index) => (
+              <Card
+                key={index}
+                id={mission.id}
+                title={mission.title}
+                username={mission.username}
+                minPar={mission.minParticipants}
+                par={mission.participants}
+                duration={mission.duration}
+                status={mission.status}
+                frequency={mission.frequency}
+                photoUrl={mission.photoUrl}
+              />
+            ))}
+          </MainSection>
+        )}
       </ContentBody>
       {(everClicked && !hasNextPage) || totalMissionData.length < 20 ? (
         <StyledButton
