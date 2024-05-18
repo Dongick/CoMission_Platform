@@ -27,6 +27,7 @@ out/
 !**/src/test/**/out/
 *.jpg
 log
+.env
 
 ### NetBeans ###
 /nbproject/private/

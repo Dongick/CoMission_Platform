@@ -8,6 +8,7 @@ file:
 spring:
   jpa:
     hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
       ddl-auto: update
       format_sql: true
       show-sql: true

@@ -1,0 +1,59 @@
+services:
+  mongodb:
+    image: mongo:7.0.4
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      - TZ=Asia/Seoul
+      - LC_ALL=C.UTF-8
+    command: [--auth]
+    volumes:
+      - testmongo-volume:/data/db
+    networks:
+      - test_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3308:3306"
+    environment:
+      - TZ=Asia/Seoul
+      - LC_ALL=C.UTF-8
+    volumes:
+      - testdb-volume:/var/lib/mysql
+    networks:
+      - test_network
+
+  spring-boot-app:
+    image: dongick/comission-platform
+    container_name: comission-platform
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+      - mysql
+    volumes:
+      - testspring-volume:/var/log
+    networks:
+      - test_network
+
+networks:
+  test_network:
+
+volumes:
+  testmongo-volume:
+    external: true
+  testdb-volume:
+    external: true
+  testspring-volume:
+    external: true
