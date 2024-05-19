@@ -12,7 +12,7 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- Rolling 정책 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern> ./log/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern> logs/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 7일까지 보관 -->
             <maxHistory>7</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
