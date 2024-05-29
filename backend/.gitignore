@@ -38,3 +38,5 @@ logs
 
 ### VS Code ###
 .vscode/
+/src/main/resources/static/missions/
+/src/main/resources/static/authentications/
