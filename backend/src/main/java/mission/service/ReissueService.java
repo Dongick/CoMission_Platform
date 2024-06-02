@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mission.config.jwt.JWTUtil;
 import mission.entity.RefreshTokenEntity;
 import mission.exception.ErrorCode;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReissueService {
     private final JWTUtil jwtUtil;
     @Transactional
@@ -31,6 +33,7 @@ public class ReissueService {
                 }
             }
         } else {
+            log.error("cookie가 존재하지 않음");
             throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
         }
 

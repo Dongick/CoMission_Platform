@@ -8,7 +8,10 @@ import { AxiosError } from "axios";
 import { ErrorResponseDataType, ConfirmPostListType } from "../types";
 import StyledButton from "./StyledButton";
 import { useState } from "react";
+import { LoadingErrorWrapper } from "../pages/MainPage";
+import Loaders from "./Loaders";
 import PostEditModal from "./PostEditModal";
+
 const PostListLayout = styled.div`
   padding: 5px;
 `;
@@ -47,9 +50,10 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
 
   if (isLoading) {
     return (
-      <NoLoginContent>
-        <h1>데이터 로딩중...</h1>
-      </NoLoginContent>
+      <LoadingErrorWrapper>
+        <h1>페이지 로딩중...</h1>
+        <Loaders></Loaders>
+      </LoadingErrorWrapper>
     );
   }
   if (isError) {
@@ -134,7 +138,7 @@ const ConfirmPostList = ({ id }: ConfirmPostListProps) => {
           color={theme.subGray}
           style={{ fontSize: "1.1rem", boxShadow: "none", cursor: "auto" }}
         >
-          더 이상 미션이 없습니다!
+          더 이상 인증글이 없습니다!
         </StyledButton>
       )}
       {showPostModal && (

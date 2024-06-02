@@ -1,5 +1,8 @@
 package mission.mock;
 
+import mission.dto.oauth2.CustomOAuth2User;
+import mission.dto.user.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,10 +20,14 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        OAuth2User principal = new DefaultOAuth2User(AuthorityUtils.createAuthorityList(customUser.role()),
-                Map.of("username", customUser.name(), "role", customUser.role(), "email", customUser.email()), "email");
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(User.builder()
+                .name(customUser.name())
+                .role(customUser.role())
+                .email(customUser.email())
+                .build());
 
-        Authentication auth = new OAuth2AuthenticationToken(principal, principal.getAuthorities(), "test");
+        Authentication auth = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+
         context.setAuthentication(auth);
         return context;
     }

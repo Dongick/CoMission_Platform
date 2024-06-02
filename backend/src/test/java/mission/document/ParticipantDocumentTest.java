@@ -22,6 +22,7 @@ class ParticipantDocumentTest {
         ObjectId missionId = new ObjectId("616157d8d4e12e67c17dc15d");
         String userEmail = "test@example.com";
         List<Authentication> authenticationList = new ArrayList<>();
+        String username = "test";
 
         // When
         ParticipantDocument participantDocument = ParticipantDocument.builder()
@@ -30,6 +31,7 @@ class ParticipantDocumentTest {
                 .missionId(missionId)
                 .userEmail(userEmail)
                 .authentication(authenticationList)
+                .username(username)
                 .build();
 
         // Then
@@ -38,5 +40,6 @@ class ParticipantDocumentTest {
         Assertions.assertThat(participantDocument.getUserEmail()).isEqualTo(userEmail);
         Assertions.assertThat(participantDocument.getAuthentication()).isEqualTo(authenticationList);
         Assertions.assertThat(participantDocument.getMissionId()).isEqualTo(missionId);
+        Assertions.assertThat(participantDocument.getUsername()).isEqualTo(username);
     }
 }

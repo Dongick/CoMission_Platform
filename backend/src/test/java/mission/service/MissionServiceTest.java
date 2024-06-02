@@ -2,15 +2,16 @@ package mission.service;
 
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
-import mission.dto.User;
 import mission.dto.mission.*;
 import mission.dto.oauth2.CustomOAuth2User;
+import mission.dto.user.User;
 import mission.exception.BadRequestException;
 import mission.exception.ConflictException;
 import mission.exception.ForbiddenException;
 import mission.exception.NotFoundException;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
+import mission.util.TimeProvider;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,12 @@ class MissionServiceTest {
     private ParticipantRepository participantRepository;
     @Mock
     private AWSS3Service awss3Service;
+    @Mock
+    private FileService fileService;
+    @Mock
+    private TimeProvider timeProvider;
+    @Mock
+    private ParticipantService participantService;
     @InjectMocks
     private MissionService missionService;
     private static String MISSION_DIR = "missions/";
@@ -65,7 +72,8 @@ class MissionServiceTest {
 
         String fileLocation = "test/photo.jpg";
 
-        when(awss3Service.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
+        when(fileService.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
         when(missionRepository.save(any())).thenReturn(MissionDocument.builder()
                 .id(new ObjectId())
                 .build());
@@ -74,8 +82,9 @@ class MissionServiceTest {
         missionService.createMission(missionCreateRequest, photoData);
 
         // then
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
         verify(missionRepository).save(any(MissionDocument.class));
-        verify(participantRepository).save(any(ParticipantDocument.class));
+        verify(participantService).saveParticipant(any(ObjectId.class), any(LocalDateTime.class), anyString(), anyString());
     }
 
     @Test
@@ -93,6 +102,7 @@ class MissionServiceTest {
         missionCreateRequest.setFrequency("daily");
         MultipartFile photoData = new MockMultipartFile("photoData", "test.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.save(any())).thenReturn(MissionDocument.builder()
                 .id(new ObjectId())
                 .build());
@@ -102,7 +112,7 @@ class MissionServiceTest {
 
         // then
         verify(missionRepository).save(any(MissionDocument.class));
-        verify(participantRepository).save(any(ParticipantDocument.class));
+        verify(participantService).saveParticipant(any(ObjectId.class), any(LocalDateTime.class), anyString(), anyString());
     }
 
     @Test
@@ -120,7 +130,8 @@ class MissionServiceTest {
         missionCreateRequest.setFrequency("daily");
         MultipartFile photoData = new MockMultipartFile("photoData", "test.txt", "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
-        when(awss3Service.uploadFile(photoData, MISSION_DIR)).thenThrow(IOException.class);
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
+        when(fileService.uploadFile(photoData, MISSION_DIR)).thenThrow(IOException.class);
 
         // when, then
         assertThrows(IOException.class, () -> missionService.createMission(missionCreateRequest, photoData));
@@ -155,20 +166,11 @@ class MissionServiceTest {
 
         String fileLocation = "test/photo.jpg";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .photoUrl(photoUrl)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(title, description, minParticipants, participants, duration, frequency, status, userEmail, photoUrl);
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
-        when(awss3Service.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
+        when(fileService.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
 
         // when
         missionService.updateMission(missionUpdateRequest, photoData, missionId);
@@ -184,8 +186,8 @@ class MissionServiceTest {
         Assertions.assertThat(missionDocument.getStartDate()).isNull();
 
         verify(missionRepository).save(missionDocument);
-        verify(awss3Service).deleteFile(anyString(), anyString());
-        verify(awss3Service).uploadFile(any(MultipartFile.class), anyString());
+        verify(fileService).deleteFile(anyString());
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
     }
 
     @Test
@@ -217,20 +219,11 @@ class MissionServiceTest {
 
         String fileLocation = "test/photo.jpg";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .photoUrl(photoUrl)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(title, description, minParticipants, participants, duration, frequency, status, userEmail, photoUrl);
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
-        when(awss3Service.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
+        when(fileService.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
 
         // when
         missionService.updateMission(missionUpdateRequest, photoData, missionId);
@@ -246,8 +239,8 @@ class MissionServiceTest {
         Assertions.assertThat(missionDocument.getStartDate()).isNotNull();
 
         verify(missionRepository).save(missionDocument);
-        verify(awss3Service).deleteFile(anyString(), anyString());
-        verify(awss3Service).uploadFile(any(MultipartFile.class), anyString());
+        verify(fileService).deleteFile(anyString());
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
     }
 
     @Test
@@ -277,18 +270,9 @@ class MissionServiceTest {
         missionUpdateRequest.setFrequency(frequency);
         MultipartFile photoData = null;
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .photoUrl(photoUrl)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(title, description, minParticipants, participants, duration, frequency, status, userEmail, photoUrl);
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
 
         // when
@@ -305,8 +289,8 @@ class MissionServiceTest {
         Assertions.assertThat(missionDocument.getStartDate()).isNull();
 
         verify(missionRepository).save(missionDocument);
-        verify(awss3Service).deleteFile(anyString(), anyString());
-        verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
+        verify(fileService).deleteFile(anyString());
+        verify(fileService, never()).uploadFile(any(MultipartFile.class), anyString());
     }
 
     @Test
@@ -337,18 +321,11 @@ class MissionServiceTest {
 
         String fileLocation = "test/photo.jpg";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
-        when(awss3Service.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
+        when(fileService.uploadFile(photoData, MISSION_DIR)).thenReturn(fileLocation);
 
         // when
         missionService.updateMission(missionUpdateRequest, photoData, missionId);
@@ -364,8 +341,8 @@ class MissionServiceTest {
         Assertions.assertThat(missionDocument.getStartDate()).isNull();
 
         verify(missionRepository).save(missionDocument);
-        verify(awss3Service, never()).deleteFile(anyString(), anyString());
-        verify(awss3Service).uploadFile(any(MultipartFile.class), anyString());
+        verify(fileService, never()).deleteFile(anyString());
+        verify(fileService).uploadFile(any(MultipartFile.class), anyString());
     }
 
     @Test
@@ -394,17 +371,9 @@ class MissionServiceTest {
         missionUpdateRequest.setFrequency(frequency);
         MultipartFile photoData = null;
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
+        when(timeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
 
         // when
@@ -421,8 +390,8 @@ class MissionServiceTest {
         Assertions.assertThat(missionDocument.getStartDate()).isNull();
 
         verify(missionRepository).save(missionDocument);
-        verify(awss3Service, never()).deleteFile(anyString(), anyString());
-        verify(awss3Service, never()).uploadFile(any(MultipartFile.class), anyString());
+        verify(fileService, never()).deleteFile(anyString());
+        verify(fileService, never()).uploadFile(any(MultipartFile.class), anyString());
     }
 
     @Test
@@ -480,16 +449,7 @@ class MissionServiceTest {
         missionUpdateRequest.setFrequency(frequency);
         MultipartFile photoData = null;
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
 
@@ -500,48 +460,6 @@ class MissionServiceTest {
     @Test
     @DisplayName("updateMission 매서드: 수정하려는 미션이 이미 종료된 경우 실패")
     void updateMission_MissionAlreadyCompleted_Failure(){
-        // given
-        prepareSecurityContextHolder();
-        CustomOAuth2User customOAuth2User = prepareCustomOAuth2User();
-
-        String missionId = "missionId";
-
-        String title = "Updated Test Mission";
-        String description = "This is an updated test mission";
-        int minParticipants = 5;
-        int participants = 4;
-        int duration = 10;
-        String frequency = "weekly";
-        String status = "CREATED";
-
-        MissionUpdateRequest missionUpdateRequest = new MissionUpdateRequest();
-        missionUpdateRequest.setAfterTitle(title);
-        missionUpdateRequest.setDescription(description);
-        missionUpdateRequest.setMinParticipants(minParticipants);
-        missionUpdateRequest.setDuration(duration);
-        missionUpdateRequest.setFrequency(frequency);
-        MultipartFile photoData = null;
-
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail("test2@example.com")
-                .build();
-
-        when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
-
-        // when, then
-        assertThrows(ForbiddenException.class, () -> missionService.updateMission(missionUpdateRequest, photoData, missionId));
-    }
-
-    @Test
-    @DisplayName("updateMission 매서드: 해당 미션을 생성한 사용자와 수정하려는 사용자가 다른 경우 실패")
-    void updateMission_DifferentUser_Failure(){
         // given
         prepareSecurityContextHolder();
         CustomOAuth2User customOAuth2User = prepareCustomOAuth2User();
@@ -565,16 +483,7 @@ class MissionServiceTest {
         missionUpdateRequest.setFrequency(frequency);
         MultipartFile photoData = null;
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
 
@@ -582,7 +491,39 @@ class MissionServiceTest {
         assertThrows(BadRequestException.class, () -> missionService.updateMission(missionUpdateRequest, photoData, missionId));
     }
 
+    @Test
+    @DisplayName("updateMission 매서드: 해당 미션을 생성한 사용자와 수정하려는 사용자가 다른 경우 실패")
+    void updateMission_DifferentUser_Failure(){
+        // given
+        prepareSecurityContextHolder();
+        CustomOAuth2User customOAuth2User = prepareCustomOAuth2User();
 
+        String userEmail = "different test email";
+        String missionId = "missionId";
+
+        String title = "Updated Test Mission";
+        String description = "This is an updated test mission";
+        int minParticipants = 5;
+        int participants = 4;
+        int duration = 10;
+        String frequency = "weekly";
+        String status = "CREATED";
+
+        MissionUpdateRequest missionUpdateRequest = new MissionUpdateRequest();
+        missionUpdateRequest.setAfterTitle(title);
+        missionUpdateRequest.setDescription(description);
+        missionUpdateRequest.setMinParticipants(minParticipants);
+        missionUpdateRequest.setDuration(duration);
+        missionUpdateRequest.setFrequency(frequency);
+        MultipartFile photoData = null;
+
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(), title, description, minParticipants, participants, duration, frequency, status, userEmail);
+
+        when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
+
+        // when, then
+        assertThrows(ForbiddenException.class, () -> missionService.updateMission(missionUpdateRequest, photoData, missionId));
+    }
 
     @Test
     @DisplayName("missionInfo 매서드: 로그인을 하지 않은 경우 성공")
@@ -597,20 +538,10 @@ class MissionServiceTest {
         int participants = 4;
         int duration = 10;
         String frequency = "weekly";
-        String status = "COMPLETED";
+        String status = "CREATED";
         String userEmail = "test@example.com";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .id(new ObjectId(missionId))
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(missionId), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
 
@@ -640,19 +571,9 @@ class MissionServiceTest {
         int participants = 4;
         int duration = 10;
         String frequency = "weekly";
-        String status = "COMPLETED";
+        String status = "CREATED";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .id(new ObjectId(missionId))
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(missionId), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
         ParticipantDocument participantDocument = ParticipantDocument.builder()
                 .userEmail(userEmail)
@@ -690,19 +611,9 @@ class MissionServiceTest {
         int participants = 4;
         int duration = 10;
         String frequency = "weekly";
-        String status = "COMPLETED";
+        String status = "CREATED";
 
-        MissionDocument missionDocument = MissionDocument.builder()
-                .id(new ObjectId(missionId))
-                .title(title)
-                .description(description)
-                .minParticipants(minParticipants)
-                .participants(participants)
-                .duration(duration)
-                .frequency(frequency)
-                .status(status)
-                .creatorEmail(userEmail)
-                .build();
+        MissionDocument missionDocument = prepareMissionDocument(new ObjectId(missionId), title, description, minParticipants, participants, duration, frequency, status, userEmail);
 
         when(missionRepository.findById(missionId)).thenReturn(Optional.of(missionDocument));
         when(participantRepository.findByMissionIdAndUserEmail(missionDocument.getId(),userEmail)).thenReturn(Optional.empty());
@@ -764,5 +675,33 @@ class MissionServiceTest {
                 .build());
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(customOAuth2User);
         return customOAuth2User;
+    }
+
+    private MissionDocument prepareMissionDocument(String title, String description, int minParticipants, int participants, int duration, String frequency, String status, String userEmail, String photoUrl) {
+        return MissionDocument.builder()
+                .title(title)
+                .description(description)
+                .minParticipants(minParticipants)
+                .participants(participants)
+                .duration(duration)
+                .frequency(frequency)
+                .status(status)
+                .creatorEmail(userEmail)
+                .photoUrl(photoUrl)
+                .build();
+    }
+
+    private MissionDocument prepareMissionDocument(ObjectId id, String title, String description, int minParticipants, int participants, int duration, String frequency, String status, String userEmail) {
+        return MissionDocument.builder()
+                .id(id)
+                .title(title)
+                .description(description)
+                .minParticipants(minParticipants)
+                .participants(participants)
+                .duration(duration)
+                .frequency(frequency)
+                .status(status)
+                .creatorEmail(userEmail)
+                .build();
     }
 }

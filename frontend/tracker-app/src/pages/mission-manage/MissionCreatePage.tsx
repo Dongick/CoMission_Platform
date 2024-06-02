@@ -135,7 +135,9 @@ const MissionCreatePage = () => {
                 />
               </InputDiv>
               <InputDiv>
-                <label htmlFor="description">미션 상세 설명 (필수)</label>
+                <label htmlFor="description">
+                  미션 상세/ 인증 방법 설명 (필수)
+                </label>
                 <Input
                   id="description"
                   value={description}

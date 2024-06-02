@@ -10,7 +10,6 @@ import mission.exception.*;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import mission.util.TimeProvider;
-import org.bson.types.ObjectId;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +30,7 @@ public class MissionService {
     private final AWSS3Service awss3Service;
     private final FileService fileService;
     private final TimeProvider timeProvider;
+    private final ParticipantService participantService;
     private static final String MISSION_DIR = "missions/";
 
     // 미션 생성 매서드
@@ -43,7 +42,6 @@ public class MissionService {
         String userEmail = customOAuth2User.getEmail();
         String username = customOAuth2User.getName();
 
-        //LocalDateTime now = LocalDateTime.now();
         LocalDateTime now = timeProvider.getCurrentDateTime();
 
         // 미션에 이미지가 존재하면 AWS S3에 저장
@@ -52,7 +50,7 @@ public class MissionService {
 
         MissionDocument missionDocument = saveMission(missionCreateRequest, fileLocation, now, userEmail, username);
 
-        saveParticipant(missionDocument.getId(), now, userEmail, username);
+        participantService.saveParticipant(missionDocument.getId(), now, userEmail, username);
     }
 
     // 미션 수정 매서드
@@ -86,7 +84,6 @@ public class MissionService {
             String fileLocation = photoData == null || photoData.isEmpty() ? null : awss3Service.uploadFile(photoData, MISSION_DIR);
 //            String fileLocation = photoData == null || photoData.isEmpty() ? null : fileService.uploadFile(photoData, MISSION_DIR);
 
-            //LocalDateTime now = LocalDateTime.now();
             LocalDateTime now = timeProvider.getCurrentDateTime();
 
             missionDocument.setTitle(missionUpdateRequest.getAfterTitle());
@@ -145,6 +142,7 @@ public class MissionService {
                 .build();
     }
 
+    // 미션 검색 매서드
     public MissionSearchResponse missionSearch(MissionSearchRequest missionSearchRequest) {
         List<MissionInfo> missionInfoList = missionRepository.findByTitleAndStatusNotContainingIgnoreCaseOrderByCreatedAtDesc(missionSearchRequest.getTitle());
 
@@ -174,17 +172,6 @@ public class MissionService {
         return missionRepository.save(missionDocument);
     }
 
-    // 미션 참여자 저장
-    private void saveParticipant(ObjectId missionId, LocalDateTime now, String userEmail, String username) {
-        participantRepository.save(ParticipantDocument.builder()
-                .missionId(missionId)
-                .joinedAt(now)
-                .userEmail(userEmail)
-                .username(username)
-                .authentication(new ArrayList<>())
-                .build());
-    }
-
     // 미션 종료
     private void endMission(MissionDocument mission) {
         // 미션을 종료 상태로 변경
@@ -193,7 +180,7 @@ public class MissionService {
     }
 
     // 해당 미션이 존재하는지 확인
-    private MissionDocument getMissionDocument(String id) {
+    public MissionDocument getMissionDocument(String id) {
         return missionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MISSION_NOT_FOUND, ErrorCode.MISSION_NOT_FOUND.getMessage()));
     }
