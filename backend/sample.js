@@ -3,7 +3,6 @@ import { check, sleep } from 'k6';
 
 export let options = {
   stages: [
-    {duration: '1m', target: 50},
     {duration: '2m', target: 50},
     {duration: '1m', target: 200},
     {duration: '2m', target: 200},
@@ -14,7 +13,7 @@ export let options = {
   },
 };
 
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'http://api.comission-platform.store/api';
 const ACCESS_TOKEN = 'access_token'
 //const photoData = open('src/main/resources/static/missions/424c1851-51c8-438a-b607-755412d86bcc.jpg', 'b');
 

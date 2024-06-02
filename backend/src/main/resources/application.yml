@@ -64,3 +64,10 @@ spring:
 app:
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS}
+
+file:
+  upload:
+    authentication:
+      directory: ${AUTHENTICATION_FILE_UPLOAD}
+    mission:
+      directory: ${MISSION_FILE_UPLOAD}

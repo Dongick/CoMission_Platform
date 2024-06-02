@@ -4,7 +4,7 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27018:27017"
+      - "27017:27017"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
@@ -19,7 +19,7 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - "3308:3306"
+      - "3306:3306"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
@@ -46,8 +46,7 @@ services:
       - mysql
       - influxdb
     volumes:
-      - /home/ubuntu/demo/logs:/logs
-#      - C:/Users/lg/Documents/GITHUB/progress-tracker/backend/src/main/resources/static/missions:/src/main/resources/static/missions
+      - /home/ubuntu/backend/logs:/logs
     networks:
       - test_network
 
@@ -56,7 +55,7 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - '3005:3000'
+      - '3005:3005'
     networks:
       - test_network
     depends_on:
