@@ -81,7 +81,7 @@ class UserControllerTest {
         userMissionPostList.add(userMissionPost);
         UserMissionPostResponse response = new UserMissionPostResponse(userMissionPostList);
 
-        when(userService.userMissionPost(email, missionId, 0)).thenReturn(response);
+        when(userService.userMissionAuthenticationPost(email, missionId, 0)).thenReturn(response);
 
         mockMvc.perform(get("/api/user/{email}/mission/{id}/post", email, missionId)
                 .param("num", "0")

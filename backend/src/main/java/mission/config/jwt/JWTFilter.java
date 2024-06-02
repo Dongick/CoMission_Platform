@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mission.dto.oauth2.CustomOAuth2User;
 import mission.dto.user.User;
 import mission.exception.ErrorCode;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -43,13 +45,12 @@ public class JWTFilter extends OncePerRequestFilter {
         String accessTokenHeader = request.getHeader("Authorization");
 
         if (accessTokenHeader == null) {
-
             if(requestUri.matches("^\\/api\\/main") || requestUri.matches("^\\/api\\/mission\\/info\\/.+")) {
 
                 filterChain.doFilter(request, response);
 
             } else {
-
+                log.error("로그인을 하지 않아 해당 api에 접근 권한 없음");
                 sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
             }
 
@@ -57,6 +58,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         if(!accessTokenHeader.startsWith("Bearer ")) {
+            log.error("AccessToken 값에 Bearer 포함 안됨");
             sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
 
             return;
@@ -68,11 +70,12 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-
+            log.warn("Access token 만료");
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.ACCESS_TOKEN_EXPIRED, ErrorCode.ACCESS_TOKEN_EXPIRED.getMessage());
 
             return;
         } catch (SignatureException e) {
+            log.error("Access token 만료여부 확인 불가");
             sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
 
             return;
@@ -83,13 +86,14 @@ public class JWTFilter extends OncePerRequestFilter {
             String category = jwtUtil.getCategory(accessToken);
 
             if (!category.equals("access")) {
-
+                log.error("Access token 페이로드 값이 access가 아님");
                 sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
 
                 return;
             }
 
         } catch (SignatureException e) {
+            log.error("Access token 페이로드 확인 불가");
             sendErrorResponse(response, HttpStatus.BAD_REQUEST, ErrorCode.ACCESS_TOKEN_INVALID, ErrorCode.ACCESS_TOKEN_INVALID.getMessage());
 
             return;

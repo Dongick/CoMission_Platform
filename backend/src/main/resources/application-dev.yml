@@ -1,13 +1,7 @@
-file:
-  upload:
-    authentication:
-      directory: ${AUTHENTICATION_FILE_UPLOAD}
-    mission:
-      directory: ${MISSION_FILE_UPLOAD}
-
 spring:
   jpa:
     hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
       ddl-auto: update
       format_sql: true
       show-sql: true
