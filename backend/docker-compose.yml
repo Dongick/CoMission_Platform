@@ -10,7 +10,7 @@ services:
       - LC_ALL=C.UTF-8
     command: [--auth]
     volumes:
-      - testmongo-volume:/data/db
+      - CoMission_Platform-MongoVolume:/data/db
     networks:
       - test_network
 
@@ -24,7 +24,7 @@ services:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
     volumes:
-      - testdb-volume:/var/lib/mysql
+      - CoMission_Platform-MysqlVolume:/var/lib/mysql
     networks:
       - test_network
 
@@ -55,7 +55,7 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - '3005:3005'
+      - '3005:3000'
     networks:
       - test_network
     depends_on:
@@ -79,9 +79,9 @@ networks:
   test_network:
 
 volumes:
-  testmongo-volume:
+  CoMission_Platform-MongoVolume:
     external: true
-  testdb-volume:
+  CoMission_Platform-MysqlVolume:
     external: true
   influxdb-volume:
     external: true
