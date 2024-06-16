@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ConfirmPostIndexType } from "../types";
 import { theme } from "../styles/theme";
 import deleteImg from "../assets/img/delete.png";
@@ -17,13 +17,25 @@ const ConfirmPost = ({ post, index, id }: ModalHandlerType) => {
   const [isEditClicked, setIsEditClicked] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { cardId } = useParams();
+  const [canEdit, setCanEdit] = useState<boolean>(false);
+  useEffect(() => {
+    checkIfWithin24Hours(post.date);
+  }, [post]);
 
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  const formattedToday = `${year}-${month}-${day}`;
-
+  const checkIfWithin24Hours = (postDateIso: string) => {
+    const postDate = new Date(postDateIso);
+    const currentDate = new Date();
+    // 밀리초 단위로 차이 계산
+    const timeDifference = currentDate.getTime() - postDate.getTime();
+    // 밀리초를 시간으로 변환
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
+    setCanEdit(hoursDifference <= 24);
+  };
+  const convertIsoDate = (postDateIso: string) => {
+    const [datePart, timePart] = postDateIso.split("T");
+    const formattedTimePart = timePart.replace("Z", "");
+    return `${datePart} ${formattedTimePart}`;
+  };
   const closeModal = () => {
     setIsEditClicked(false);
   };
@@ -43,7 +55,7 @@ const ConfirmPost = ({ post, index, id }: ModalHandlerType) => {
   return (
     <PostLayout>
       <PostHeader>
-        {formattedToday === post.date && (
+        {canEdit && (
           <IconWrapper>
             <img
               src={editImg}
@@ -79,7 +91,7 @@ const ConfirmPost = ({ post, index, id }: ModalHandlerType) => {
             color: `${theme.subGray}`,
           }}
         >
-          {post.date}
+          {convertIsoDate(post.date)}
         </p>
       </PostHeader>
       <PostContent>
