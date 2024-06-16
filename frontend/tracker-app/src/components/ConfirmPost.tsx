@@ -32,9 +32,14 @@ const ConfirmPost = ({ post, index, id }: ModalHandlerType) => {
     setCanEdit(hoursDifference <= 24);
   };
   const convertIsoDate = (postDateIso: string) => {
-    const [datePart, timePart] = postDateIso.split("T");
-    const formattedTimePart = timePart.replace("Z", "");
-    return `${datePart} ${formattedTimePart}`;
+    const date = new Date(postDateIso);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 +1 필요
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
   const closeModal = () => {
     setIsEditClicked(false);
