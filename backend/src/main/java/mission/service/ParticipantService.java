@@ -86,7 +86,7 @@ public class ParticipantService {
                 .joinedAt(now)
                 .userEmail(userEmail)
                 .username(username)
-                .authentication(new ArrayList<>())
+//                .authentication(new ArrayList<>())
                 .build());
     }
 

@@ -14,7 +14,8 @@ export let options = {
 };
 
 const BASE_URL = 'http://api.comission-platform.store/api';
-const ACCESS_TOKEN = 'access_token'
+const LOCAL_BASE_URL = 'http://localhost:8080/api';
+const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsInVzZXJuYW1lIjoi7J2064-Z7J21Iiwicm9sZSI6IlJPTEVfVVNFUiIsImVtYWlsIjoiZGxlaGRkbHIzMjE5QG5hdmVyLmNvbSIsImlhdCI6MTcxODM0MTQyNCwiZXhwIjoxNzE4MzQzMjI0fQ.mZwCkhiq4QuREh1eHKdhj4c_LFKx090JEcmFXcn8xZ8'
 //const photoData = open('src/main/resources/static/missions/424c1851-51c8-438a-b607-755412d86bcc.jpg', 'b');
 
 function getPath(){
@@ -70,7 +71,30 @@ function postPath(){
     sleep(1);
 }
 
+function getPerformanceTestPath(){
+
+  const params = {
+          headers: {
+              'Authorization': `Bearer ${ACCESS_TOKEN}`,
+  //            'Content-Type': 'application/json',
+          },
+      };
+
+  let res = http.get(`${LOCAL_BASE_URL}/performance/authentication/6662b7507c6e39272a2ec010/0`, params, {
+    tags: {
+        endpoint: 'get_path',
+    },
+  });
+
+  // 응답 체크
+  check(res, {
+    'status was 200': (r) => r.status == 200,
+  });
+
+  // 1초 대기
+  sleep(1);
+}
+
 export default function () {
-    getPath();
-//    postPath();
+    getPerformanceTestPath()
 }

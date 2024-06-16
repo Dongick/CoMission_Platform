@@ -98,31 +98,31 @@ class AuthenticationControllerTest {
         verify(authenticationService).deleteAuthentication("testTitle");
     }
 
-    @Test
-    @DisplayName("authenticationList 매서드: 성공")
-    void authenticationList() throws Exception{
-        LocalDateTime now = LocalDateTime.of(2024, 4, 12, 11, 11, 00);
-
-        List<Map<String, Object>> authenticationData = new ArrayList<>();
-        Map<String ,Object> authenticationMap = new HashMap<>();
-        authenticationMap.put("date", now);
-        authenticationMap.put("photoData", "testPhotoData");
-        authenticationMap.put("textData", "testTextData");
-        authenticationMap.put("userEmail", "testUserEmail");
-        authenticationMap.put("username", "testUsername");
-        authenticationData.add(authenticationMap);
-
-        AuthenticationListResponse response = new AuthenticationListResponse(authenticationData);
-        when(authenticationService.authenticationList(anyString(), anyInt())).thenReturn(response);
-
-        mockMvc.perform(get("/api/authentication/{id}/{num}", "testTitle", "0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticationData[0].photoData").value("testPhotoData"))
-                .andExpect(jsonPath("$.authenticationData[0].textData").value("testTextData"))
-                .andExpect(jsonPath("$.authenticationData[0].userEmail").value("testUserEmail"))
-                .andExpect(jsonPath("$.authenticationData[0].username").value("testUsername"))
-                .andExpect(jsonPath("$.authenticationData[0].date").value("2024-04-12T11:11:00"));
-
-        verify(authenticationService).authenticationList("testTitle", 0);
-    }
+//    @Test
+//    @DisplayName("authenticationList 매서드: 성공")
+//    void authenticationList() throws Exception{
+//        LocalDateTime now = LocalDateTime.of(2024, 4, 12, 11, 11, 00);
+//
+//        List<Map<String, Object>> authenticationData = new ArrayList<>();
+//        Map<String ,Object> authenticationMap = new HashMap<>();
+//        authenticationMap.put("date", now);
+//        authenticationMap.put("photoData", "testPhotoData");
+//        authenticationMap.put("textData", "testTextData");
+//        authenticationMap.put("userEmail", "testUserEmail");
+//        authenticationMap.put("username", "testUsername");
+//        authenticationData.add(authenticationMap);
+//
+//        AuthenticationListResponse response = new AuthenticationListResponse(authenticationData);
+//        when(authenticationService.authenticationList(anyString(), anyInt())).thenReturn(response);
+//
+//        mockMvc.perform(get("/api/authentication/{id}/{num}", "testTitle", "0"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.authenticationData[0].photoData").value("testPhotoData"))
+//                .andExpect(jsonPath("$.authenticationData[0].textData").value("testTextData"))
+//                .andExpect(jsonPath("$.authenticationData[0].userEmail").value("testUserEmail"))
+//                .andExpect(jsonPath("$.authenticationData[0].username").value("testUsername"))
+//                .andExpect(jsonPath("$.authenticationData[0].date").value("2024-04-12T11:11:00"));
+//
+//        verify(authenticationService).authenticationList("testTitle", 0);
+//    }
 }

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class AuthenticationTest {
 
     @Test
@@ -20,7 +18,7 @@ class AuthenticationTest {
         String textData = "/test/1";
 
         // When
-        Authentication authentication = Authentication.builder()
+        AuthenticationDocument authentication = AuthenticationDocument.builder()
                 .date(date)
                 .completed(completed)
                 .photoData(photoData)

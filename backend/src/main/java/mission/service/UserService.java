@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mission.config.jwt.JWTUtil;
-import mission.document.Authentication;
+import mission.document.AuthenticationDocument;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.mission.SimpleMissionInfo;
@@ -15,15 +15,19 @@ import mission.dto.user.UserMissionPost;
 import mission.dto.user.UserMissionPostResponse;
 import mission.dto.user.UserPostResponse;
 import mission.exception.*;
+import mission.repository.AuthenticationRepository;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import mission.repository.RefreshTokenRepository;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +40,7 @@ public class UserService {
     private final MissionRepository missionRepository;
     private final ParticipantRepository participantRepository;
     private final MissionService missionService;
+    private final AuthenticationRepository authenticationRepository;
 
     // logout 매서드
     @Transactional
@@ -120,24 +125,14 @@ public class UserService {
             // 해당 미션이 존재하는지 확인
             MissionDocument missionDocument = missionService.getMissionDocument(id);
 
+            // 해당 미션에 참여한 사용자인지 확인
             ParticipantDocument participantDocument = getParticipantDocument(missionDocument, email);
 
-            List<Authentication> authenticationList = participantDocument.getAuthentication();
+            Pageable pageable = PageRequest.of(num, 5, Sort.by(Sort.Direction.DESC, "date"));
 
-            List<UserMissionPost> userMissionPostList = groupAndSortAuthentications(authenticationList, num);
+            Page<AuthenticationDocument> authenticationDocumentPage = authenticationRepository.findByParticipantIdAndMissionId(participantDocument.getId(), participantDocument.getMissionId(), pageable);
 
-            UserMissionPostResponse userMissionPostResponse = new UserMissionPostResponse(userMissionPostList);
-
-            return userMissionPostResponse;
-        }
-
-        throw new ForbiddenException(ErrorCode.DIFFERENT_LOGGED_USER, ErrorCode.DIFFERENT_LOGGED_USER.getMessage());
-    }
-
-    // 인증글들을 형식에 맞춰 출력
-    private List<UserMissionPost> groupAndSortAuthentications(List<Authentication> authenticationList, int num) {
-
-        return authenticationList.stream()
+            List<UserMissionPost> userMissionPostList = authenticationDocumentPage.getContent().stream()
                     .map(authentication -> {
                         UserMissionPost userMissionPost = UserMissionPost.builder()
                                 .date(authentication.getDate())
@@ -146,11 +141,15 @@ public class UserService {
                                 .build();
                         return userMissionPost;
                     })
-                .sorted(Comparator.comparing(map -> map.getDate(), Comparator.reverseOrder()))
-                .skip((long) num * 5)
-                .limit(5)
-                .collect(Collectors.toList()
-                );
+                    .collect(Collectors.toList()
+                    );
+
+            UserMissionPostResponse userMissionPostResponse = new UserMissionPostResponse(userMissionPostList);
+
+            return userMissionPostResponse;
+        }
+
+        throw new ForbiddenException(ErrorCode.DIFFERENT_LOGGED_USER, ErrorCode.DIFFERENT_LOGGED_USER.getMessage());
     }
 
     // 해당 미션에 해당 참가자가 존재하는지 확인

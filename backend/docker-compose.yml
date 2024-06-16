@@ -4,13 +4,13 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
     command: [--auth]
     volumes:
-      - CoMission_Platform-MongoVolume:/data/db
+      - testmongo-volume:/data/db
     networks:
       - test_network
 
@@ -19,12 +19,12 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - "3306:3306"
+      - "3308:3306"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
     volumes:
-      - CoMission_Platform-MysqlVolume:/var/lib/mysql
+      - testdb-volume:/var/lib/mysql
     networks:
       - test_network
 
@@ -47,6 +47,8 @@ services:
       - influxdb
     volumes:
       - /home/ubuntu/backend/logs:/logs
+      - C:\Users\lg\Documents\GITHUB\progress-tracker\backend\src\main\resources\static\missions:/missions
+      - C:\Users\lg\Documents\GITHUB\progress-tracker\backend\src\main\resources\static\authentications:/authentications
     networks:
       - test_network
 
@@ -79,9 +81,9 @@ networks:
   test_network:
 
 volumes:
-  CoMission_Platform-MongoVolume:
+  testmongo-volume:
     external: true
-  CoMission_Platform-MysqlVolume:
+  testdb-volume:
     external: true
   influxdb-volume:
     external: true
