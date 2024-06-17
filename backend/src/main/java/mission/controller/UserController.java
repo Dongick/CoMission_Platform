@@ -78,12 +78,12 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
 
     })
-    public ResponseEntity<UserMissionPostResponse> getUserMissionAuthentication(
+    public ResponseEntity<UserMissionPostResponse> getUserMissionAuthenticationPost(
             @PathVariable String id,
             @PathVariable String email,
             @RequestParam(required = false, defaultValue = "0") int num) {
 
-        UserMissionPostResponse userMissionPostResponse = userService.userMissionPost(email, id, num);
+        UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(email, id, num);
         return ResponseEntity.ok(userMissionPostResponse);
     }
 }

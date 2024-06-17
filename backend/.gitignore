@@ -30,6 +30,8 @@ CustomOAuth2AuthorizedClientService.java
 CustomClientRegistrationRepo.java
 SocialClientRegistration.java
 *.jpg
+logs
+.env
 
 ### NetBeans ###
 /nbproject/private/
@@ -40,3 +42,5 @@ SocialClientRegistration.java
 
 ### VS Code ###
 .vscode/
+/src/main/resources/static/missions/
+/src/main/resources/static/authentications/

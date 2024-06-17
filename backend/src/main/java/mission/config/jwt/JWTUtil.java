@@ -3,6 +3,7 @@ package mission.config.jwt;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
+import lombok.extern.slf4j.Slf4j;
 import mission.entity.RefreshTokenEntity;
 import mission.exception.BadRequestException;
 import mission.exception.ErrorCode;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class JWTUtil {
 
     private SecretKey secretKey;
@@ -86,10 +88,10 @@ public class JWTUtil {
 
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60*60*60);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-//        cookie.setAttribute("SameSite", "None");
+        cookie.setAttribute("SameSite", "None");
 
         return cookie;
     }
@@ -114,7 +116,7 @@ public class JWTUtil {
 
         // 토큰이 존재하는지 확인
         if (refreshToken == null) {
-
+            log.error("RefreshToken 값이 null");
             throw new MissionAuthenticationException(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
         }
 
@@ -122,7 +124,7 @@ public class JWTUtil {
         try {
             isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-
+            log.warn("RefreshToken 만료됨");
             throw new MissionAuthenticationException(ErrorCode.REFRESH_TOKEN_EXPIRED, ErrorCode.REFRESH_TOKEN_EXPIRED.getMessage());
         }
 
@@ -130,14 +132,14 @@ public class JWTUtil {
         String category = getCategory(refreshToken);
 
         if (!category.equals("refresh")) {
-
+            log.error("RefreshToken 페이로드 값이 refresh가 아님");
             throw new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage());
         }
 
         //DB에 저장되어 있는지 확인
         Optional<RefreshTokenEntity> optionalRefreshTokenEntity = refreshTokenRepository.findByRefreshToken(refreshToken);
         if (optionalRefreshTokenEntity.isEmpty()) {
-
+            log.error("RefreshToken이 DB에 값과 일치하지 않음");
             throw new BadRequestException(ErrorCode.REFRESH_TOKEN_INVALID, ErrorCode.REFRESH_TOKEN_INVALID.getMessage());
         }
 

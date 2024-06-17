@@ -246,7 +246,7 @@ class UserServiceTest {
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
 
         // when
-        UserMissionPostResponse userMissionPostResponse = userService.userMissionPost(userEmail, id, num);
+        UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
 
         // then
         List<UserMissionPost> userMissionPostList = userMissionPostResponse.getUserMissionPostList();
@@ -283,7 +283,7 @@ class UserServiceTest {
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
 
         // when
-        UserMissionPostResponse userMissionPostResponse = userService.userMissionPost(userEmail, id, num);
+        UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
 
         // then
         List<UserMissionPost> userMissionPostList = userMissionPostResponse.getUserMissionPostList();
@@ -319,7 +319,7 @@ class UserServiceTest {
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
 
         // when
-        UserMissionPostResponse userMissionPostResponse = userService.userMissionPost(userEmail, id, num);
+        UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
 
         // then
         List<UserMissionPost> userMissionPostList = userMissionPostResponse.getUserMissionPostList();
@@ -339,7 +339,7 @@ class UserServiceTest {
         int num = 0;
 
         // when, then
-        assertThrows(ForbiddenException.class, () -> userService.userMissionPost(email, id, num));
+        assertThrows(ForbiddenException.class, () -> userService.userMissionAuthenticationPost(email, id, num));
     }
 
     @Test
@@ -351,7 +351,7 @@ class UserServiceTest {
         int num = -1;
 
         // when, then
-        assertThrows(BadRequestException.class, () -> userService.userMissionPost(userEmail, id, num));
+        assertThrows(BadRequestException.class, () -> userService.userMissionAuthenticationPost(userEmail, id, num));
     }
 
     private List<ParticipantDocument> prepareParticipantDocumentList(ObjectId[] ids, String email) {
