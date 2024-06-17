@@ -200,6 +200,7 @@ export default MissionConfirmPost;
 
 export const NoLoginContent = styled.div`
   font-family: "notoBold";
+  width: 100%;
   padding-top: 20%;
   & > span,
   h1 {

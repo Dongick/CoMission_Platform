@@ -138,14 +138,14 @@ public class UserService {
     private List<UserMissionPost> groupAndSortAuthentications(List<Authentication> authenticationList, int num) {
 
         return authenticationList.stream()
-                    .map(authentication -> {
-                        UserMissionPost userMissionPost = UserMissionPost.builder()
-                                .date(authentication.getDate())
-                                .photoData(authentication.getPhotoData())
-                                .textData(authentication.getTextData())
-                                .build();
-                        return userMissionPost;
-                    })
+                .map(authentication -> {
+                    UserMissionPost userMissionPost = UserMissionPost.builder()
+                            .date(authentication.getDate())
+                            .photoData(authentication.getPhotoData())
+                            .textData(authentication.getTextData())
+                            .build();
+                    return userMissionPost;
+                })
                 .sorted(Comparator.comparing(map -> map.getDate(), Comparator.reverseOrder()))
                 .skip((long) num * 5)
                 .limit(5)

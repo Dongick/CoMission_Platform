@@ -220,9 +220,7 @@ const MissionCreatePage = () => {
                   }}
                   onChange={durationChangeHandler}
                 >
-                  <option value={100} disabled>
-                    100일
-                  </option>
+                  <option value={100}>100일</option>
                   <option value={365}>365일</option>
                 </select>
               </InputDiv>
