@@ -5,13 +5,19 @@
 
 🔽 서비스 메인 페이지
 ---
-![Animation1](https://github.com/Dongick/CoMission_Platform/assets/91418544/5f2a5ff9-36a0-444f-9615-51796cf56441)
+![Animation1](https://github.com/Dongick/CoMission_Platform/assets/91418544/bcc09051-272c-4583-bf4d-7e82d9b426c8)
 ---
 <br/>
 
 🔽 소셜 로그인 후 메인 페이지
 ---
-![Animation](https://github.com/Dongick/CoMission_Platform/assets/91418544/ac269a7a-f90c-4e43-b10d-3c63fe7f2791)
+![Animation](https://github.com/Dongick/CoMission_Platform/assets/91418544/fb73658e-491b-4300-b386-a18dea9dcc95)
+---
+<br/>
+
+🔽 미션 참가 후, 인증글 작성/삭제
+---
+![Animation2-min](https://github.com/Dongick/CoMission_Platform/assets/91418544/fdc27d1e-3dfe-4998-a8d1-c03d64da7856)
 ---
 
 <br/>
