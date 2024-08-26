@@ -80,7 +80,7 @@
 - AWS EC2 (배포)
 - AWS S3 (이미지 파일 저장)
 
-#### CI && CD
+#### CI & CD
 - Docker
 - Github Actions
 
