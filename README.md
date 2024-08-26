@@ -80,6 +80,14 @@
 - AWS EC2 (배포)
 - AWS S3 (이미지 파일 저장)
 
+#### CI && CD
+- Docker
+- Github Actions
+
+#### 성능테스트
+- K6
+- Grafana
+
 #### 기타
 - Swagger (API 문서화)
 
