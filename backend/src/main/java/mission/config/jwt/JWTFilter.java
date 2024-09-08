@@ -49,7 +49,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 filterChain.doFilter(request, response);
             } else {
-                log.error("로그인을 하지 않아 해당 api에 접근 권한 없음");
+//                log.error("로그인을 하지 않아 해당 api에 접근 권한 없음");
                 sendErrorResponse(response, HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getMessage());
             }
 

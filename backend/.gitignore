@@ -44,3 +44,5 @@ logs
 .vscode/
 /src/main/resources/static/missions/
 /src/main/resources/static/authentications/
+/src/main/java/mission/service/PerformanceTestService.java
+/src/main/java/mission/controller/PerformanceTestController.java

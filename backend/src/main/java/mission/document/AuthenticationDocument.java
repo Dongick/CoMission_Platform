@@ -3,20 +3,21 @@ package mission.document;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
 import java.time.LocalDateTime;
 
-@Document(collection = "participant")
+@Document(collection = "authentication")
 @Data
 @Builder
-public class ParticipantDocument {
-    @Id
+public class AuthenticationDocument {
     private ObjectId id;
     private ObjectId missionId;
-    private String userEmail;
+    private ObjectId participantId;
     private String username;
-    private LocalDateTime joinedAt;
+    private String userEmail;
+    private LocalDateTime date;
+    private boolean completed;
+    private String photoData;
+    private String textData;
 }

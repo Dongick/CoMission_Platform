@@ -4,7 +4,7 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
@@ -19,7 +19,7 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - "3306:3306"
+      - "3308:3306"
     environment:
       - TZ=Asia/Seoul
       - LC_ALL=C.UTF-8
@@ -47,6 +47,8 @@ services:
       - influxdb
     volumes:
       - /home/ubuntu/backend/logs:/logs
+      - C:\Users\lg\Documents\GITHUB\progress-tracker\backend\src\main\resources\static\missions:/missions
+      - C:\Users\lg\Documents\GITHUB\progress-tracker\backend\src\main\resources\static\authentications:/authentications
     networks:
       - test_network
 

@@ -5,12 +5,9 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ParticipantDocumentTest {
     @Test
@@ -21,7 +18,7 @@ class ParticipantDocumentTest {
         LocalDateTime joinedAt = LocalDateTime.now();
         ObjectId missionId = new ObjectId("616157d8d4e12e67c17dc15d");
         String userEmail = "test@example.com";
-        List<Authentication> authenticationList = new ArrayList<>();
+        List<AuthenticationDocument> authenticationList = new ArrayList<>();
         String username = "test";
 
         // When
@@ -30,7 +27,7 @@ class ParticipantDocumentTest {
                 .joinedAt(joinedAt)
                 .missionId(missionId)
                 .userEmail(userEmail)
-                .authentication(authenticationList)
+//                .authentication(authenticationList)
                 .username(username)
                 .build();
 
@@ -38,7 +35,7 @@ class ParticipantDocumentTest {
         Assertions.assertThat(participantDocument.getId()).isEqualTo(id);
         Assertions.assertThat(participantDocument.getJoinedAt()).isEqualTo(joinedAt);
         Assertions.assertThat(participantDocument.getUserEmail()).isEqualTo(userEmail);
-        Assertions.assertThat(participantDocument.getAuthentication()).isEqualTo(authenticationList);
+//        Assertions.assertThat(participantDocument.getAuthentication()).isEqualTo(authenticationList);
         Assertions.assertThat(participantDocument.getMissionId()).isEqualTo(missionId);
         Assertions.assertThat(participantDocument.getUsername()).isEqualTo(username);
     }
