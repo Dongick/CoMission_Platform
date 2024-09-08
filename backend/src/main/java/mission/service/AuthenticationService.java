@@ -81,8 +81,8 @@ public class AuthenticationService {
         }
 
         // 인증 사진을 AWS S3에 저장
-//        String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
-        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file, AUTHENTICATION_DIR);
+        String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
+//        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file, AUTHENTICATION_DIR);
 
         saveAuthentication(participantDocument.getUserEmail(), participantDocument.getUsername(), participantDocument.getMissionId(), participantDocument.getId(), now, fileLocation, authenticationCreateRequest.getTextData());
     }
@@ -119,13 +119,13 @@ public class AuthenticationService {
 
         // 기존 인증글에 사진 데이터가 존재하면 삭제
         if (authenticationDocument.getPhotoData() != null) {
-//            awss3Service.deleteFile(authenticationDocument.getPhotoData(), AUTHENTICATION_DIR);
-            fileService.deleteFile(authenticationDocument.getPhotoData());
+            awss3Service.deleteFile(authenticationDocument.getPhotoData(), AUTHENTICATION_DIR);
+//            fileService.deleteFile(authenticationDocument.getPhotoData());
         }
 
         // 인증글에 사진이 존재하면 AWS S3에 저장
-//        String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
-        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file, AUTHENTICATION_DIR);
+        String fileLocation = file == null || file.isEmpty() ? null : awss3Service.uploadFile(file, AUTHENTICATION_DIR);
+//        String fileLocation = file == null || file.isEmpty() ? null : fileService.uploadFile(file, AUTHENTICATION_DIR);
 
         authenticationDocument.setPhotoData(fileLocation);
         authenticationDocument.setTextData(authenticationUpdateRequest.getTextData());
@@ -169,8 +169,8 @@ public class AuthenticationService {
 
         // 당일 인증글에 사진 데이터가 존재하면 삭제
         if (authenticationDocument.getPhotoData() != null) {
-//            awss3Service.deleteFile(authenticationDocument.getPhotoData(), AUTHENTICATION_DIR);
-            fileService.deleteFile(authenticationDocument.getPhotoData());
+            awss3Service.deleteFile(authenticationDocument.getPhotoData(), AUTHENTICATION_DIR);
+//            fileService.deleteFile(authenticationDocument.getPhotoData());
         }
 
         authenticationRepository.delete(authenticationDocument);
