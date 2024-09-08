@@ -1,16 +1,26 @@
 # 📝 CoMission Platform - 공유미션 플랫폼 서비스
-> ### 배포 도메인 -> [Comission Platform](https://comission-platform.shop) 
-![image](https://github.com/chany0ng/progress-tracker/assets/91418544/372df2a6-61ac-47e7-8c3c-465d441c7d70)
-🔺 서비스 메인 페이지
+> ### 배포 도메인 -> [Comission Platform](https://comission-platform.shop)
+<br/>
 
 
+🔽 서비스 메인 페이지
+---
+![Animation1](https://github.com/Dongick/CoMission_Platform/assets/91418544/bcc09051-272c-4583-bf4d-7e82d9b426c8)
+---
+<br/>
+
+🔽 소셜 로그인 후 메인 페이지
+---
+![Animation](https://github.com/Dongick/CoMission_Platform/assets/91418544/fb73658e-491b-4300-b386-a18dea9dcc95)
+---
+<br/>
+
+🔽 미션 참가 후, 인증글 작성/삭제
+---
+![Animation2-min](https://github.com/Dongick/CoMission_Platform/assets/91418544/fdc27d1e-3dfe-4998-a8d1-c03d64da7856)
 ---
 
-
-![image](https://github.com/chany0ng/progress-tracker/assets/91418544/88a990c2-48be-4e29-9afe-75a30ff7e253)
-🔺 미션 상세 페이지
-
-
+<br/>
 
 ## ✅ 프로젝트 소개
 - **Comission Platform**은 사용자가 로그인하고 미션을 생성하여 사람들과 공유할 수 있는 웹 애플리케이션입니다
@@ -70,15 +80,17 @@
 - AWS EC2 (배포)
 - AWS S3 (이미지 파일 저장)
 
+#### CI & CD
+- Docker
+- Github Actions
+
+#### 성능테스트
+- K6
+- Grafana
+
 #### 기타
 - Swagger (API 문서화)
 
-## ✅ 미션 관련 정보
-- 미션 주제
-- 미션에 대한 간단한 설명
-- 미션을 시작하기 위한 최소 필요 인원
-- 마감 날짜 최대1년
-- 미션 인증 주기 최소 1~7일(미션 별, 인증 게시판 필요)
 
 ## ✅ Git branch 전략
 - main
