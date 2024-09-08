@@ -2,12 +2,14 @@ import styled from "styled-components";
 import StyledButton from "./StyledButton";
 import LoginModal from "./LoginModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { userInfo } from "../recoil";
 import { postData } from "../axios";
 import useLogout from "../useLogout";
 const UserMenu = () => {
   const logout = useLogout();
+  const navigate = useNavigate();
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [userInfoState, setUserInfoState] = useRecoilState(userInfo);
   const handleLoginClick = () => {
@@ -35,15 +37,14 @@ const UserMenu = () => {
         border: "0.5px solid #363636",
         padding: "10px 15px",
         marginRight: "10px",
-        display: "none",
       }}
+      onClick={() => navigate("/my-page")}
     >
       내 정보
     </StyledButton>
   );
   return (
     <Wrapper>
-      {userInfoState.isLoggedIn}
       {userInfoState.isLoggedIn ? (
         <div>
           {myInfoButton}
@@ -76,7 +77,7 @@ export default UserMenu;
 const Wrapper = styled.div`
   position: absolute;
   top: 30%;
-  right: 15%;
+  right: 10%;
   @media screen and (max-width: 1024px) {
     display: none;
   }

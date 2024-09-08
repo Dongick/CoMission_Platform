@@ -14,12 +14,17 @@ import {
   SearchedMissionInfoType,
   SimpleMissionInfoType,
   LazyMissionInfoListType,
+  FilterType,
 } from "../types";
 import { getData } from "../axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import useLogout from "../useLogout";
-import MissionSearch from "../components/MissionSearch";
 import { NoLoginContent } from "./mission/MissionConfirmPostPage";
+import Filter from "../components/Filter";
+
+const LazyCard = lazy(() => import("../components/Card"));
+const LazyMyCard = lazy(() => import("../components/MyCard"));
+const LazyMissionSearch = lazy(() => import("../components/MissionSearch"));
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -35,6 +40,25 @@ const MainPage = () => {
   const [noDataMessage, setNoDataMessage] =
     useState<string>("생성된 미션이 없습니다!");
   const [everClicked, setEverClicked] = useState<boolean>(false);
+  const [sort, setSort] = useState<string>("latest");
+  const [filter, setFilter] = useState<FilterType>({
+    started: false,
+    created: false,
+  });
+  const [filterQuery, setFilterQuery] = useState<string>("all");
+  useEffect(() => {
+    if (filter.started && filter.created) {
+      setFilterQuery("all");
+    } else if (filter.started) {
+      setFilterQuery("started");
+    } else if (filter.created) {
+      setFilterQuery("created");
+    } else {
+      setFilterQuery("all");
+    }
+  }, [filter]);
+
+  // 소셜로그인 토큰처리
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const accessToken = urlSearchParams.get("AccessToken");
@@ -42,17 +66,20 @@ const MainPage = () => {
     const name = urlSearchParams.get("username");
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
-      setUserInfoState({
+      setUserInfoState((prev) => ({
+        ...prev,
         isLoggedIn: true,
         user_id: `${name}`,
         user_email: `${email}`,
-      });
+      }));
       navigate("/");
     }
   }, [location.search, setUserInfoState, navigate]);
 
   const fetchLazyData = async ({ pageParam = 1 }) =>
-    await getData<LazyMissionInfoListType>(`/api/main/${pageParam}`);
+    await getData<LazyMissionInfoListType>(
+      `/api/main/?sort=${sort}&num=${pageParam}&filter=${filterQuery}`
+    );
   const {
     data: lazyData,
     fetchNextPage,
@@ -74,8 +101,10 @@ const MainPage = () => {
   });
 
   const fetchData = async () =>
-    await getData<MainServerResponseType>("/api/main");
-  const { data, isLoading, isError, isSuccess } = useQuery({
+    await getData<MainServerResponseType>(
+      `/api/main?sort=${sort}&num=0&filter=${filterQuery}`
+    );
+  const { data, refetch, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["totalMissionData"],
     queryFn: fetchData,
   });
@@ -131,7 +160,9 @@ const MainPage = () => {
 
   return (
     <Layout>
-      <MissionSearch updateData={updateData} />
+      <Suspense>
+        <LazyMissionSearch updateData={updateData} />
+      </Suspense>
       <StyledButton
         bgcolor={theme.subGreen}
         style={{ margin: "30px", fontSize: "large", borderRadius: "20px" }}
@@ -184,29 +215,39 @@ const MainPage = () => {
           )}
         </div>
       )}
-      {totalMissionData.length === 0 && !isLoading && (
-        <NoLoginContent style={{ padding: "10%" }}>
-          <span>❌</span>
-          <h1>{noDataMessage}</h1>
-          <p>미션을 생성해보세요!</p>
-        </NoLoginContent>
-      )}
-      <MainSection>
-        {totalMissionData?.map((mission, index) => (
-          <Card
-            key={index}
-            id={mission.id}
-            title={mission.title}
-            username={mission.username}
-            minPar={mission.minParticipants}
-            par={mission.participants}
-            duration={mission.duration}
-            status={mission.status}
-            frequency={mission.frequency}
-            photoUrl={mission.photoUrl}
-          />
-        ))}
-      </MainSection>
+      <ContentBody>
+        <Filter
+          sort={sort}
+          setSort={setSort}
+          filter={filter}
+          setFilter={setFilter}
+          refetch={refetch}
+        />
+        {totalMissionData.length === 0 && !isLoading ? (
+          <NoLoginContent style={{ padding: "10%" }}>
+            <span>❌</span>
+            <h1>{noDataMessage}</h1>
+            <p>미션을 생성해보세요!</p>
+          </NoLoginContent>
+        ) : (
+          <MainSection>
+            {totalMissionData?.map((mission, index) => (
+              <Card
+                key={index}
+                id={mission.id}
+                title={mission.title}
+                username={mission.username}
+                minPar={mission.minParticipants}
+                par={mission.participants}
+                duration={mission.duration}
+                status={mission.status}
+                frequency={mission.frequency}
+                photoUrl={mission.photoUrl}
+              />
+            ))}
+          </MainSection>
+        )}
+      </ContentBody>
       {(everClicked && !hasNextPage) || totalMissionData.length < 20 ? (
         <StyledButton
           disabled
@@ -237,7 +278,7 @@ export default MainPage;
 const MainSection = styled.section`
   min-height: 100vh;
   padding: 3vh;
-  width: 70%;
+  width: 80%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr));
@@ -248,6 +289,12 @@ const MainSection = styled.section`
     grid-template-columns: repeat(auto-fill, minmax(30vw, 1fr));
   }
   gap: 20px; /* Adjust the gap between cards */
+`;
+
+const ContentBody = styled.div`
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
 `;
 
 const MyMissionSection = styled.section`
