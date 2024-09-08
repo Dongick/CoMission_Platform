@@ -579,7 +579,7 @@ class MissionServiceTest {
                 .userEmail(userEmail)
                 .missionId(new ObjectId(missionId))
                 .joinedAt(LocalDateTime.now())
-                .authentication(new ArrayList<>())
+//                .authentication(new ArrayList<>())
                 .username(username)
                 .build();
 

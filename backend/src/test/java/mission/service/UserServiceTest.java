@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mission.config.jwt.JWTUtil;
+import mission.document.AuthenticationDocument;
 import mission.document.MissionDocument;
 import mission.document.ParticipantDocument;
 import mission.dto.mission.SimpleMissionInfo;
@@ -13,6 +14,7 @@ import mission.dto.user.UserMissionPost;
 import mission.dto.user.UserMissionPostResponse;
 import mission.dto.user.UserPostResponse;
 import mission.exception.*;
+import mission.repository.AuthenticationRepository;
 import mission.repository.MissionRepository;
 import mission.repository.ParticipantRepository;
 import mission.repository.RefreshTokenRepository;
@@ -26,6 +28,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +54,8 @@ class UserServiceTest {
     private MissionRepository missionRepository;
     @Mock
     private ParticipantRepository participantRepository;
+    @Mock
+    private AuthenticationRepository authenticationRepository;
     @Mock
     private MissionService missionService;
     @InjectMocks
@@ -225,14 +230,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("userMissionPost 매서드: 자신이 작성한 인증글이 5개가 넘는 미션 성공")
-    void userMissionPost_overAuthentication5() {
+    @DisplayName("userMissionAuthenticationPost 매서드: 자신이 작성한 인증글이 5개가 넘는 미션 성공")
+    void userMissionAuthenticationPost_overAuthentication5() {
         // given
         String userEmail = "test@example.com";
         String id = "65ea0c8007b2c737d6227bf0";
         int num = 0;
 
-        String []textData = {"test1 data", "test2 data", "test3 data", "test4 data", "test5 data", "test6 data"};
+        String []textData = {"test1 data", "test2 data", "test3 data", "test4 data", "test5 data"};
 
         LocalDateTime now = LocalDateTime.of(2024, 4, 12, 11, 11);
 
@@ -240,10 +245,17 @@ class UserServiceTest {
                 .id(new ObjectId(id))
                 .build();
 
-        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+//        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+
+        ParticipantDocument participantDocument = prepareParticipantDocument(id, userEmail);
+
+        Page<AuthenticationDocument> authenticationDocumentList = prepareTwoAuthentication(now, null, textData);
+
+        Pageable pageable = PageRequest.of(num, 5, Sort.by(Sort.Direction.DESC, "date"));
 
         when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(authenticationRepository.findByParticipantIdAndMissionId(participantDocument.getId(), participantDocument.getMissionId(), pageable)).thenReturn(authenticationDocumentList);
 
         // when
         UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
@@ -262,8 +274,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("userMissionPost 매서드: 자신이 작성한 인증글이 5개가 안되는 미션 성공")
-    void userMissionPost_underAuthentication5() {
+    @DisplayName("userMissionAuthenticationPost 매서드: 자신이 작성한 인증글이 5개가 안되는 미션 성공")
+    void userMissionAuthenticationPost_underAuthentication5() {
         // given
         String userEmail = "test@example.com";
         String id = "65ea0c8007b2c737d6227bf0";
@@ -277,10 +289,21 @@ class UserServiceTest {
                 .id(new ObjectId(id))
                 .build();
 
-        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+//        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+
+        ParticipantDocument participantDocument = prepareParticipantDocument(id, userEmail);
+
+        Page<AuthenticationDocument> authenticationDocumentList = prepareTwoAuthentication(now, null, textData);
+
+        Pageable pageable = PageRequest.of(num, 5, Sort.by(Sort.Direction.DESC, "date"));
+
 
         when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+//        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(authenticationRepository.findByParticipantIdAndMissionId(participantDocument.getId(), participantDocument.getMissionId(), pageable)).thenReturn(authenticationDocumentList);
+
 
         // when
         UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
@@ -298,14 +321,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("userMissionPost 매서드: num이 0보다 클 때 성공")
-    void userMissionPost_num_1() {
+    @DisplayName("userMissionAuthenticationPost 매서드: num이 0보다 클 때 성공")
+    void userMissionAuthenticationPost_num_1() {
         // given
         String userEmail = "test@example.com";
         String id = "65ea0c8007b2c737d6227bf0";
         int num = 1;
 
-        String []textData = {"test1 data", "test2 data", "test3 data", "test4 data", "test5 data", "test6 data"};
+        String []textData = {"test1 data"};
 
         LocalDateTime now = LocalDateTime.of(2024, 4, 12, 11, 11);
 
@@ -313,10 +336,21 @@ class UserServiceTest {
                 .id(new ObjectId(id))
                 .build();
 
-        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+//        ParticipantDocument participantDocument = prepareTwoAuthentication(prepareParticipantDocument(id, userEmail), now, null, textData);
+
+        ParticipantDocument participantDocument = prepareParticipantDocument(id, userEmail);
+
+        Page<AuthenticationDocument> authenticationDocumentList = prepareTwoAuthentication(now, null, textData);
+
+        Pageable pageable = PageRequest.of(num, 5, Sort.by(Sort.Direction.DESC, "date"));
+
 
         when(missionService.getMissionDocument(anyString())).thenReturn(missionDocument);
+//        when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+
         when(participantRepository.findByMissionIdAndUserEmail(any(ObjectId.class), anyString())).thenReturn(Optional.of(participantDocument));
+        when(authenticationRepository.findByParticipantIdAndMissionId(participantDocument.getId(), participantDocument.getMissionId(), pageable)).thenReturn(authenticationDocumentList);
+
 
         // when
         UserMissionPostResponse userMissionPostResponse = userService.userMissionAuthenticationPost(userEmail, id, num);
@@ -324,15 +358,15 @@ class UserServiceTest {
         // then
         List<UserMissionPost> userMissionPostList = userMissionPostResponse.getUserMissionPostList();
         Assertions.assertThat(userMissionPostList.size()).isEqualTo(1);
-        Assertions.assertThat(userMissionPostList.get(0).getTextData()).isEqualTo(textData[5]);
+        Assertions.assertThat(userMissionPostList.get(0).getTextData()).isEqualTo(textData[0]);
 
         verify(missionService).getMissionDocument(anyString());
         verify(participantRepository).findByMissionIdAndUserEmail(any(ObjectId.class), anyString());
     }
 
     @Test
-    @DisplayName("userMissionPost 매서드: email이 로그인한 사용자와 다를 때 실패")
-    void userMissionPost_email_DIFFERENT_LOGGED_USER() {
+    @DisplayName("userMissionAuthenticationPost 매서드: email이 로그인한 사용자와 다를 때 실패")
+    void userMissionAuthenticationPost_email_DIFFERENT_LOGGED_USER() {
         // given
         String email = "testFailed@example.com";
         String id = "65ea0c8007b2c737d6227bf0";
@@ -343,8 +377,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("userMissionPost 매서드: num 값이 0보다 작을 때 실패")
-    void userMissionPost_num_VALIDATION_FAILED() {
+    @DisplayName("userMissionAuthenticationPost 매서드: num 값이 0보다 작을 때 실패")
+    void userMissionAuthenticationPost_num_VALIDATION_FAILED() {
         // given
         String userEmail = "test@example.com";
         String id = "65ea0c8007b2c737d6227bf0";
@@ -376,26 +410,45 @@ class UserServiceTest {
     }
 
     private ParticipantDocument prepareParticipantDocument(String missionId, String userEmail) {
+        ObjectId id = new ObjectId("32ea0c8007b2c737d6227bf0");
         return ParticipantDocument.builder()
+                .id(id)
                 .missionId(new ObjectId(missionId))
                 .userEmail(userEmail)
-                .authentication(new ArrayList<>())
                 .build();
     }
 
-    private ParticipantDocument prepareTwoAuthentication(ParticipantDocument participantDocument, LocalDateTime now, String photoUrl, String [] textData) {
-        List<mission.document.Authentication> authenticationList = participantDocument.getAuthentication();
+//    private ParticipantDocument prepareTwoAuthentication(ParticipantDocument participantDocument, LocalDateTime now, String photoUrl, String [] textData) {
+//        List<AuthenticationDocument> authenticationList = participantDocument.getAuthentication();
+//
+//        for(int i = 0; i < textData.length; i++) {
+//            authenticationList.add(AuthenticationDocument.builder()
+//                    .date(now.minusDays(i + 1))
+//                    .photoData(photoUrl)
+//                    .textData(textData[i])
+//                    .build());
+//        }
+//
+//        participantDocument.setAuthentication(authenticationList);
+//
+//        return participantDocument;
+//    }
+
+    private Page<AuthenticationDocument> prepareTwoAuthentication(LocalDateTime now, String photoUrl, String [] textData) {
+        List<AuthenticationDocument> authenticationDocumentList = new ArrayList<>();
 
         for(int i = 0; i < textData.length; i++) {
-            authenticationList.add(mission.document.Authentication.builder()
+            AuthenticationDocument authenticationDocument = AuthenticationDocument.builder()
                     .date(now.minusDays(i + 1))
                     .photoData(photoUrl)
                     .textData(textData[i])
-                    .build());
+                    .build();
+
+            authenticationDocumentList.add(authenticationDocument);
         }
 
-        participantDocument.setAuthentication(authenticationList);
+//        Page<AuthenticationDocument> authenticationDocumentPage = (Page<AuthenticationDocument>) authenticationDocumentList;
 
-        return participantDocument;
+        return new PageImpl<>(authenticationDocumentList);
     }
 }
