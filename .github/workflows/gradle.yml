@@ -41,7 +41,6 @@ jobs:
 
       - name: Docker image build && push
         run: |
-          cd ./demo
           docker build -t ${{secrets.DOCKERHUB_USERNAME}}/comission-platform .
           docker push ${{secrets.DOCKERHUB_USERNAME}}/comission-platform
 
