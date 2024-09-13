@@ -42,7 +42,7 @@ jobs:
       - name: Docker image build
         run: |
           cd ./demo
-          docker build -t ${{secrets.DOCKERHUB_USERNAME}}/gitaction-test .
+          docker build -t ${{secrets.DOCKERHUB_USERNAME}}/comission-platform .
 
 #    - name: Copy docker-compose.yml to EC2
 #      uses: appleboy/scp-action@master
