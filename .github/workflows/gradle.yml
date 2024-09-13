@@ -30,7 +30,6 @@ jobs:
 
       - name: Grant execute permission for gradle && Build with Gradle without Test
         run: |
-          cd ./demo
           chmod +x gradlew
           ./gradlew clean build -x test --stacktrace
 
