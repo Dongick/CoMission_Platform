@@ -39,10 +39,11 @@ jobs:
       - name: Docker hub login
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Docker image build
+      - name: Docker image build && push
         run: |
           cd ./demo
           docker build -t ${{secrets.DOCKERHUB_USERNAME}}/comission-platform .
+          docker push ${{secrets.DOCKERHUB_USERNAME}}/comission-platform .
 
 #    - name: Copy docker-compose.yml to EC2
 #      uses: appleboy/scp-action@master
